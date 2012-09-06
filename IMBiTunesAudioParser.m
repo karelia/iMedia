@@ -146,15 +146,11 @@
 	
 	// Create an empty (unpopulated) root node...
 	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"iTunes";
 	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 
 	// If we have more than one library then append the library name to the root node...
@@ -165,10 +161,6 @@
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,libraryName];
 	}
 
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-    [self checkAccessRightsForNode:node];
-    
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
 	// the root node down, as we have no way of finding WHAT has changed in iTunes...
 	
@@ -503,14 +495,11 @@
 		{
 			// Create node for this album...
 			
-			IMBNode* playlistNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* playlistNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			playlistNode.isLeafNode = [self isLeafPlaylist:playlistDict];
 			playlistNode.icon = [self iconForPlaylist:playlistDict];
 			playlistNode.name = albumName;
-			playlistNode.mediaSource = self.mediaSource;
-			playlistNode.mediaType = self.mediaType;
-			playlistNode.parserIdentifier = self.identifier;
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case

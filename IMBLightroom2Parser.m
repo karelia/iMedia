@@ -166,12 +166,10 @@
 															  @"Folders",
 															  @"Name of Folders node in IMBLightroomParser");
 	
-	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.mediaSource = self.mediaSource;
+	IMBNode* foldersNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
-	foldersNode.parserIdentifier = self.identifier;
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
                                                    rootPath:nil

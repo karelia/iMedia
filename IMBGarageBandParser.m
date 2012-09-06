@@ -109,15 +109,11 @@
 	
 	// Create an empty (unpopulated) root node...
 	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"GarageBand";
 	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 
 	return node;
@@ -157,14 +153,11 @@
 				@"My Compositions",
 				@"Name of node in IMBGarageBandParser");
 		
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
 			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:YES] error:NULL];
 			subnode.name = userSongsName;
-			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
 			subnode.isIncludedInPopup = YES;
 			subnode.isLeafNode = YES;
 			[subnodes addObject:subnode];

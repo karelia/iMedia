@@ -124,17 +124,14 @@
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 	[fileManager release];
 	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser: self topLevel:YES] autorelease];
 	node.icon = [self iconForItemAtURL:url error:NULL];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
-	node.mediaType = self.mediaType;
 	node.mediaSource = url;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = ![hasSubfolders boolValue];
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
-	node.parserIdentifier = self.identifier;
 	
 	if (node.isTopLevelNode)
 	{
@@ -147,10 +144,6 @@
 		node.isIncludedInPopup = NO;
 	}
 	
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-	[self checkAccessRightsForNode:node];
-		
 	// Enable FSEvents based file watching for root nodes...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
@@ -258,17 +251,14 @@
 			NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:&error];
 			if (!hasSubfolders) continue;
 			
-			IMBNode* subnode = [[IMBNode alloc] init];
+			IMBNode* subnode = [[IMBNode alloc] initWithParser:self topLevel:NO];
 			subnode.icon = [self iconForItemAtURL:url error:NULL];
 			subnode.name = name;
 			
             NSString* path = [url path];
 			subnode.identifier = [self identifierForPath:path];
             
-			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = url;
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
 			subnode.isLeafNode = ![hasSubfolders boolValue];
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;

@@ -249,14 +249,10 @@ static NSArray* sSupportedUTIs = nil;
 
 	// Create the top-level node...
 
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"Lightroom";
 	node.identifier = [self rootNodeIdentifier];
-	node.mediaSource = self.mediaSource;
-	node.mediaType = self.mediaType;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isIncludedInPopup = YES;
@@ -268,10 +264,6 @@ static NSArray* sSupportedUTIs = nil;
 		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,[self libraryName]];
 	}
 
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-    [self checkAccessRightsForNode:node];
-    
 	// Watch the root node. Whenever something in Lightroom changes, we have to replace the
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
@@ -608,11 +600,9 @@ static NSArray* sSupportedUTIs = nil;
 														 @"Name of unnamed node in IMBLightroomParser");
 			}
 			
-			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.name = name;
 			node.icon = [self folderIcon];
-			node.parserIdentifier = self.identifier;
-			node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierWithFolderId:id_local];
 			node.attributes = [self attributesWithRootFolder:id_local
 													 idLocal:id_local
@@ -695,11 +685,9 @@ static NSArray* sSupportedUTIs = nil;
 			IMBNode *node = nil;
 			
 			if ([pathFromRoot length] > 0) {
-				node = [[[IMBNode alloc] init] autorelease];
+				node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 				
 				node.icon = [self folderIcon];
-				node.parserIdentifier = self.identifier;
-				node.mediaSource = self.mediaSource;
 				node.name = [pathFromRoot lastPathComponent];
 				node.isLeafNode = NO;
 
@@ -803,12 +791,10 @@ static NSArray* sSupportedUTIs = nil;
 				}
 			}
 			
-			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
 			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];
-			node.parserIdentifier = self.identifier;
-			node.mediaSource = self.mediaSource;
 			node.attributes = [self attributesWithRootFolder:nil
 													 idLocal:idLocal
 													rootPath:nil

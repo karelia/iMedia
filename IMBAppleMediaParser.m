@@ -343,7 +343,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
     
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 
     
 //    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
@@ -351,11 +351,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	node.icon = icon;
 	node.name = [[self class] libraryName];
 	node.identifier = [self rootNodeIdentifier];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	
 	if (node.isTopLevelNode)
@@ -370,10 +366,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         }
 	}
 	
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-	[self checkAccessRightsForNode:node];
-
 	// Enable FSEvents based file watching for root nodes...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
@@ -881,13 +873,11 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
-			subnode.mediaSource = self.mediaSource;
-			subnode.parserIdentifier = self.identifier;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:

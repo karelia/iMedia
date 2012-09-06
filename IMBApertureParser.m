@@ -631,13 +631,11 @@
 		{
 			// Create node for this album...
 			
-			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* albumNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.name = albumName;
-			albumNode.mediaSource = self.mediaSource;
-			albumNode.parserIdentifier = self.identifier;
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 
