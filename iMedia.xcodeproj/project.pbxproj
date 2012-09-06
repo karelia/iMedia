@@ -382,7 +382,7 @@
 		D09934341011B63600C527B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D09934331011B63600C527B7 /* main.m */; };
 		D0993931101236AB00C527B7 /* IMBOutlineView.h in Headers */ = {isa = PBXBuildFile; fileRef = D099392F101236AB00C527B7 /* IMBOutlineView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D09FD77F105586BC00E328C7 /* IMBImageBrowserView.h in Headers */ = {isa = PBXBuildFile; fileRef = D09FD77D105586BC00E328C7 /* IMBImageBrowserView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A00A9715F47A7100596789 /* IMBAccessRightsViewController.h */; };
+		D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A00A9715F47A7100596789 /* IMBAccessRightsViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */; };
 		D0A13A9F152F29C9005513CD /* IMBFolderObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A13A9D152F29C8005513CD /* IMBFolderObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0A13AA0152F29C9005513CD /* IMBFolderObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A13A9E152F29C8005513CD /* IMBFolderObject.m */; };
@@ -450,7 +450,7 @@
 		D0D635EC1035B4C500FF8631 /* IMBLightroomParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635E81035B4C500FF8631 /* IMBLightroomParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0D635EE1035B4C500FF8631 /* IMBApertureParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D0D635EA1035B4C500FF8631 /* IMBApertureParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */; };
-		D0DC63F515ECAB9400DAD84E /* IMBAccessRightsController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DC63F415ECAB9400DAD84E /* IMBAccessRightsController.h */; };
+		D0DC63F515ECAB9400DAD84E /* IMBAccessRightsController.h in Headers */ = {isa = PBXBuildFile; fileRef = D0DC63F415ECAB9400DAD84E /* IMBAccessRightsController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0DC63F815ECC10600DAD84E /* IMBAccessRightsController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0DC63F715ECC10600DAD84E /* IMBAccessRightsController.m */; };
 		D0E69CD0151C5576002FE181 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		D0E69CD2151C5581002FE181 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
