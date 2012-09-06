@@ -67,14 +67,6 @@
 @implementation IMBAppleMediaParserMessenger
 
 
-// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
-
-+ (NSMutableArray *)parsers
-{
-	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
-    return nil;
-}
-
 // Returns the dispatch-once token. Token must be static. Must be subclassed.
 
 + (dispatch_once_t *)onceTokenRef
@@ -192,6 +184,10 @@
                       }
                   });
 	
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
 	return (NSArray*)parsers;
 }
 

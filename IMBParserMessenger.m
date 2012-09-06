@@ -59,6 +59,7 @@
 #import "IMBNodeObject.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
+#import "NSObject+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBAccessRightsController.h"
 
@@ -82,6 +83,9 @@
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
 @synthesize isUserAdded = _isUserAdded;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,6 +208,26 @@
 #pragma mark
 
 @implementation IMBParserMessenger (XPC)
+
+
+// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
+
++ (NSMutableArray *)parsers
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+    return nil;
+}
+
+
+// Sets this parser messenger's instance to all parsers of this instance
+
+- (void) setParserMessengerForParsers
+{
+    for (IMBParser *parser in [[self class] parsers])
+    {
+        parser.parserMessenger = self;
+    }
+}
 
 
 // Helper method to resolve any attached bookmarks, thus giving the XPC service access to parts of the file system...

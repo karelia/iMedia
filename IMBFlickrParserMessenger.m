@@ -178,6 +178,7 @@
 	parser.identifier = [[self class] identifier];
 	parser.mediaType = self.mediaType;
 	parser.mediaSource = self.mediaSource;
+    parser.parserMessenger = self;
 	
 	NSArray* parsers = [NSArray arrayWithObject:parser];
 	[parser release];

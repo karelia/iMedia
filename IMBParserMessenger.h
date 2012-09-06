@@ -106,7 +106,15 @@
 
 @interface IMBParserMessenger (XPC)
 
-// This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
+// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
+
++ (NSMutableArray *)parsers;
+
+// Sets this parser messenger's instance to all parsers of this instance
+
+- (void) setParserMessengerForParsers;
+
+// This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses
 // may opt to return more than one instance (e.g. Aperture may create one instance per library). MUST be 
 // overridden by subclasses..
 

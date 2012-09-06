@@ -96,7 +96,10 @@
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -154,7 +157,10 @@
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 

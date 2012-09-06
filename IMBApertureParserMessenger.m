@@ -100,7 +100,10 @@ return kIMBMediaTypeImage;
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -159,7 +162,10 @@ return kIMBMediaTypeImage;
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -211,7 +217,10 @@ return kIMBMediaTypeImage;
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -349,6 +358,10 @@ return kIMBMediaTypeImage;
 		}
 	});
 	
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
 	return (NSArray*)parsers;
 }
 
