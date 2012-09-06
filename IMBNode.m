@@ -58,6 +58,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
+#import "IMBParser.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 #import "NSImage+iMedia.h"
@@ -137,8 +138,9 @@
 
 #pragma mark
 
+// Designated initializer
 
-- (id) init
+- (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel
 {
 	if (self = [super init])
 	{
@@ -150,7 +152,7 @@
 		self.displayedObjectCount = -1;
 
 		self.isGroupNode = NO;
-		self.isTopLevelNode = NO;
+		self.isTopLevelNode = inTopLevel;
 		self.isLeafNode = NO;
 		self.isLoading = NO;
 		self.isUserAdded = NO;
@@ -162,9 +164,30 @@
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
+        
+        if (inParser)
+        {
+            self.mediaType = inParser.mediaType;
+            self.parserIdentifier = inParser.identifier;
+            self.mediaSource = inParser.mediaSource;
+            self.parserMessenger = inParser.parserMessenger;
+            
+            if (self.isTopLevelNode)
+            {
+                // Being sandboxed the app may yet not have entitlements to access this top level node
+                
+                [inParser checkAccessRightsForNode:self];
+            }
+        }
 	}
 	
 	return self;
+}
+
+
+- (id) init
+{
+    return [self initWithParser:nil topLevel:NO];
 }
 
 
@@ -886,6 +909,14 @@
 	}
 		
 	return nil;
+}
+
+
+// Returns the root url of this node's library (may be different from self.mediaSource)
+
+- (NSURL*)libraryRootURL
+{
+    return [self.parserMessenger libraryRootURLForMediaSource:self.mediaSource];
 }
 
 

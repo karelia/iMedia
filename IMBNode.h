@@ -65,6 +65,7 @@
 
 @class IMBObject;
 @class IMBParserMessenger;
+@class IMBParser;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,6 +155,10 @@
 
 @property (retain,readonly) NSArray* subnodes;		
 		
+// Designated initializer
+
+- (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel;
+
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 
@@ -236,6 +241,11 @@
 
 - (NSIndexPath*) indexPath;
 - (IMBNode*) topLevelNode;
+
+// Returns the root url of this node's library (may be different from self.mediaSource)
+
+- (NSURL*)libraryRootURL;
+
 - (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
 - (BOOL) isPopulated;
 
