@@ -89,8 +89,8 @@
 
 // Helper methods...
 
-- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;	// Finds the common ancestor folder for an array of urls
-- (NSData*) bookmarkForURL:(NSURL*)inURL;
++ (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;	// Finds the common ancestor folder for an array of urls
++ (NSData*) bookmarkForURL:(NSURL*)inURL;
 
 @end
 

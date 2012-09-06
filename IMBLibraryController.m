@@ -65,6 +65,7 @@
 #import "IMBKQueue.h"
 #import "IMBFileSystemObserver.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSImage+iMedia.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
 
@@ -1040,11 +1041,43 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[item setTarget:inTarget];						// Group nodes get a dummy action that will be disabled
 			[item setAction:@selector(__dummyAction:)];		// in - [IMBNodeViewController validateMenuItem:]
+
+			NSFont* font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+			NSColor* color = [NSColor disabledControlTextColor];
+			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+				font,NSFontAttributeName,
+				color,NSForegroundColorAttributeName,
+				nil];
+				
+			NSAttributedString* title = [[[NSAttributedString alloc] initWithString:name attributes:attributes] autorelease];
+			[item setAttributedTitle:title];
 		}
 		else
 		{
 			[item setTarget:inTarget];						// Normal nodes get the desired target/action
 			[item setAction:inSelector];
+			
+			if (!inNode.isAccessible)						// Inaccessible nodes also get a warning icon appended
+			{
+				NSFont* font = [NSFont menuFontOfSize:[NSFont systemFontSize]];
+				NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+					font,NSFontAttributeName,
+					nil];
+				
+				NSImage* icon = [[NSImage imb_imageNamed:@"warning.tiff"] copy];
+				[icon setSize:NSMakeSize(16.0,16.0)];
+				
+				NSMutableAttributedString* title = [[[NSMutableAttributedString alloc] initWithString:name attributes:attributes] autorelease];
+				NSMutableAttributedString* space = [[[NSMutableAttributedString alloc] initWithString:@" " attributes:attributes] autorelease];
+				NSMutableAttributedString* warning = [[[NSMutableAttributedString alloc] initWithAttributedString:[icon attributedString]] autorelease];
+				[warning addAttribute:NSBaselineOffsetAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0,1)];
+				
+				[title appendAttributedString:space];
+				[title appendAttributedString:warning];
+				[item setAttributedTitle:title];
+				
+				[icon release];
+			}
 		}
 		
 		[item setImage:icon];

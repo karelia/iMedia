@@ -75,10 +75,10 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 @interface IMBAccessRightsController ()
 
-- (NSURL*) _urlForBookmark:(NSData*)inBookmark;
++ (NSURL*) _urlForBookmark:(NSData*)inBookmark;
 
-- (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL;	
-- (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark;
++ (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL;
++ (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark;
 
 @end
 
@@ -154,7 +154,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	
 	for (NSData* bookmark in self.bookmarks)
 	{
-		NSURL* url = [self _urlForBookmark:bookmark];
+		NSURL* url = [[self class] _urlForBookmark:bookmark];
 
 		if ([path hasPrefix:[url path]])
 		{
@@ -175,7 +175,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 - (NSURL*) addBookmark:(NSData*)inBookmark
 {
-	NSURL* url = [self _urlForBookmark:inBookmark];
+	NSURL* url = [[self class] _urlForBookmark:inBookmark];
 	
     @synchronized(self)
     {
@@ -210,18 +210,18 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
     
 	for (NSData* bookmark in self.bookmarks)
 	{
-		NSURL* url = [self _urlForAppScopedBookmark:bookmark];
-		BOOL started = [url startAccessingSecurityScopedResource];
+		NSURL* url = [[self class] _urlForAppScopedBookmark:bookmark];
+		/*BOOL started =*/ [url startAccessingSecurityScopedResource];
 
         // TODO/JJ: For debugging purposes (remove later)
         
-		NSString* path = [url path];
-		
-		BOOL accessible = [[NSFileManager defaultManager]
-			imb_isPath:path
-			accessible:kIMBAccessRead|kIMBAccessWrite];
-	
-		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
+//		NSString* path = [url path];
+//		
+//		BOOL accessible = [[NSFileManager defaultManager]
+//			imb_isPath:path
+//			accessible:kIMBAccessRead|kIMBAccessWrite];
+//	
+//		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
 	}
 }
 
@@ -237,8 +237,8 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
     NSURL* aURL = nil;
 	for (NSData* bookmark in self.bookmarks)
 	{
-        aURL = [self _urlForBookmark:bookmark];
-        anSSB = [self _appScopedBookmarkForURL:aURL];
+        aURL = [[self class] _urlForBookmark:bookmark];
+        anSSB = [[self class] _appScopedBookmarkForURL:aURL];
         
         if (anSSB) [SSBs addObject:anSSB];
     }
@@ -255,7 +255,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 // Creates a URL for the common ancestor folder of the specified URLS...
 
-- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs
++ (NSURL*) commonAncestorForURLs:(NSArray*)inURLs
 {
 	if ([inURLs count] == 0) return nil;
 
@@ -275,7 +275,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSData*) bookmarkForURL:(NSURL*)inURL
++ (NSData*) bookmarkForURL:(NSURL*)inURL
 {
 	NSError* error = nil;
 	
@@ -285,15 +285,18 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		relativeToURL:nil
 		error:&error];
 
-	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Helper method to resolve a regular bookmark to a URL...
 
-- (NSURL*) _urlForBookmark:(NSData*)inBookmark
++ (NSURL*) _urlForBookmark:(NSData*)inBookmark
 {
 	NSError* error = nil;
 	BOOL stale = NO;
@@ -305,7 +308,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		bookmarkDataIsStale:&stale
 		error:&error];
 
-	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
 		
 	return url;
 }
@@ -316,7 +319,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 // Create an app scoped SSB for the specified URL...
 
-- (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL
++ (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL
 {
 	NSError* error = nil;
 	
@@ -326,15 +329,15 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		relativeToURL:nil
 		error:&error];
 
-	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }
 
 
-// REsolve an app scoped SSB to a URL...
+// Resolve an app scoped SSB to a URL...
 
-- (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark
++ (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark
 {
 	NSError* error = nil;
 	BOOL stale = NO;
@@ -346,7 +349,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 		bookmarkDataIsStale:&stale
 		error:&error];
 
-	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
 		
 	return url;
 }

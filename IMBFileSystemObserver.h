@@ -99,6 +99,10 @@ extern NSString* kIMBPathDidChangeNotification;
 - (void) addPath:(NSString*)inPath;
 - (void) removePath:(NSString*)inPath;
 
+// Add access rights to part of the file system. Without access rights the FSEvent API won't be able to do its job... 
+
+- (void) addAccessRights:(NSData*)inBookmark;
+
 @end
 
 

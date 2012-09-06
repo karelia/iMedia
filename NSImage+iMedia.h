@@ -73,4 +73,6 @@
 - (NSBitmapImageRep *) imb_firstBitmap;	
 - (NSBitmapImageRep *) imb_bitmap;	
 
+- (NSAttributedString*) attributedString;
+
 @end

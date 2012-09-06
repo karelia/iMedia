@@ -433,5 +433,23 @@
 }
 
 
+// Return this image as an NSAttributedString
+
+- (NSAttributedString*) attributedString
+{
+    NSTextAttachment* attachment = [[NSTextAttachment alloc] init];
+    NSTextAttachmentCell* cell = [[NSTextAttachmentCell alloc] init];
+ 
+	[cell setImage:self];
+    [attachment setAttachmentCell:cell];
+    NSAttributedString* string = [NSAttributedString attributedStringWithAttachment:attachment];
+
+    [attachment release];
+    [cell release];
+	
+    return string;
+}
+
+
 @end
 

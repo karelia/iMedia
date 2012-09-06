@@ -76,8 +76,6 @@
 - (id) init {
 	if ((self = [super init])) {
 		self.desiredSize = [IMBConfig flickrDownloadSize];
-
-        #warning "CAUTION: Until we found the right place to run this call in iMB 3, we run it here."
         [self loadFlickrAPIKeyAndSharedSecretFromKeychain];
 	}
 	
