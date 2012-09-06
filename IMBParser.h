@@ -86,6 +86,7 @@
 
 @property (copy, readonly) NSString* mediaType;
 @property (getter=isCustom) BOOL custom;
+@property (retain) NSData* bookmark;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
 // a background operation. It is passed as an argument to the parser so that existing old nodes can be recreated
@@ -152,6 +153,7 @@
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
+  NSData* _bookmark; // Security scoped bookmark, to be used when accessing the source
 }
 
 - (id) initWithMediaType:(NSString*)inMediaType;

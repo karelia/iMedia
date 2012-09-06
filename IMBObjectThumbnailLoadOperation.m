@@ -102,6 +102,25 @@
 		// Load the thumbnail. Please note that we will load the thumbnail even if we already have a thumbnail stored
 		// in this object. This is useful if the size has changed and we now need to load a larger thumbnail...
 	
+    NSURL* securityScopedURL = nil;
+    if (parser.bookmark != nil)
+    {
+      NSError* error = nil;
+      securityScopedURL = [NSURL URLByResolvingBookmarkData:[parser bookmark]
+                                                    options: NSURLBookmarkResolutionWithSecurityScope
+                                              relativeToURL: nil
+                                        bookmarkDataIsStale: NO
+                                                      error: &error];
+      if (error != nil)
+        securityScopedURL = nil;
+      
+      if (securityScopedURL != nil)
+      {
+        if (![securityScopedURL imb_startAccessingSecurityScopedResource])
+          securityScopedURL = nil; // Prevent calling to stop if start has been failed
+      }
+    }
+
 		if (self.options & kIMBLoadThumbnail)
 		{
 			//NSLog(@"Loading thumbnail for %@", object.name);
@@ -120,6 +139,8 @@
 				[object.parser loadMetadataForObject:object];
 			}
 		}
+    
+    [securityScopedURL imb_stopAccessingSecurityScopedResource];
 	}
 
 	@catch (NSException* inException)

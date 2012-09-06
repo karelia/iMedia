@@ -359,10 +359,30 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			{
 				if (parser.isCustom)
 				{
+          if (parser.bookmark == nil)
+          {
+            // Create URL bookmark
+            NSError* bookmarkCreationOutError = nil;
+            NSURL* mediaSourceURL = [NSURL fileURLWithPath:parser.mediaSource isDirectory:YES];
+            parser.bookmark =
+              [mediaSourceURL bookmarkDataWithOptions: NSURLBookmarkCreationWithSecurityScope
+                       includingResourceValuesForKeys: nil
+                                        relativeToURL: nil
+                                                error: &bookmarkCreationOutError];
+            if (bookmarkCreationOutError != nil)
+            {
+              NSLog(NSLocalizedString(@"Could not create a bookmark for URL. Error: %@", @"URL bookmark creation failed."),
+                    [bookmarkCreationOutError localizedFailureReason]);
+            }
+          }
+          
+          // Create a dictionary with the information required for restoring the
+          // cusom parser:
 					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
 						NSStringFromClass([parser class]),@"className",
 						parser.mediaSource,@"mediaSource",
 						parser.mediaType,@"mediaType",
+            parser.bookmark,@"bookmark",
 						nil];
 						
 					[customParsers addObject:info];	
@@ -396,6 +416,9 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		parser.mediaSource = [info objectForKey:@"mediaSource"];
 		parser.custom = YES;
 		
+    // Restore bookmark
+    parser.bookmark = [info objectForKey:@"bookmark"];
+    
 		[self addCustomParser:parser forMediaType:parser.mediaType];
 		[parser release];
 	}

@@ -190,9 +190,34 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSString* folder = inNode.mediaSource;
-	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:outError];	
-	if (!files) return NO;
+  NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
+  NSFileManager* fm = [NSFileManager imb_threadSafeManager];
+  NSArray* files = [fm contentsOfDirectoryAtURL:folderURL
+                     includingPropertiesForKeys:nil
+                                        options:NSDirectoryEnumerationSkipsHiddenFiles
+                                          error:outError];
+  
+  BOOL gotAccessFromBookmark = NO;
+  if (!files && [self bookmark] != nil)
+  {
+    folderURL = [NSURL URLByResolvingBookmarkData:[self bookmark]
+                                          options:NSURLBookmarkResolutionWithSecurityScope
+                                    relativeToURL:nil
+                              bookmarkDataIsStale:NO
+                                            error:outError];
+    gotAccessFromBookmark = [folderURL imb_startAccessingSecurityScopedResource];
+  }
+  
+  files = [fm contentsOfDirectoryAtURL:folderURL
+            includingPropertiesForKeys:nil
+                               options:NSDirectoryEnumerationSkipsHiddenFiles
+                                 error:outError];
+	if (!files)
+  {
+    if (gotAccessFromBookmark)
+      [folderURL imb_stopAccessingSecurityScopedResource];
+    return NO;
+  }
     
     
     NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
@@ -209,7 +234,7 @@
     
     NSMutableArray* folders = [NSMutableArray array];
 
-    for (NSString* file in files)
+    for (NSURL* fileURL in files)
     {
         if (index%32 == 0)
         {
@@ -219,9 +244,9 @@
         
         // Hidden file system items (e.g. ".thumbnails") will be skipped...
         
-        if (![file hasPrefix:@"."])	
+        // if (![file hasPrefix:@"."])
         {
-            NSString* path = [folder stringByAppendingPathComponent:file];
+            NSString* path = fileURL.path; // [folder stringByAppendingPathComponent:file];
             
             // For folders will be handled later. Just remember it for now...
             BOOL isDir = NO;
@@ -242,7 +267,7 @@
             
             else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
             {
-                NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
+                NSString *betterName = [fm displayNameAtPath:[[path lastPathComponent] stringByDeletingPathExtension]];
                 betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
                 
                 IMBObject* object = [self objectForPath:path name:betterName index:index++];
@@ -337,6 +362,9 @@
 	
 	IMBDrain(pool);
 					
+  if (gotAccessFromBookmark)
+    [folderURL imb_stopAccessingSecurityScopedResource];
+  
 	return result;
 }
 
