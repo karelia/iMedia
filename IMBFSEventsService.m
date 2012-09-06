@@ -58,6 +58,7 @@
 #import <XPCKit/XPCKit.h>
 #import <iMedia/IMBFileWatcher.h>
 #import <iMedia/IMBFSEventsWatcher.h>
+#import <iMedia/IMBAccessRightsController.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +107,8 @@ int main(int argc,const char *argv[])
 	[[IMBFSEventsWatcher sharedFileWatcher] setDelegate:delegate];
 	[[IMBFSEventsWatcher sharedFileWatcher] setDispatchQueue:sDispatchQueue];
 	
+	[IMBAccessRightsController sharedAccessRightsController];
+
 	[XPCService runServiceWithConnectionHandler:^(XPCConnection* inConnection)
 	{
 		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inConnection)
@@ -130,6 +133,12 @@ int main(int argc,const char *argv[])
 			{
 //				[sConnection sendLog:[NSString stringWithFormat:@"REMOVING PATH %@",path]];
 				[[IMBFSEventsWatcher sharedFileWatcher] removePath:path];
+			}
+			else if ([operation isEqual:@"addAccessRights"])
+			{
+				NSData* bookmark = [inMessage objectForKey:@"bookmark"];
+				/*NSURL* url =*/ [[IMBAccessRightsController sharedAccessRightsController] addBookmark:bookmark];
+//				[sConnection sendLog:[NSString stringWithFormat:@"Adding access rights for %@",url]];
 			}
 			else if ([operation isEqual:@"stop"])
 			{

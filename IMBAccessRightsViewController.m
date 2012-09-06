@@ -64,6 +64,7 @@
 #import "IMBObject.h"
 #import "IMBConfig.h"
 #import "SBUtilities.h"
+#import "IMBFileSystemObserver.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -267,6 +268,10 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 						}
 					});
 			}
+			
+			// Also send it to the FSEvents service, so that it can do its job...
+			
+			[[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
 		}
 		else
 		{
