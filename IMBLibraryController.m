@@ -1040,6 +1040,16 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[item setTarget:inTarget];						// Group nodes get a dummy action that will be disabled
 			[item setAction:@selector(__dummyAction:)];		// in - [IMBNodeViewController validateMenuItem:]
+
+			NSFont* font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+			NSColor* color = [NSColor disabledControlTextColor];
+			NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+				font,NSFontAttributeName,
+				color,NSForegroundColorAttributeName,
+				nil];
+				
+			NSAttributedString* title = [[[NSAttributedString alloc] initWithString:name attributes:attributes] autorelease];
+			[item setAttributedTitle:title];
 		}
 		else
 		{
