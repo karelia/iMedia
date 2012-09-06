@@ -349,6 +349,11 @@
 
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
+    // Since inNode was most likely instantiated through -initWithCoder: (coming from the app)
+    // its parser messenger is not set. Do it now.
+    
+    inNode.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	BOOL success = [parser populateNode:inNode error:&error];
@@ -385,6 +390,11 @@
 
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
+    // Since inNode was most likely instantiated through initWithCoder (coming from the app)
+    // its parser messenger is not set. Do it now.
+    
+    inNode.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	IMBNode* node = [parser reloadNodeTree:inNode error:&error];
