@@ -386,7 +386,10 @@
 		
 		if (error)
 		{
-			[NSApp presentError:error];
+			dispatch_async(dispatch_get_main_queue(),^()
+			{
+				[NSApp presentError:error];
+			});
 		}
 	}];
 }
