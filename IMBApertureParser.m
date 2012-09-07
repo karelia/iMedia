@@ -735,6 +735,12 @@
 					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
 					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
+
+                    // Check whether we have access to this resource's location
+                    
+                    [self checkAccessRightsForObject:object];
+                    
+                    //NSLog(@"Access to object at %@: %@", [object.location path], object.isAccessible ? @"YES" : @"NO");
 				}
 				
 				[pool2 drain];
