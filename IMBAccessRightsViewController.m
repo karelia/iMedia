@@ -196,6 +196,15 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
 
+		// We really wanted to use [panel runModal] here, because working modally (i.e. blocking everything until
+		// the panel is dismissed) would be the right thing here. However, runModal has a serious bug in sandboxed
+		// apps. It simply stops working the second time you show an NSOpenPanel. It freezes, until you send the app
+		// the the background and bring it to the front again.
+		
+		// For this reason we had to use the modern completion block based API - which has the drawback that it
+		// doesn't work modally. To guard against having two NSOpenPanels showing at the same time, we introduced
+		// the stupid _isOpen flag...
+		
 		[panel beginWithCompletionHandler:^(NSInteger button)
 		{
 			if (button == NSFileHandlingPanelOKButton)
