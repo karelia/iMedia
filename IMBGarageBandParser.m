@@ -126,21 +126,31 @@
 	
 	// Need to set this before instatiating the node, so that check for access rights works correctly...
 	
-	self.mediaSource = [NSURL fileURLWithPath:[self userSongsPath]];
+    NSString* path = [self userSongsPath];
+	self.mediaSource = [NSURL fileURLWithPath:path];
 
+    NSFileManager* manager = [[NSFileManager alloc] init];
+    BOOL exists = [manager fileExistsAtPath:path];
+    [manager release];
+    
 	// Create an empty (unpopulated) root node...
 	
-	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
-	node.icon = icon;
-	node.name = @"GarageBand";
-	node.identifier = [self identifierForPath:@"/"];
-	node.groupType = kIMBGroupTypeLibrary;
-	node.isLeafNode = NO;
-	node.mediaType = self.mediaType;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
+    if (exists)
+    {
+        IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+        node.icon = icon;
+        node.name = @"GarageBand";
+        node.identifier = [self identifierForPath:@"/"];
+        node.groupType = kIMBGroupTypeLibrary;
+        node.isLeafNode = NO;
+        node.mediaType = self.mediaType;
+        node.parserIdentifier = self.identifier;
+        node.isTopLevelNode = YES;
 
-	return node;
+        return node;
+    }
+
+    return nil;
 }
 
 
