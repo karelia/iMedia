@@ -221,12 +221,13 @@
 	return @"com.apple.iPhoto";
 }
 
-// Returns the key for iPhoto libraries in com.apple.iApps
+// Returns the key for the path to the current iPhoto library in com.apple.Aperture
 
-+ (NSString *) librariesKey
++ (NSString *) libraryPathKey
 {
-	return @"iPhotoRecentDatabases";
+	return @"iPhotoLastOpenedDatabase";
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Both image and movie use the same xpc service, so override this method...

@@ -86,9 +86,9 @@
 }
 
 
-// Returns the key for (iPhoto/Aperture) libraries in com.apple.iApps. Must be subclassed.
+// Returns the key for the last opened (iPhoto/Aperture) library in com.apple.iApps. Must be subclassed.
 
-+ (NSString *) librariesKey
++ (NSString *) libraryPathKey
 {
 	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
@@ -134,6 +134,18 @@
 }
 
 
+// Returns the list of URLs to messenger specific libraries that should be made available to the browser
+// NOTE: The current implementation returns a list of just one library URL
+
++ (NSArray *)libraryURLs
+{
+    NSString *currentLibraryURL = SBPreferencesCopyAppValue((CFStringRef)[self libraryPathKey],
+                                                             (CFStringRef)@"com.apple.iApps");
+    [currentLibraryURL autorelease];
+    return [NSArray arrayWithObject:[NSURL URLWithString:currentLibraryURL]];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // Library root is parent directory of metadata XML file
 
@@ -159,12 +171,10 @@
                   ^{
                       if ([messengerClass isInstalled])
                       {
-                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)[messengerClass librariesKey],(CFStringRef)@"com.apple.iApps");
-                          NSArray* libraries = (NSArray*)recentLibraries;
+                          NSArray* libraries = [messengerClass libraryURLs];
                           
-                          for (NSString* library in libraries)
+                          for (NSURL* url in libraries)
                           {
-                              NSURL* url = [NSURL URLWithString:library];
                               NSString* path = [url path];
                               NSFileManager *fileManager = [[NSFileManager alloc] init];
                               
@@ -177,7 +187,7 @@
                                   
                                   parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
                                   parser.mediaType = self.mediaType;
-                                  parser.mediaSource = [NSURL fileURLWithPath:path];
+                                  parser.mediaSource = url;
                                   parser.appPath = [messengerClass appPath];
                                   parser.shouldDisplayLibraryName = libraries.count > 1;
                                   
@@ -192,8 +202,6 @@
                               
                               [fileManager release];
                           }
-						  
-						if (recentLibraries) CFRelease(recentLibraries);
                       }
                   });
 	
