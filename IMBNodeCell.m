@@ -377,7 +377,10 @@
 	}
 	else
 	{
-		[NSApp presentError:_badgeError];
+		dispatch_async(dispatch_get_main_queue(),^()
+		{
+			[NSApp presentError:_badgeError];
+		});
 	}
 }
 
