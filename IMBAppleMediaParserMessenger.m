@@ -86,9 +86,18 @@
 }
 
 
-// Returns the key for the last opened (iPhoto/Aperture) library in com.apple.iApps. Must be subclassed.
+// Returns the key for known (iPhoto/Aperture) libraries in com.apple.iApps preferences file. Must be subclassed.
 
-+ (NSString *) libraryPathKey
++ (NSString *) preferencesLibraryPathsKey
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	return nil;
+}
+
+
+// Returns the library resource name. Must be subclassed.
+
++ (NSString *) libraryName
 {
 	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
@@ -121,31 +130,6 @@
 }
 
 
-- (id) init
-{
-	if ((self = [super init]))
-	{
-		self.mediaSource = nil;	// Will be discovered in XPC service
-		self.mediaType = [[self class] mediaType];
-		self.isUserAdded = NO;
-	}
-	
-	return self;
-}
-
-
-// Returns the list of URLs to messenger specific libraries that should be made available to the browser
-// NOTE: The current implementation returns a list of just one library URL
-
-+ (NSArray *)libraryURLs
-{
-    NSString *currentLibraryURL = SBPreferencesCopyAppValue((CFStringRef)[self libraryPathKey],
-                                                             (CFStringRef)@"com.apple.iApps");
-    [currentLibraryURL autorelease];
-    return [NSArray arrayWithObject:[NSURL URLWithString:currentLibraryURL]];
-}
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // Library root is parent directory of metadata XML file
 
@@ -160,6 +144,42 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark
+#pragma mark Parser instantiation
+
+// Designated factory method for creating parsers
+
+- (IMBAppleMediaParser *)newParserWithMediaSource:(NSURL *)inMediaSource
+{
+    Class messengerClass = [self class];
+    IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[super newParser];
+    
+    // All parsers are kept in static list
+    
+    [[messengerClass parsers] addObject:parser];
+    [parser release];
+    
+    if (inMediaSource)
+    {
+        NSString* path = [inMediaSource path];
+        parser.identifier = [NSString stringWithFormat:@"%@:/%@", [[self class] identifier], path];
+        parser.mediaType = self.mediaType;
+        parser.mediaSource = inMediaSource;
+        parser.appPath = [messengerClass appPath];
+    }
+    return parser;
+}
+
+
+- (IMBParser *)newParser
+{
+    return [self newParserWithMediaSource:nil];
+}
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
 // This method is called on the XPC service side. Discover the path to the AlbumData.xml file and create  
 // an IMBParser instance preconfigured with that path...
 
@@ -171,28 +191,36 @@
                   ^{
                       if ([messengerClass isInstalled])
                       {
-                          NSArray* libraries = [messengerClass libraryURLs];
+                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue(
+                                                            (CFStringRef)[messengerClass preferencesLibraryPathsKey],
+                                                            (CFStringRef)@"com.apple.iApps");
                           
-                          for (NSURL* url in libraries)
+                          // We decided it's a better user experience to only provide the most recently used library.
+                          // Most recently used library currently always stored at index 0 in library list.
+                          // (But still leave the code in place to be able to easily switch back to providing all known libraries)
+                          
+                          NSArray* libraries;
+                          if ([(NSArray*)recentLibraries count] > 0)
                           {
+                              libraries = [NSArray arrayWithObject:[(NSArray*)recentLibraries objectAtIndex:0]];
+                          } else {
+                              libraries = [NSArray array];
+                          }
+                          
+                          for (NSString* library in libraries)
+                          {
+                              NSURL* url = [NSURL URLWithString:library];
                               NSString* path = [url path];
+                              
                               NSFileManager *fileManager = [[NSFileManager alloc] init];
                               
                               BOOL changed;
                               if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
-                              {
-                                  // Create a parser instance preconfigure with that path...
+                              {                                  
+                                  IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
+                                  parser.shouldDisplayLibraryName = [libraries count] > 1;
                                   
-                                  IMBAppleMediaParser* parser = (IMBAppleMediaParser*)[self newParser];
-                                  
-                                  parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-                                  parser.mediaType = self.mediaType;
-                                  parser.mediaSource = url;
-                                  parser.appPath = [messengerClass appPath];
-                                  parser.shouldDisplayLibraryName = libraries.count > 1;
-                                  
-                                  [parsers addObject:parser];
-                                  [parser release];
+                                  //NSLog(@"%@ uses library: %@", [parser class], path);
                                   
                                   // Exclude enclosing folder from being displayed by IMBFolderParser...
                                   
@@ -202,6 +230,7 @@
                               
                               [fileManager release];
                           }
+                          if (recentLibraries) CFRelease(recentLibraries);
                       }
                   });
 	

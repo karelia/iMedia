@@ -221,11 +221,12 @@
 	return @"com.apple.iPhoto";
 }
 
-// Returns the key for the path to the current iPhoto library in com.apple.Aperture
 
-+ (NSString *) libraryPathKey
+// Returns the key for known iPhoto libraries in com.apple.iApps preferences file
+
++ (NSString *) preferencesLibraryPathsKey
 {
-	return @"iPhotoLastOpenedDatabase";
+	return @"iPhotoRecentDatabases";
 }
 
 

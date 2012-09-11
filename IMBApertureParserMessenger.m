@@ -262,11 +262,12 @@ return kIMBMediaTypeImage;
 	return @"com.apple.Aperture";
 }
 
-// Returns the key for the path to the current Aperture library in com.apple.Aperture
 
-+ (NSString *) libraryPathKey
+// Returns the key for known Aperture libraries in com.apple.iApps preferences file
+
++ (NSString *) preferencesLibraryPathsKey
 {
-	return @"ApertureLastOpenedDatabase";
+	return @"ApertureLibraries";
 }
 
 
