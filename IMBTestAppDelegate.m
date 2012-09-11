@@ -291,11 +291,11 @@
 {
 	if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.DesktopPictures"])
 	{
-		return NO;
+		return YES;
 	}
 	else if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.UserPictures"])
 	{
-		return NO;
+		return YES;
 	}
 	else if ([inIdentifier isEqualToString:@"com.karelia.imedia.folder.iChatIcons"])
 	{
