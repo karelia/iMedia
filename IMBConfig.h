@@ -102,10 +102,6 @@
 + (void)registerLibraryPath:(NSString *)aPath;
 + (BOOL) isLibraryAtURL:(NSURL *)url;
 
-// Set default prefs values...
-
-+ (void) registerDefaultValues;
-
 // Returns a base URL to a file that exists (and that we'll have read access to in sandboxed applications). 
 // This URL can be used for creating and resolving document security scoped bookmarks...
 

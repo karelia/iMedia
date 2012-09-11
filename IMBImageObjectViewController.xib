@@ -289,7 +289,6 @@
 														<bool key="EncodedWithXMLCoder">YES</bool>
 														<object class="IKImageBrowserView" id="3005548">
 															<reference key="NSNextResponder" ref="522777816"/>
-															<int key="NSvFlags">45</int>
 															<object class="NSMutableSet" key="NSDragTypes">
 																<bool key="EncodedWithXMLCoder">YES</bool>
 																<object class="NSArray" key="set.sortedObjects">

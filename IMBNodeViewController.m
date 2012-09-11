@@ -837,6 +837,19 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	return node.isGroupNode;
 }
 
+- (BOOL)respondsToSelector:(SEL)aSelector;
+{
+    // I found that (slightly weirdly), if you implement -outlineView:isGroupItem:, NSOutlineView assumes that you must have at least one group item somewhere in the tree, and so it automatically outdents all but the top-level nodes by 1. Thus if configured not to show group nodes, we need to pretend that method doesn't even exist so as to receive regular layout
+    if (aSelector == @selector(outlineView:isGroupItem:))
+    {
+        return [IMBConfig showsGroupNodes];
+    }
+    else
+    {
+        return [super respondsToSelector:aSelector];
+    }
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

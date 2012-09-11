@@ -99,6 +99,7 @@
 		CEAF1F3B125A80D4001C3EBB /* IMBHoverButton.h in Headers */ = {isa = PBXBuildFile; fileRef = CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */; };
 		CEAF1F3C125A80D4001C3EBB /* IMBHoverButton.m in Sources */ = {isa = PBXBuildFile; fileRef = CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */; };
 		CEAF1FE5125A8B6A001C3EBB /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = CEAF1FE4125A8B6A001C3EBB /* Credits.html */; };
+		CEB719D715F121CF001A958E /* Flickr.tiff in Resources */ = {isa = PBXBuildFile; fileRef = CEB719D615F121CF001A958E /* Flickr.tiff */; };
 		CEF6539C117E5C29003FF1A5 /* Attribute.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65395117E5C28003FF1A5 /* Attribute.pdf */; };
 		CEF6539D117E5C29003FF1A5 /* CC.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65396117E5C28003FF1A5 /* CC.pdf */; };
 		CEF6539E117E5C29003FF1A5 /* commercial.pdf in Resources */ = {isa = PBXBuildFile; fileRef = CEF65397117E5C28003FF1A5 /* commercial.pdf */; };
@@ -143,7 +144,6 @@
 		D02D7912104BC89900309DC0 /* IMBComboViewTemplate.pdf in Resources */ = {isa = PBXBuildFile; fileRef = D02D7911104BC89900309DC0 /* IMBComboViewTemplate.pdf */; };
 		D02E53C810A5563500B205BD /* NSData+SKExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = D02E53C610A5563500B205BD /* NSData+SKExtensions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D02E53C910A5563500B205BD /* NSData+SKExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D02E53C710A5563500B205BD /* NSData+SKExtensions.m */; };
-		D032CE41109B2F2200D84782 /* Flickr.png in Resources */ = {isa = PBXBuildFile; fileRef = D032CE40109B2F2200D84782 /* Flickr.png */; };
 		D032CE47109B301100D84782 /* IMBFlickrNode.h in Headers */ = {isa = PBXBuildFile; fileRef = D032CE42109B301100D84782 /* IMBFlickrNode.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0363E7C11D3787800E0579F /* NSView+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = D0363E7A11D3787800E0579F /* NSView+iMedia.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D03C2840108265C300BD55CF /* IMBiPhotoVideoParser.h in Headers */ = {isa = PBXBuildFile; fileRef = D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -627,6 +627,7 @@
 		CEAF1F39125A80D4001C3EBB /* IMBHoverButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBHoverButton.h; sourceTree = "<group>"; };
 		CEAF1F3A125A80D4001C3EBB /* IMBHoverButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBHoverButton.m; sourceTree = "<group>"; };
 		CEAF1FE4125A8B6A001C3EBB /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
+		CEB719D615F121CF001A958E /* Flickr.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Flickr.tiff; sourceTree = "<group>"; };
 		CEF65395117E5C28003FF1A5 /* Attribute.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = Attribute.pdf; path = CC/Attribute.pdf; sourceTree = "<group>"; };
 		CEF65396117E5C28003FF1A5 /* CC.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = CC.pdf; path = CC/CC.pdf; sourceTree = "<group>"; };
 		CEF65397117E5C28003FF1A5 /* commercial.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; name = commercial.pdf; path = CC/commercial.pdf; sourceTree = "<group>"; };
@@ -687,7 +688,6 @@
 		D02E53C710A5563500B205BD /* NSData+SKExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+SKExtensions.m"; sourceTree = "<group>"; };
 		D032CB78109A2F4A00D84782 /* IMBMovieObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBMovieObject.h; sourceTree = "<group>"; };
 		D032CB79109A2F4A00D84782 /* IMBMovieObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBMovieObject.m; sourceTree = "<group>"; };
-		D032CE40109B2F2200D84782 /* Flickr.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Flickr.png; sourceTree = "<group>"; };
 		D032CE42109B301100D84782 /* IMBFlickrNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFlickrNode.h; sourceTree = "<group>"; };
 		D032CE43109B301100D84782 /* IMBFlickrNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrNode.m; sourceTree = "<group>"; };
 		D0363E7A11D3787800E0579F /* NSView+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+iMedia.h"; sourceTree = "<group>"; };
@@ -1013,6 +1013,7 @@
 		FC1484111598881A00F6FDB8 /* IMBFlickrSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrSession.m; sourceTree = "<group>"; };
 		FC30D0251309777300463E52 /* IMBFlickrParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFlickrParser.m; sourceTree = "<group>"; };
 		FC32F01F130C47F100966FFD /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FC850F8D14C71EEE00CC6ACA /* cs */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FCAA9638134227D700EA1A3A /* nl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FCD9ABB210C677FF0092F441 /* IMBLoadMoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBLoadMoreObject.h; sourceTree = "<group>"; };
 		FCD9ABB310C677FF0092F441 /* IMBLoadMoreObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBLoadMoreObject.m; sourceTree = "<group>"; };
@@ -1388,7 +1389,7 @@
 				D00D0AA612258E4A000924AE /* IMBFlickrHeaderView.xib */,
 				D023460410CA5E2C00E14112 /* load-more-normal.pdf */,
 				D023460510CA5E2C00E14112 /* load-more-pressed.pdf */,
-				D032CE40109B2F2200D84782 /* Flickr.png */,
+				CEB719D615F121CF001A958E /* Flickr.tiff */,
 				CEF65395117E5C28003FF1A5 /* Attribute.pdf */,
 				CEF65396117E5C28003FF1A5 /* CC.pdf */,
 				CEF65397117E5C28003FF1A5 /* commercial.pdf */,
@@ -2359,6 +2360,7 @@
 				ja,
 				pt_BR,
 				zh_CN,
+				cs,
 				no,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* iMedia */;
@@ -2453,7 +2455,6 @@
 				D0941A94105E24DD0092B2F1 /* iTunes9-icon-32.png in Resources */,
 				CEF695E5106434FE005D7E72 /* OmniwebBookmarksToXBEL.xslt in Resources */,
 				CEF696FE10643CF4005D7E72 /* IMBLinkObjectViewController.xib in Resources */,
-				D032CE41109B2F2200D84782 /* Flickr.png in Resources */,
 				D023460610CA5E2C00E14112 /* load-more-normal.pdf in Resources */,
 				D023460710CA5E2C00E14112 /* load-more-pressed.pdf in Resources */,
 				CE69E9DD114B05EA0016E5E0 /* firefox_allBookmarks.png in Resources */,
@@ -2517,6 +2518,7 @@
 				D024A32015319CB4005B6C0A /* IMBAlertPopoverViewController.xib in Resources */,
 				D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */,
 				D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */,
+				CEB719D715F121CF001A958E /* Flickr.tiff in Resources */,
 				D065383615EFDC810081D8D3 /* IMBAccessRightsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2866,6 +2868,7 @@
 				FCEFB40C135332530043CBEB /* ja */,
 				CE1DE6481386E2E600C3F780 /* pt_BR */,
 				CE87008C146204E300CAFED2 /* zh_CN */,
+				FC850F8D14C71EEE00CC6ACA /* cs */,
 				3091F6B415C9508E005019A1 /* no */,
 			);
 			name = Localizable.strings;

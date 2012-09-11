@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1831,7 +1831,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[inPasteboard writeObjects:pasteboardItems];
 	[inPasteboard imb_setParserMessenger:parserMessenger];
 	
-	return pasteboardItems.count;
+    // TODO: Let the parser/messenger know its objects are writing to the pasteboard, so for iPhoto objects, can add additional data mimicking iPhoto
+    //[parser didWriteObjects:promise.objects toPasteboard:inPasteboard];
+    
+    return pasteboardItems.count;
 }
 
 

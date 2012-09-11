@@ -372,7 +372,7 @@
 		
 		// Start playing it...
 		
-		if (error == nil)
+		if (movie)
 		{
 			[movie gotoBeginning];
 			[movie play];
@@ -384,7 +384,7 @@
 		
 		// Handle errors...
 		
-		if (error)
+		else
 		{
 			dispatch_async(dispatch_get_main_queue(),^()
 			{

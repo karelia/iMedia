@@ -202,15 +202,9 @@
 	imageRect.origin.y -= kImageOriginYOffset;
 	imageRect.size = NSMakeSize(kIconImageSize,kIconImageSize);
 
-	if (inFlipped)
-	{
-		imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
-	}
-	else
-	{
-		imageRect.origin.y -= ceil(0.5 * (inBounds.size.height - imageRect.size.height));
-	}
-
+    // Vertically center the image
+	imageRect.origin.y += ceil(0.5 * (inBounds.size.height - imageRect.size.height));
+    
 	return imageRect;
 }
 
