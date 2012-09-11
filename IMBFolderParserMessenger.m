@@ -171,6 +171,7 @@
 	parser.fileUTI = self.fileUTI;
 	parser.displayPriority = self.displayPriority;
 	parser.isUserAdded = self.isUserAdded;
+    parser.parserMessenger = self;
 	
 	NSArray* parsers = [NSArray arrayWithObject:parser];
 	[parser release];

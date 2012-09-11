@@ -59,12 +59,13 @@
 #import "IMBNodeObject.h"
 #import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
+#import "NSObject+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "IMBAccessRightsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark
 
 //@interface IMBParserMessenger ()
 //- (void) _setParserIdentifier:(IMBParser*)inParser onNodeTree:(IMBNode*)inNode;
@@ -82,6 +83,9 @@
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
 @synthesize isUserAdded = _isUserAdded;
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -174,6 +178,7 @@
 	return nil;
 }
 
+
 + (NSString*) xpcSerivceIdentifier
 {
 	return [self identifier];
@@ -203,6 +208,55 @@
 #pragma mark
 
 @implementation IMBParserMessenger (XPC)
+
+
+// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
+
++ (NSMutableArray *)parsers
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+    return nil;
+}
+
+
+// Sets this parser messenger's instance to all parsers of this instance
+
+- (void) setParserMessengerForParsers
+{
+    for (IMBParser *parser in [[self class] parsers])
+    {
+        parser.parserMessenger = self;
+    }
+}
+
+
+// Helper method to resolve any attached bookmarks, thus giving the XPC service access to parts of the file system...
+
+//- (void) _resolveAccessRightsBookmarks
+//{
+//	for (NSData* bookmark in self.accessRightBookmarks)
+//	{
+//		NSError* error = nil;
+//		BOOL stale = NO;
+//		
+//		NSURL* url = [NSURL URLByResolvingBookmarkData:bookmark
+//			options:0
+//			relativeToURL:nil
+//			bookmarkDataIsStale:&stale
+//			error:&error];
+//			
+//		NSString* path = [url path];
+//		
+//		BOOL accessible = [[NSFileManager defaultManager]
+//			imb_isPath:path
+//			accessible:kIMBAccessRead|kIMBAccessWrite];
+//	
+//		NSLog(@"%s path %@ accessible %d",__FUNCTION__,path,accessible);
+//	}
+//}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // This method is called on the XPC service side. The default implementation just returns a single parser instance. 
@@ -295,6 +349,11 @@
 
 - (IMBNode*) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
+    // Since inNode was most likely instantiated through -initWithCoder: (coming from the app)
+    // its parser messenger is not set. Do it now.
+    
+    inNode.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	BOOL success = [parser populateNode:inNode error:&error];
@@ -307,12 +366,12 @@
 		[self _setObjectIdentifierWithParser:parser onNodeTree:node];
 	}
 	
-	if (success == NO && error == nil)
+	if (node.isAccessible && success == NO && error == nil)
 	{
 		NSString* title = @"Programmer Error";
 		
 		NSString* description = [NSString stringWithFormat:
-			@"%@ returned NO while trying to populate the node '%@' But it didn't return and error.\n\nThis is a programmer error that should be corrected.",
+			@"%@ returned NO while trying to populate the node '%@' But it didn't return an error.\n\nThis is a programmer error that should be corrected.",
 			NSStringFromClass([parser class]),
 			inNode.name];
 			
@@ -331,6 +390,11 @@
 
 - (IMBNode*) reloadNodeTree:(IMBNode*)inNode error:(NSError**)outError
 {
+    // Since inNode was most likely instantiated through initWithCoder (coming from the app)
+    // its parser messenger is not set. Do it now.
+    
+    inNode.parserMessenger = self;
+    
 	NSError* error = nil;
 	IMBParser* parser = [self parserWithIdentifier:inNode.parserIdentifier];
 	IMBNode* node = [parser reloadNodeTree:inNode error:&error];
@@ -471,6 +535,17 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (NSURL*) addAccessRightsBookmark:(NSData*)inBookmark error:(NSError**)outError
+{
+	NSURL* url = [[IMBAccessRightsController sharedAccessRightsController] addBookmark:inBookmark];
+	if (outError) *outError = nil;
+	return url;
+}
+
+
 @end
 
 
@@ -535,6 +610,21 @@
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
 {
 	return @"";
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns the URL that represents the root of this parser messenger's library.
+// This is not necessarily identical to the mediaSource of a library.
+// Its implementation defaults to inMediaSource but may be overriden for a more appropriate URL
+// (e.g. parent directory of inMediaSource for Lightroom).
+// NOTE: We cannot access the messenger's own mediaSource property here because it's not set in the app.
+
+- (NSURL*) libraryRootURLForMediaSource:(NSURL*)inMediaSource
+{
+    return inMediaSource;
 }
 
 

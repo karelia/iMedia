@@ -49,6 +49,7 @@
 
 #import "NSFileManager+iMedia.h"
 #import "NSString+iMedia.h"
+#import "sys/stat.h"
 
 
 @implementation NSFileManager (iMedia)
@@ -307,6 +308,19 @@
     return result;
 }
 
+
+- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission)inPermission
+{
+    return (access([inPath cStringUsingEncoding:NSUTF8StringEncoding], inPermission) == 0);
+}
+
+
+- (NSInteger) imb_modeForPath:(NSString *)inPath
+{
+	struct stat buffer;
+    stat([inPath cStringUsingEncoding:NSUTF8StringEncoding], &buffer);
+	return (NSInteger)(buffer.st_mode);
+}
 
 
 @end

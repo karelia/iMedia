@@ -65,6 +65,7 @@
 
 @class IMBObject;
 @class IMBParserMessenger;
+@class IMBParser;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,6 +110,7 @@
 	BOOL _isIncludedInPopup;
 	BOOL _wantsRecursiveObjects;
 	BOOL _shouldDisplayObjectView;
+    BOOL _isAccessible;
 	
 	// Observing file system changes...
 	
@@ -153,6 +155,10 @@
 
 @property (retain,readonly) NSArray* subnodes;		
 		
+// Designated initializer
+
+- (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel;
+
 - (NSUInteger) countOfSubnodes;
 - (IMBNode*) objectInSubnodesAtIndex:(NSUInteger)inIndex;
 
@@ -207,6 +213,7 @@
 @property (assign) BOOL wantsRecursiveObjects;
 @property (assign) BOOL shouldDisplayObjectView;	
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
+@property (assign) BOOL isAccessible;
 
 // Observing file system changes...
 
@@ -234,6 +241,11 @@
 
 - (NSIndexPath*) indexPath;
 - (IMBNode*) topLevelNode;
+
+// Returns the root url of this node's library (may be different from self.mediaSource)
+
+- (NSURL*)libraryRootURL;
+
 - (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
 - (BOOL) isPopulated;
 

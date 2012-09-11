@@ -62,8 +62,10 @@
 
 
 @interface IMBiTunesParserMessenger : IMBParserMessenger
+{
+}
 
-@end
+ @end
 
 
 @interface IMBiTunesAudioParserMessenger : IMBiTunesParserMessenger

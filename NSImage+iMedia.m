@@ -91,6 +91,70 @@
 	return image;
 }
 
+
+// Returns an NSImage from our own bundle...
+
++ (NSImage*) imb_imageNamed:(NSString*)inName
+{
+	static NSMutableDictionary* sImageCache = nil;
+	static dispatch_once_t sOnceToken;
+	
+	dispatch_once(&sOnceToken,^()
+	{
+		sImageCache = [[NSMutableDictionary alloc] init];
+	});
+	
+	NSImage* image = (NSImage*)[sImageCache objectForKey:inName];
+	
+	if (image == nil)
+	{
+		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+		NSString* path = [bundle pathForResource:inName ofType:nil];
+		image = [[NSImage alloc] initWithContentsOfFile:path];
+		[sImageCache setObject:image forKey:inName];
+	}
+	
+	return image;
+}
+
+
+// Returns a CGImage from our own bundle...
+
++ (CGImageRef) imb_CGImageNamed:(NSString*)inName
+{
+	static NSMutableDictionary* sImageCache = nil;
+	static dispatch_once_t sOnceToken;
+	
+	dispatch_once(&sOnceToken,^()
+	{
+		sImageCache = [[NSMutableDictionary alloc] init];
+	});
+
+	CGImageRef image = (CGImageRef)[sImageCache objectForKey:inName];
+
+	if (image == nil)
+	{
+		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+		NSString* path = [bundle pathForResource:inName ofType:nil];
+		
+		if (path)
+		{
+			CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+        
+			if (imageSource)
+			{
+				image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
+				[sImageCache setObject:(id)image forKey:inName];
+				CGImageRelease(image);
+				CFRelease(imageSource);
+			}
+		}
+	}
+
+	return image;
+}
+
+
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
 + (NSDictionary *)imb_metadataFromImageAtURL:(NSURL *)url checkSpotlightComments:(BOOL)aCheckSpotlight;
 {
@@ -366,6 +430,24 @@
 	}
 	
 	return result;
+}
+
+
+// Return this image as an NSAttributedString
+
+- (NSAttributedString*) attributedString
+{
+    NSTextAttachment* attachment = [[NSTextAttachment alloc] init];
+    NSTextAttachmentCell* cell = [[NSTextAttachmentCell alloc] init];
+ 
+	[cell setImage:self];
+    [attachment setAttachmentCell:cell];
+    NSAttributedString* string = [NSAttributedString attributedStringWithAttachment:attachment];
+
+    [attachment release];
+    [cell release];
+	
+    return string;
 }
 
 

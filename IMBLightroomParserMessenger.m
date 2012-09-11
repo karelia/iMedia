@@ -73,7 +73,6 @@
 
 #pragma mark GLOBALS
 
-static NSMutableArray* sParsers = nil;
 static dispatch_once_t sOnceToken = 0;
 
 
@@ -86,6 +85,20 @@ static dispatch_once_t sOnceToken = 0;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
+    return parsers;
+}
 
 
 - (id) init
@@ -161,6 +174,18 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
+// Library root is parent directory of catalog file
+
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
+{
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -168,29 +193,34 @@ static dispatch_once_t sOnceToken = 0;
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
     dispatch_once(&sOnceToken,
     ^{
 		if ([[self class] isInstalled])
 		{
 			NSString* mediaType = [self mediaType];
-			sParsers = [[NSMutableArray alloc] init];
 			
 			if ([mediaType isEqualTo:kIMBMediaTypeImage])
 			{
-				[sParsers addObjectsFromArray:[IMBLightroom1Parser concreteParserInstancesForMediaType:mediaType]];
-				[sParsers addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:mediaType]];
-				[sParsers addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:mediaType]];
-				[sParsers addObjectsFromArray:[IMBLightroom4Parser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom1Parser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom4Parser concreteParserInstancesForMediaType:mediaType]];
 			}
 			else if ([mediaType isEqualTo:kIMBMediaTypeMovie])
 			{
-				[sParsers addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:mediaType]];
-				[sParsers addObjectsFromArray:[IMBLightroom4VideoParser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom4VideoParser concreteParserInstancesForMediaType:mediaType]];
 			}
 		}
 	});
 
-	return (NSArray*)sParsers;
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
+	return (NSArray*)parsers;
 }
 
 

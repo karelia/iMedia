@@ -143,6 +143,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
+@synthesize isAccessible = _isAccessible;
 
 @synthesize imageLocation = _imageLocation;
 @synthesize atomic_imageRepresentation = _imageRepresentation;
@@ -166,6 +167,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		_shouldDrawAdornments = YES;
 		_shouldDisableTitle = NO;
 		_isLoadingThumbnail = NO;
+		_isAccessible = YES;
 		_needsImageRepresentation = YES;
 		_imageVersion = 0;
 	}
@@ -219,14 +221,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.metadataDescription = [coder decodeObjectForKey:@"metadataDescription"];
 		self.parserIdentifier = [coder decodeObjectForKey:@"parserIdentifier"];
 
-		self.index = [coder decodeIntegerForKey:@"index"];
+		self.index = (NSUInteger)[coder decodeInt64ForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
+		self.isAccessible = [coder decodeBoolForKey:@"isAccessible"];
 		
 		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
 		self.needsImageRepresentation = [coder decodeBoolForKey:@"needsImageRepresentation"];
-		self.imageVersion = [coder decodeIntegerForKey:@"imageVersion"];
+		self.imageVersion = (NSUInteger)[coder decodeInt64ForKey:@"imageVersion"];
 
 		if ([self.imageRepresentationType isEqualToString:IKImageBrowserCGImageRepresentationType])
 		{
@@ -258,14 +261,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	[coder encodeObject:self.metadataDescription forKey:@"metadataDescription"];
 	[coder encodeObject:self.parserIdentifier forKey:@"parserIdentifier"];
 
-	[coder encodeInteger:self.index forKey:@"index"];
+	int64_t index = (int64_t)self.index; [coder encodeInt64:index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
+	[coder encodeBool:self.isAccessible forKey:@"isAccessible"];
 
 	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
 	[coder encodeBool:self.needsImageRepresentation forKey:@"needsImageRepresentation"];
-	[coder encodeInteger:self.imageVersion forKey:@"imageVersion"];
+	int64_t imageVersion = (int64_t)self.imageVersion; [coder encodeInteger:imageVersion forKey:@"imageVersion"];
 
 	if (self.atomic_imageRepresentation)
 	{
@@ -305,6 +309,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
+	copy.isAccessible = self.isAccessible;
 
 	copy.imageLocation = self.imageLocation;
 	copy.atomic_imageRepresentation = self.atomic_imageRepresentation;

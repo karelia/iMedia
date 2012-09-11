@@ -44,39 +44,57 @@
 */
 
 
-// Author: Unknown
+//----------------------------------------------------------------------------------------------------------------------
 
 
-#import <Cocoa/Cocoa.h>
-#import <unistd.h>
+// Author: Peter Baumgartner, Jörg Jacobson
 
-// Enumeration of access permissions in nomenclatura of access() function
-typedef enum
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark ABSTRACT
+
+// This singleton controller is responsible for letting the user grant read/write access to parts of the file system.
+// This access is persistent...
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBAccessRightsController : NSObject
 {
-    kIMBAccessRead = R_OK,
-    kIMBAccessWrite = W_OK,
-    kIMBAccessExecute = X_OK,
-    kIMBPathExists = F_OK
-} IMBAccessPermission;
+	NSMutableArray* _bookmarks;
+}
 
+// Create singleton instance of the controller...
 
-@interface NSFileManager (iMedia)
++ (IMBAccessRightsController*) sharedAccessRightsController;
 
-- (BOOL)imb_isPathHidden:(NSString *)path;
-- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
-- (NSString *)imb_pathResolved:(NSString *)path;
+// Accessor method. Returns a security scoped bookmark, if the user has granted acccess to this part of the
+// file system. Please note that the bookmark may point to an ancestor of the specified URL. If the user
+// hasn't granted access, then nil may be returned...
 
-- (NSString*)imb_uniqueTemporaryFile:(NSString*)name;
-- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
-- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
+@property (retain) NSMutableArray* bookmarks;
 
-- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
+- (BOOL) hasBookmarkForURL:(NSURL*)inURL;
+- (NSURL*) addBookmark:(NSData*)inBookmark;
 
-- (NSString*) imb_volumeNameAtPath:(NSString*)inPath;
-- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath;
-- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
-- (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
-- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission) inPermission;
-- (NSInteger) imb_modeForPath:(NSString *)inPath;
+// Persistence...
+
+- (void) loadFromPrefs;
+- (void) saveToPrefs;
+
+// Helper methods...
+
++ (NSURL*) commonAncestorForURLs:(NSArray*)inURLs;	// Finds the common ancestor folder for an array of urls
++ (NSData*) bookmarkForURL:(NSURL*)inURL;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

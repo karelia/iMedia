@@ -96,7 +96,10 @@
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -154,7 +157,10 @@
 {
     static NSMutableArray *parsers = nil;
     
-    if (!parsers) parsers = [[NSMutableArray alloc] init];
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
     return parsers;
 }
 
@@ -215,12 +221,14 @@
 	return @"com.apple.iPhoto";
 }
 
-// Returns the key for iPhoto libraries in com.apple.iApps
 
-+ (NSString *) librariesKey
+// Returns the key for known iPhoto libraries in com.apple.iApps preferences file
+
++ (NSString *) preferencesLibraryPathsKey
 {
 	return @"iPhotoRecentDatabases";
 }
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Both image and movie use the same xpc service, so override this method...

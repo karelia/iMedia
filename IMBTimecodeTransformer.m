@@ -107,11 +107,11 @@
 		if ([inValue respondsToSelector:@selector(doubleValue)]) 
 		{
 			double t = [inValue doubleValue];
-			NSInteger T = (NSInteger) t;
+			int T = (int) t;
 			
-			NSInteger HH = T / 3600;
-			NSInteger MM = (T / 60) % 60;
-			NSInteger SS = T % 60;
+			int HH = T / 3600;
+			int MM = (T / 60) % 60;
+			int SS = T % 60;
 			
 			if (HH > 0)
 			{

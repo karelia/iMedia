@@ -57,6 +57,7 @@
 
 #import "IMBAudioObjectViewController.h"
 #import "IMBNodeViewController.h"
+#import "IMBAccessRightsViewController.h"
 #import "IMBObjectArrayController.h"
 #import "IMBPanelController.h"
 #import "IMBCommon.h"
@@ -237,7 +238,14 @@
 		}
 		else
 		{
-			[self startPlayingSelection:inSender];
+			if (object != nil && object.isAccessible == NO)
+			{
+				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			}
+			else
+			{
+				[self startPlayingSelection:inSender];
+			}
 		}
 	}
 }
@@ -247,7 +255,16 @@
 
 - (void) tableViewSelectionDidChange:(NSNotification*)inNotification
 {
-	if (self.audioPlayer.rate > 0.0)
+	NSTableView* tableview = (NSTableView*)inNotification.object;
+	NSInteger row = [tableview selectedRow];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	IMBObject* object = row>=0 ? [objects objectAtIndex:row] : nil;
+	
+	if (object != nil && object.isAccessible == NO)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+	}
+	else if (self.audioPlayer.rate > 0.0)
 	{
 		[self startPlayingSelection:nil];
 	}
@@ -369,7 +386,10 @@
 		
 		else
 		{
-			[NSApp presentError:error];
+			dispatch_async(dispatch_get_main_queue(),^()
+			{
+				[NSApp presentError:error];
+			});
 		}
 	}];
 }

@@ -71,7 +71,6 @@
 
 #pragma mark GLOBALS
 
-static NSMutableArray* sParsers = nil;
 static dispatch_once_t sOnceToken = 0;
 
 
@@ -108,6 +107,21 @@ static dispatch_once_t sOnceToken = 0;
 }
 	
 									
+//----------------------------------------------------------------------------------------------------------------------
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
+    return parsers;
+}
+
+
 + (NSString*) identifier
 {
 	return @"com.karelia.imedia.GarageBand";
@@ -174,23 +188,28 @@ static dispatch_once_t sOnceToken = 0;
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
+
     dispatch_once(&sOnceToken,
     ^{
 		if ([[self class] isInstalled])
 		{
-			sParsers = [[NSMutableArray alloc] initWithCapacity:1];
-
 			IMBGarageBandParser* parser = (IMBGarageBandParser*)[self newParser];
 			parser.identifier = [[self class] identifier];
 			parser.mediaType = self.mediaType;
 			parser.mediaSource = nil;
 			parser.appPath = [[self class] garageBandPath];
-			[sParsers addObject:parser];
+			[parsers addObject:parser];
 			[parser release];
 		}
 	});
 
-	return (NSArray*)sParsers;
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
+	return (NSArray*)parsers;
 }
 
 

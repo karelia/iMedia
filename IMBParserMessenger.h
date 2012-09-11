@@ -106,7 +106,15 @@
 
 @interface IMBParserMessenger (XPC)
 
-// This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses  
+// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
+
++ (NSMutableArray *)parsers;
+
+// Sets this parser messenger's instance to all parsers of this instance
+
+- (void) setParserMessengerForParsers;
+
+// This factory method creates IMBParser instances. Usually just returns a single instance, but subclasses
 // may opt to return more than one instance (e.g. Aperture may create one instance per library). MUST be 
 // overridden by subclasses..
 
@@ -138,7 +146,12 @@
 
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
-@end
+// Adds the access rights for a given folder to the XPC service. The service is responsible for persisting this
+// access right...
+
+- (NSURL*) addAccessRightsBookmark:(NSData*)inBookmark error:(NSError**)outError;
+
+ @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,6 +184,13 @@
 
 //- (IMBNode*) nodeWithIdentifier:(NSString*)inIdentifier;
 //- (void) invalidateThumbnails;
+
+// Returns the URL that represents the root of this parser messenger's library.
+// This is not necessarily identical to the mediaSource of a library.
+// Its implementation defaults to inMediaSource but may be overriden for a more appropriate URL
+// (e.g. parent directory of mediaSource for Lightroom).
+
+- (NSURL*) libraryRootURLForMediaSource:(NSURL*)inMediaSource;
 
 @end
 

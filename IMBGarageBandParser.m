@@ -101,32 +101,6 @@
 #pragma mark Parser Methods
 
 
-- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
-{
-	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
-	[icon setScalesWhenResized:YES];
-	[icon setSize:NSMakeSize(16.0,16.0)];
-	
-	// Create an empty (unpopulated) root node...
-	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
-	node.icon = icon;
-	node.name = @"GarageBand";
-	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
-	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
-	node.isLeafNode = NO;
-
-	return node;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 // Paths to important folders containing songs...
 
 - (NSString*) userSongsPath
@@ -139,6 +113,48 @@
 //{
 //	return @"/Library/Application Support/GarageBand/GarageBand Demo Songs/";
 //}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IMBNode*) unpopulatedTopLevelNode:(NSError**)outError
+{
+	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
+	[icon setScalesWhenResized:YES];
+	[icon setSize:NSMakeSize(16.0,16.0)];
+	
+	// Need to set this before instatiating the node, so that check for access rights works correctly...
+	
+    NSString* path = [self userSongsPath];
+	self.mediaSource = [NSURL fileURLWithPath:path];
+
+    NSFileManager* manager = [[NSFileManager alloc] init];
+    BOOL exists = [manager fileExistsAtPath:path];
+    [manager release];
+    
+	// Create an empty (unpopulated) root node...
+	
+    if (exists)
+    {
+        IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+        node.icon = icon;
+        node.name = @"GarageBand";
+        node.identifier = [self identifierForPath:@"/"];
+        node.groupType = kIMBGroupTypeLibrary;
+        node.isLeafNode = NO;
+        node.mediaType = self.mediaType;
+        node.parserIdentifier = self.identifier;
+        node.isTopLevelNode = YES;
+
+        return node;
+    }
+
+    return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
@@ -157,16 +173,18 @@
 				@"My Compositions",
 				@"Name of node in IMBGarageBandParser");
 		
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			subnode.identifier = [self identifierForPath:userSongsPath];
 			subnode.icon = [self iconForItemAtURL:[NSURL fileURLWithPath:userSongsPath isDirectory:YES] error:NULL];
 			subnode.name = userSongsName;
-			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = [NSURL fileURLWithPath:userSongsPath];
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
 			subnode.isIncludedInPopup = YES;
 			subnode.isLeafNode = YES;
+			subnode.mediaType = self.mediaType;
+			subnode.parserIdentifier = self.identifier;
+			subnode.isTopLevelNode = NO;
+
+
 			[subnodes addObject:subnode];
 		}
 		

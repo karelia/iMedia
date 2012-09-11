@@ -108,12 +108,17 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 	NSString* _appPath;
 	NSDictionary* _plist;
 	NSDate* _modificationDate;
+	BOOL _shouldDisplayLibraryName;
 }
 
 @property (retain) NSString* appPath;
 @property (retain,readonly) NSDictionary* plist;
 @property (retain,readonly) NSDate* modificationDate;
 
+// When there is more than one library of a given type (iPhoto or Aperture) make its name distinguishable
+// through its apended library name
+
+@property (assign) BOOL shouldDisplayLibraryName;
 
 // Returns IKImageBrowserCGImageRepresentationType
 

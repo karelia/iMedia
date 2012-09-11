@@ -66,9 +66,13 @@
 - (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect;		// new instance
 
 + (NSImage *) imb_imageWithData:(NSData *)aData mimeType:(NSString *)aMimeType;
++ (NSImage*) imb_imageNamed:(NSString*)inName;
++ (CGImageRef) imb_CGImageNamed:(NSString*)inName;
 
 // Create a NSBitmapImageRep from NSImage
 - (NSBitmapImageRep *) imb_firstBitmap;	
 - (NSBitmapImageRep *) imb_bitmap;	
+
+- (NSAttributedString*) attributedString;
 
 @end

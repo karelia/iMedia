@@ -58,6 +58,13 @@
 #import "IMBNodeCell.h"
 #import "IMBNode.h"
 #import "IMBAlertPopover.h"
+#import "IMBNodeViewController.h"
+#import "IMBLibraryController.h"
+#import "IMBAccessRightsController.h"
+#import "IMBAccessRightsViewController.h"
+#import "IMBOutlineView.h"
+#import "SBUtilities.h"
+#import "IMBParserMessenger.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,6 +88,7 @@
 @implementation IMBNodeCell
 
 @synthesize isGroupCell = _isGroupCell;
+@synthesize node = _node;
 @synthesize icon = _icon;
 @synthesize badgeIcon = _badgeIcon;
 @synthesize badgeError = _badgeError;
@@ -109,6 +117,7 @@
 
 - (void) dealloc
 {
+	IMBRelease(_node);
 	IMBRelease(_icon);
  	IMBRelease(_badgeIcon);
  	IMBRelease(_badgeError);
@@ -125,6 +134,7 @@
     IMBNodeCell* cell = (IMBNodeCell*) [super copyWithZone:inZone];
 	
     cell->_isGroupCell = _isGroupCell;
+    cell->_node = [_node retain];
     cell->_icon = [_icon retain];
 	cell->_badgeIcon = [_badgeIcon retain];
 	cell->_badgeError = [_badgeError retain];
@@ -271,26 +281,7 @@
 
 
 #pragma mark 
-
-
-//- (void) editWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate event:(NSEvent*)inEvent
-//{
-//	NSRect titleRect = [self titleRectForBounds:inFrame];
-//	[super editWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate event:inEvent];
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-//- (void) selectWithFrame:(NSRect)inFrame inView:(NSView*)inControlView editor:(NSText*)inText delegate:(id)inDelegate start:(NSInteger)inStart length:(NSInteger)inLength
-//{
-//	NSRect titleRect = [self titleRectForBounds:inFrame];
-//	[super selectWithFrame:titleRect inView:inControlView editor:inText delegate:inDelegate start:inStart length:inLength];
-//}
-
-
-//----------------------------------------------------------------------------------------------------------------------
+#pragma mark Event Handling
 
 
 // Check if we clicked on a badge icon...
@@ -318,6 +309,9 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 - (BOOL) trackMouse:(NSEvent*)inEvent inRect:(NSRect)inCellFrame ofView:(NSView*)inControlView untilMouseUp:(BOOL)flag
 {
     [self setControlView:inControlView];
@@ -342,38 +336,87 @@
     if (inside)
 	{
 		_clickedRect = badgeRect;
-		[self showPopover:nil];
+
+		if (_badgeError)
+		{
+			[self showErrorPopover:nil];
+		}
     }
  
     return YES;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
 
-- (IBAction) showPopover:(id)inSender
+- (IBAction) showErrorPopover:(id)inSender
 {
-	if (_badgeError)
+	if (IMBRunningOnLionOrNewer())
 	{
-		if (IMBRunningOnLionOrNewer())
-		{
-			NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
-			NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
-			NSString* ok = @"   OK   ";
+		NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
+		NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
+		NSString* ok = @"   OK   ";
 
-			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
-			
-			[alert addButtonWithTitle:ok block:^()
-			{
-				[alert close];
-			}];
-			
-			[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
-		}
-		else
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+		
+		[alert addButtonWithTitle:ok block:^()
+		{
+			[alert close];
+		}];
+		
+		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
+	}
+	else
+	{
+		dispatch_async(dispatch_get_main_queue(),^()
 		{
 			[NSApp presentError:_badgeError];
-		}
+		});
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (IBAction) showAccessRightsPopover:(id)inSender
+{
+	NSString* libraryName = self.title;
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsTitle",
+		nil,
+		IMBBundle(),
+		@"Access to Media Files Not Allowed",
+		@"Alert title");
+
+	NSString* format = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsMessage",
+		nil,
+		IMBBundle(),
+		@"The application does not have the necessary rights to access the media files in %@.\n\n Click the \"Grant Access\" button to allow the application to access these media files.",
+		@"Alert message");
+		
+	NSString* ok = NSLocalizedStringWithDefaultValue(
+		@"IMBNodeCell.grantAccessRightsButton",
+		nil,
+		IMBBundle(),
+		@"Grant Access",
+		@"Alert button");
+
+	NSString* message = [NSString stringWithFormat:format,libraryName];
+	IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+	
+	[alert addButtonWithTitle:ok block:^()
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
+		[alert close];
+	}];
+	
+	[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
 }
 
 

@@ -93,7 +93,6 @@
 @implementation IMBApertureParser
 
 @synthesize placeholderParser = _placeholderParser;
-@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize version = _version;
 
 
@@ -289,6 +288,7 @@
 	NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
 	
 	NSString* nodePath = nil;
+	
 	if (inIdSpace)
 	{
 		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",(unsigned long)[path hash],libraryName,inIdSpace,inId];
@@ -631,13 +631,11 @@
 		{
 			// Create node for this album...
 			
-			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* albumNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.name = albumName;
-			albumNode.mediaSource = self.mediaSource;
-			albumNode.parserIdentifier = self.identifier;
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 
@@ -737,6 +735,12 @@
 					object.imageLocation = thumbPath ? [NSURL fileURLWithPath:thumbPath isDirectory:NO] : object.location;
 					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
+
+                    // Check whether we have access to this resource's location
+                    
+                    [self checkAccessRightsForObject:object];
+                    
+                    //NSLog(@"Access to object at %@: %@", [object.location path], object.isAccessible ? @"YES" : @"NO");
 				}
 				
 				[pool2 drain];

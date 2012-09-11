@@ -99,6 +99,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize appPath = _appPath;
 @synthesize atomic_plist = _plist;
 @synthesize modificationDate = _modificationDate;
+@synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -277,6 +278,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
     [fileManager release];
     
+//    NSLog(@"%@ metadata:\n%@", path, metadata);
+    
     if (metadata)
     {
 		NSDate* modificationDate = [metadata objectForKey:NSFileModificationDate];
@@ -368,16 +371,28 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
     
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+
+    
+//    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
+    
 	node.icon = icon;
 	node.name = [[self class] libraryName];
 	node.identifier = [self rootNodeIdentifier];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
+	
+	if (node.isTopLevelNode)
+	{
+		if (self.shouldDisplayLibraryName)
+        {
+            NSString* path = (NSString*)[node.mediaSource path];
+            NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+            node.name = [NSString stringWithFormat:@"%@ (%@)",node.name, libraryName];
+        } else {
+            node.name = [NSString stringWithFormat:@"%@",node.name];
+        }
+	}
 	
 	// Enable FSEvents based file watching for root nodes...
 	
@@ -886,13 +901,11 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
-			subnode.mediaSource = self.mediaSource;
-			subnode.parserIdentifier = self.identifier;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:

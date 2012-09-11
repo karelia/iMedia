@@ -93,23 +93,26 @@
 {
 	NSMutableArray* libraryPaths = [NSMutableArray array];
     
-	CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
-																(CFStringRef)@"com.adobe.Lightroom");
-	
-	if (recentLibrariesList) {
-        [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-        CFRelease(recentLibrariesList);
-	}
-	
     if ([libraryPaths count] == 0) {
 		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
 																		(CFStringRef)@"com.adobe.Lightroom");
 		
 		if (activeLibraryPath) {
+			[libraryPaths addObject:(NSString*)activeLibraryPath];
 			CFRelease(activeLibraryPath);
 		}
     }
     
+	if ([libraryPaths count] == 0) {
+		CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
+																(CFStringRef)@"com.adobe.Lightroom");
+	
+		if (recentLibrariesList) {
+			[self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
+			CFRelease(recentLibrariesList);
+		}
+    }
+	
 	return libraryPaths;
 }
 

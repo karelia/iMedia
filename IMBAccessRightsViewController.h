@@ -44,39 +44,55 @@
 */
 
 
-// Author: Unknown
+//----------------------------------------------------------------------------------------------------------------------
 
 
-#import <Cocoa/Cocoa.h>
-#import <unistd.h>
+// Author: Peter Baumgartner, Jörg Jacobson
 
-// Enumeration of access permissions in nomenclatura of access() function
-typedef enum
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark ABSTRACT
+
+// This singleton controller is responsible for letting the user grant read/write access to parts of the file system.
+// This access is persistent. The controller provides the UI, storage, and accessor methods...
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark CLASSES
+
+@class IMBNode;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@interface IMBAccessRightsViewController : NSViewController
 {
-    kIMBAccessRead = R_OK,
-    kIMBAccessWrite = W_OK,
-    kIMBAccessExecute = X_OK,
-    kIMBPathExists = F_OK
-} IMBAccessPermission;
+	BOOL _isOpen;
+	IBOutlet NSTextField* _warningTitle;
+	IBOutlet NSTextField* _warningMessage;
+}
 
+// User inteface to grant access to part of the file system. Returns a url for the folder that the user
+// actually selected or nil in case of Cancel...
 
-@interface NSFileManager (iMedia)
++ (IMBAccessRightsViewController*) sharedViewController;
 
-- (BOOL)imb_isPathHidden:(NSString *)path;
-- (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
-- (NSString *)imb_pathResolved:(NSString *)path;
+- (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
+- (void) grantAccessRightsForNode:(IMBNode*)inNode;
 
-- (NSString*)imb_uniqueTemporaryFile:(NSString*)name;
-- (NSString*)imb_uniqueTemporaryFile:(NSString*)name withinDirectory:(NSString*)directoryPath;
-- (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath;
-
-- (NSString*)imb_sharedTemporaryFolder:(NSString*)dirName;
-
-- (NSString*) imb_volumeNameAtPath:(NSString*)inPath;
-- (NSString*) imb_relativePathToVolumeAtPath:(NSString*)inPath;
-- (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
-- (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
-- (BOOL) imb_isPath:(NSString *)inPath accessible:(IMBAccessPermission) inPermission;
-- (NSInteger) imb_modeForPath:(NSString *)inPath;
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+

@@ -122,19 +122,16 @@
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-    [fileManager release];
-
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	[fileManager release];
+	
+	IMBNode* node = [[[IMBNode alloc] initWithParser: self topLevel:YES] autorelease];
 	node.icon = [self iconForItemAtURL:url error:NULL];
 	node.name = name;
 	node.identifier = [self identifierForPath:path];
-	node.mediaType = self.mediaType;
 	node.mediaSource = url;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = ![hasSubfolders boolValue];
 	node.displayPriority = self.displayPriority;
 	node.isUserAdded = self.isUserAdded;
-	node.parserIdentifier = self.identifier;
 	
 	if (node.isTopLevelNode)
 	{
@@ -151,6 +148,7 @@
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
 	node.watchedPath = path;
+	
 	
 	return node;
 }
@@ -175,7 +173,7 @@
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
 		options:NSDirectoryEnumerationSkipsHiddenFiles 
 		error:&error];
-    
+
     [fileManager release];
 
 	if (urls)
@@ -253,17 +251,14 @@
 			NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:&error];
 			if (!hasSubfolders) continue;
 			
-			IMBNode* subnode = [[IMBNode alloc] init];
+			IMBNode* subnode = [[IMBNode alloc] initWithParser:self topLevel:NO];
 			subnode.icon = [self iconForItemAtURL:url error:NULL];
 			subnode.name = name;
 			
             NSString* path = [url path];
 			subnode.identifier = [self identifierForPath:path];
             
-			subnode.mediaType = self.mediaType;
 			subnode.mediaSource = url;
-			subnode.parserIdentifier = self.identifier;
-			subnode.isTopLevelNode = NO;
 			subnode.isLeafNode = ![hasSubfolders boolValue];
 			subnode.groupType = kIMBGroupTypeFolder;
 			subnode.isIncludedInPopup = NO;
@@ -355,6 +350,9 @@
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
+
+    BOOL accessible = [[NSFileManager defaultManager] imb_isPath:[directory path] accessible:kIMBAccessRead|kIMBAccessWrite];
+	if (!accessible) return [NSNumber numberWithBool:NO];
 	
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
