@@ -234,10 +234,6 @@ static IMBPanelController* sSharedPanelController = nil;
 	IMBNodeViewController* nodeViewController = nil;
 	IMBObjectViewController* objectViewController = nil;
 	
-	// Load the access rights bookmarks to grant access to parts of the file system...
-	
-	[IMBAccessRightsController sharedAccessRightsController];
-
 	// Load the parsers...
 	
 	IMBParserController* parserController = [IMBParserController sharedParserController];
