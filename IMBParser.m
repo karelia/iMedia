@@ -523,7 +523,7 @@
     inNode.isAccessible = path ? [manager imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite] : YES;
 	[manager release];
     
-    NSLog(@"Access to %@: %@", [[inNode libraryRootURL] path], inNode.isAccessible ? @"YES" : @"NO");
+    //NSLog(@"Access to %@: %@", [[inNode libraryRootURL] path], inNode.isAccessible ? @"YES" : @"NO");
 }
 
 

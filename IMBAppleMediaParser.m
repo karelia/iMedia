@@ -250,7 +250,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
     [fileManager release];
     
-    NSLog(@"%@ metadata:\n%@", path, metadata);
+//    NSLog(@"%@ metadata:\n%@", path, metadata);
     
     if (metadata)
     {
