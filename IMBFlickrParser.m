@@ -83,7 +83,7 @@
 	NSString* pathToImage = [ourBundle pathForResource:@"Flickr" ofType:@"png"];
 	NSImage* icon = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
 	
-    //  create an empty root node (unpopulated and without subnodes)...	
+    //  create an empty root node (unpopulated and without subnodes)...
 	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.groupType = kIMBGroupTypeInternet;	
 	node.icon = icon;
@@ -92,6 +92,7 @@
 	node.isLeafNode = NO;
 	node.mediaSource = nil;
 	node.name = @"Flickr";
+	node.isAccessible = YES;
 	
 	return node;
 }
