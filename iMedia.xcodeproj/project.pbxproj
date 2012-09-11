@@ -2932,6 +2932,7 @@
 		};
 		30FFEBFA150A08DC0009C1D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -2964,6 +2965,7 @@
 		};
 		30FFEBFB150A08DC0009C1D0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3010,6 +3012,7 @@
 		};
 		D054AFFB152984FA00EBFA1C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3042,6 +3045,7 @@
 		};
 		D054AFFC152984FA00EBFA1C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3068,6 +3072,7 @@
 		};
 		D05D39AA152ACD1300E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3100,6 +3105,7 @@
 		};
 		D05D39AB152ACD1300E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3126,6 +3132,7 @@
 		};
 		D05D39BB152ACD2400E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3158,6 +3165,7 @@
 		};
 		D05D39BC152ACD2400E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3184,6 +3192,7 @@
 		};
 		D05D39CC152ACD3300E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3216,6 +3225,7 @@
 		};
 		D05D39CD152ACD3300E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3242,6 +3252,7 @@
 		};
 		D05D39DD152ACD5E00E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3274,6 +3285,7 @@
 		};
 		D05D39DE152ACD5E00E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3300,6 +3312,7 @@
 		};
 		D05D39EE152ACD6800E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3332,6 +3345,7 @@
 		};
 		D05D39EF152ACD6800E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3358,6 +3372,7 @@
 		};
 		D05D39FF152ACD8800E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3390,6 +3405,7 @@
 		};
 		D05D3A00152ACD8800E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3416,6 +3432,7 @@
 		};
 		D05D3A11152AD0D000E30C43 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3448,6 +3465,7 @@
 		};
 		D05D3A12152AD0D000E30C43 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3516,6 +3534,7 @@
 		};
 		D0E96CFF1518C9BF004F3EE7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3548,6 +3567,7 @@
 		};
 		D0E96D001518C9BF004F3EE7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3574,6 +3594,7 @@
 		};
 		D0F2DDC9152485130059DF8D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
@@ -3606,6 +3627,7 @@
 		};
 		D0F2DDCA152485130059DF8D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
