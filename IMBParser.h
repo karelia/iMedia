@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -156,6 +156,10 @@
 // Default implementation for getting a bookmark for an existing local file...
 
 - (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
+
+// Informs that some of the receiver's IMBObjects have been written to a pasteboard. Could use this to add some
+// extra parser-specific data to the pasteboard. Default implementation does nothing.
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
 
 @end
 

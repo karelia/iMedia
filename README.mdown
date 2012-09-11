@@ -40,6 +40,10 @@ Recent Release Notes
 
 * The `+[IMBConfig registerDefaultValues]` method has been made private. You should have no need to call it in your app as `IMBConfig` automatically runs that routine the first time it is used
 
+### 2.5.2
+
+* When dragging or copying iPhoto images, we mimic iPhoto by also including `ImageDataListPboardType` on the pasteboard. This allows iPhoto-aware apps to properly handle image metadata without any knowledge of iMedia
+
 
 Development
 ========
