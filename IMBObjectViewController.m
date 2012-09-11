@@ -58,6 +58,7 @@
 #import "IMBObjectViewController.h"
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
+#import "IMBAccessRightsViewController.h"
 #import "IMBConfig.h"
 #import "IMBParserMessenger.h"
 #import "IMBNode.h"
@@ -68,6 +69,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSPasteboard+iMedia.h"
 #import "NSView+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
@@ -1150,12 +1152,25 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
-			[inCell setBadge:badgeRef];
+			if (!object.isAccessible)
+			{
+				CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
+				[inCell setBadge:warning];
+			}
+			else 
+			{
+				[inCell setBadge:badgeRef];
+			}
 		}
 
 		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 		{
-			if (badgeRef)
+			if (!object.isAccessible)
+			{
+				NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
+				[inCell setImage:warning];
+			}
+			else if (badgeRef)
 			{
 				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
 				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
@@ -1288,32 +1303,42 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	id delegate = controller.delegate;
 	BOOL didHandleEvent = NO;
 	
-	if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-	{
-		IMBNode* node = self.currentNode;
-		NSArray* objects = [ibObjectArrayController selectedObjects];
-		didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-	}
-	
-	if (!didHandleEvent)
-	{
-		NSArray* objects = [ibObjectArrayController arrangedObjects];
-		NSUInteger row = [(NSTableView*)inSender clickedRow];
-		IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	NSUInteger row = [(NSTableView*)inSender clickedRow];
+	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 		
-		if ([object isKindOfClass:[IMBNodeObject class]])
+	if (object != nil && object.isAccessible == NO)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+	}
+	else
+	{
+		if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 		{
-			[self expandNodeObject:(IMBNodeObject*)object];
+			IMBNode* node = self.currentNode;
+			objects = [ibObjectArrayController selectedObjects];
+			didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
 		}
-		else if ([object isKindOfClass:[IMBButtonObject class]])
+		
+		if (!didHandleEvent)
 		{
-			[(IMBButtonObject*)object sendDoubleClickAction];
-		}
-		else
-		{
-			[self openSelectedObjects:inSender];
+			objects = [ibObjectArrayController arrangedObjects];
+			object = row!=-1 ? [objects objectAtIndex:row] : nil;
+			
+			if ([object isKindOfClass:[IMBNodeObject class]])
+			{
+				[self expandNodeObject:(IMBNodeObject*)object];
+			}
+			else if ([object isKindOfClass:[IMBButtonObject class]])
+			{
+				[(IMBButtonObject*)object sendDoubleClickAction];
+			}
+			else
+			{
+				[self openSelectedObjects:inSender];
+			}	
 		}	
-	}	
+	}
 }
 
 
@@ -1323,7 +1348,19 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	// No-op; clicking is handled with more detail from the mouse operations.
 	// However we want to make sure our window becomes key with a click.
+	
 	[[inSender window] makeKeyWindow];
+
+	// If we do not have access right for the clicked object, then prompt the user to give us access...
+	
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
+	NSUInteger row = [(NSTableView*)inSender clickedRow];
+	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
+		
+	if (object != nil && object.isAccessible == NO)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+	}
 }
 
 

@@ -55,7 +55,8 @@
 
 #pragma mark HEADERS
 
-#import "IMBEntitlementsController.h"
+#import "IMBAccessRightsController.h"
+#import "NSFileManager+iMedia.h"
 #import "IMBConfig.h"
 
 
@@ -64,7 +65,7 @@
 
 #pragma mark CONSTANTS
 
-static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
+static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,12 +73,12 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 
 #pragma mark 
 
-@interface IMBEntitlementsController ()
+@interface IMBAccessRightsController ()
 
-@property (retain) NSMutableDictionary* bookmarks;
++ (NSURL*) _urlForBookmark:(NSData*)inBookmark;
 
-- (NSData*) appScopedBookmarkForURL:(NSURL*)inURL;								// Creates an app scoped (security scoped) bookmark
-- (NSData*) regularBookmarkForAppScopedBookmark:(NSData*)inAppScopedBookmark;	// Converts a security scoped bookmark to a regular bookmark
++ (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL;
++ (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark;
 
 @end
 
@@ -87,7 +88,7 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 
 #pragma mark
 
-@implementation IMBEntitlementsController
+@implementation IMBAccessRightsController
 
 @synthesize bookmarks = _bookmarks;
 
@@ -101,18 +102,17 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 
 // Returns a singleton instance of the IMBEntitlementsController...
 
-+ (IMBEntitlementsController*) sharedEntitlementsController;
++ (IMBAccessRightsController*) sharedAccessRightsController;
 {
-	static IMBEntitlementsController* sSharedEntitlementsController = nil;
+	static IMBAccessRightsController* sSharedAccessRightsController = nil;
 	static dispatch_once_t sOnceToken = 0;
 
     dispatch_once(&sOnceToken,
     ^{
-		sSharedEntitlementsController = [[IMBEntitlementsController alloc] init];
+		sSharedAccessRightsController = [[IMBAccessRightsController alloc] init];
 	});
 
-    NSAssert([NSThread isMainThread], @"IMBEntitlementsController should only accessed from the main thread");
-	return sSharedEntitlementsController;
+	return sSharedAccessRightsController;
 }
 
 
@@ -123,20 +123,9 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 {
 	if (self = [super init])
 	{
-		self.bookmarks = [NSMutableDictionary dictionary];
-		
-		// When the app quits, save the bookmarks to prefs, so that access rights persist...
-		
-		[[NSNotificationCenter defaultCenter]				 
-			addObserver:self								
-			selector:@selector(saveToPrefs) 
-			name:NSApplicationWillTerminateNotification 
-			object:nil];
-			
-		// Upon launch, load them again so that the user doesn't need to be prompted again...
+		// Load persisted bookmarks upon launch
 		
 		[self loadFromPrefs];
-
 	}
 	
 	return self;
@@ -145,98 +134,8 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 
 - (void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	IMBRelease(_bookmarks);
 	[super dealloc];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Load the dictionary from the prefs, and then resolve each bookmark to a URL to make sure that the app has
-// access to the respective part of the file system...
-
-- (void) loadFromPrefs
-{
-	NSDictionary* bookmarks = [IMBConfig prefsValueForKey:kBookmarksPrefsKey];
-	self.bookmarks = [NSMutableDictionary dictionaryWithDictionary:bookmarks];
-	
-	for (NSURL* key in self.bookmarks)
-	{
-		// Get bookmark...
-		
-		NSData* bookmark = [self.bookmarks objectForKey:key];
-		
-		NSError* error = nil;
-		BOOL stale = NO;
-		
-		// Resolve it...
-		
-		NSURL* url = [NSURL
-			URLByResolvingBookmarkData:bookmark
-			options:NSURLBookmarkResolutionWithSecurityScope|NSURLBookmarkResolutionWithoutUI
-			relativeToURL:nil
-			bookmarkDataIsStale:&stale
-			error:&error];
-		
-		// Start access, thus granting the rights. Please note that we won't balance with stopAccessing until
-		// the app terminates...
-		
-		[url startAccessingSecurityScopedResource];
-	}
-}
-
-
-// Save the dictionary as is to the prefs. Now also balance the startAccessingSecurityScopedResource which was
-// done in the method above...
-		
-- (void) saveToPrefs
-{
-	[IMBConfig setPrefsValue:self.bookmarks forKey:kBookmarksPrefsKey];
-
-	for (NSURL* url in self.bookmarks)
-	{
-		[url stopAccessingSecurityScopedResource];
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-#pragma mark User Interface
-
-
-- (void) presentConfirmationUserInterfaceForURL:(NSURL*)inSuggestedURL
-{
-	NSOpenPanel* panel = [NSOpenPanel openPanel];
-	// configure...
-	panel.canChooseDirectories = YES;
-	panel.allowsMultipleSelection = NO;
-	panel.canCreateDirectories = NO;
-	
-	panel.title = @"Confirm Read Access";
-	panel.prompt = @"Confirm";
-//	panel.nameFieldLabel = @""
-	panel.message = @"Click the confirm button to grant read access to your media files.";
-	panel.accessoryView = nil;
-	
-	[panel setDirectoryURL:inSuggestedURL];
-	[panel beginWithCompletionHandler:^(NSInteger inButton)
-	{
-		if (inButton == NSOKButton)
-		{
-			NSURL* url = [panel URL];
-			
-			if ([self confirmedBookmarkForURL:url] == nil)
-			{
-				NSData* bookmark = [self appScopedBookmarkForURL:url];
-				[self.bookmarks setObject:bookmark forKey:url];
-			}
-		}
-	}];
 }
 
 
@@ -247,22 +146,103 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 #pragma mark Accessors
 
 
-// Walk through our use confirmed bookmarks and check if we have one that contains the specified URL. 
-// If there are more than one then just use the first one...
+// Check if we have a bookmark that grants us access to the specified URL...
 
-- (NSData*) confirmedBookmarkForURL:(NSURL*)inURL
+- (BOOL) hasBookmarkForURL:(NSURL*)inURL
 {
 	NSString* path = [inURL path];
 	
-	for (NSURL* url in _bookmarks)
+	for (NSData* bookmark in self.bookmarks)
 	{
+		NSURL* url = [[self class] _urlForBookmark:bookmark];
+
 		if ([path hasPrefix:[url path]])
 		{
-			return [_bookmarks objectForKey:url];
+			return YES;
 		}
 	}
 	
+	return NO;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// If we do not have an appropriate bookmark in our list yet, then add it and save it to user's preferences
+// (bookmarks must be saved instantaneously because there is no guaranteed hook to utilize when an XPC service
+//  is terminated)
+
+- (NSURL*) addBookmark:(NSData*)inBookmark
+{
+	NSURL* url = [[self class] _urlForBookmark:inBookmark];
+	
+    @synchronized(self)
+    {
+        if (![self hasBookmarkForURL:url])
+        {
+            [self.bookmarks addObject:inBookmark];
+            [self saveToPrefs];
+            
+            return url;
+        }
+    }
+	
 	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Persistence
+
+
+// Load the dictionary from the prefs, and then resolve each bookmark to a URL to make sure that the app has
+// access to the respective part of the file system. Start access, thus granting the rights. Please note that
+// we won't balance with stopAccessing until the app terminates...
+
+- (void) loadFromPrefs
+{
+	NSArray* bookmarks = [IMBConfig prefsValueForKey:kBookmarksPrefsKey];
+	self.bookmarks = [NSMutableArray arrayWithArray:bookmarks];
+    
+	for (NSData* bookmark in self.bookmarks)
+	{
+		NSURL* url = [[self class] _urlForAppScopedBookmark:bookmark];
+		/*BOOL started =*/ [url startAccessingSecurityScopedResource];
+
+        // TODO/JJ: For debugging purposes (remove later)
+        
+//		NSString* path = [url path];
+//		
+//		BOOL accessible = [[NSFileManager defaultManager]
+//			imb_isPath:path
+//			accessible:kIMBAccessRead|kIMBAccessWrite];
+//	
+//		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
+	}
+}
+
+
+// Save bookmarks list (SSBs) to user's preferences
+
+- (void) saveToPrefs
+{
+    // Only SSBs are persistent
+    
+    NSMutableArray* SSBs = [NSMutableArray arrayWithCapacity:[self.bookmarks count]];
+    NSData* anSSB = nil;
+    NSURL* aURL = nil;
+	for (NSData* bookmark in self.bookmarks)
+	{
+        aURL = [[self class] _urlForBookmark:bookmark];
+        anSSB = [[self class] _appScopedBookmarkForURL:aURL];
+        
+        if (anSSB) [SSBs addObject:anSSB];
+    }
+	[IMBConfig setPrefsValue:SSBs forKey:kBookmarksPrefsKey];
 }
 
 
@@ -275,7 +255,7 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 
 // Creates a URL for the common ancestor folder of the specified URLS...
 
-- (NSURL*) commonAncestorForURLs:(NSArray*)inURLs
++ (NSURL*) commonAncestorForURLs:(NSArray*)inURLs
 {
 	if ([inURLs count] == 0) return nil;
 
@@ -292,27 +272,86 @@ static NSString* kBookmarksPrefsKey = @"userConfirmedBookmarks";
 }
 
 
-// Create an app scoped SSB for the specified URL...
+//----------------------------------------------------------------------------------------------------------------------
 
-- (NSData*) appScopedBookmarkForURL:(NSURL*)inURL
+
++ (NSData*) bookmarkForURL:(NSURL*)inURL
 {
 	NSError* error = nil;
 	
 	NSData* bookmark = [inURL
-		bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope|NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+		bookmarkDataWithOptions:0
 		includingResourceValuesForKeys:nil
 		relativeToURL:nil
 		error:&error];
+
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
 		
 	return bookmark;
 }
 
 
-// To be implmented...
-	
-- (NSData*) regularBookmarkForAppScopedBookmark:(NSData*)inAppScopedBookmark
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Helper method to resolve a regular bookmark to a URL...
+
++ (NSURL*) _urlForBookmark:(NSData*)inBookmark
 {
-	return nil;
+	NSError* error = nil;
+	BOOL stale = NO;
+		
+	NSURL* url = [NSURL
+		URLByResolvingBookmarkData:inBookmark
+		options:0
+		relativeToURL:nil
+		bookmarkDataIsStale:&stale
+		error:&error];
+
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+		
+	return url;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Create an app scoped SSB for the specified URL...
+
++ (NSData*) _appScopedBookmarkForURL:(NSURL*)inURL
+{
+	NSError* error = nil;
+	
+	NSData* bookmark = [inURL
+		bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope/*|NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess*/
+		includingResourceValuesForKeys:nil
+		relativeToURL:nil
+		error:&error];
+
+//	NSLog(@"%s inURL=%@ error=%@",__FUNCTION__,inURL,error);
+		
+	return bookmark;
+}
+
+
+// Resolve an app scoped SSB to a URL...
+
++ (NSURL*) _urlForAppScopedBookmark:(NSData*)inBookmark
+{
+	NSError* error = nil;
+	BOOL stale = NO;
+		
+	NSURL* url = [NSURL
+		URLByResolvingBookmarkData:inBookmark
+		options:NSURLBookmarkResolutionWithSecurityScope
+		relativeToURL:nil
+		bookmarkDataIsStale:&stale
+		error:&error];
+
+//	NSLog(@"%s url=%@ error=%@",__FUNCTION__,url,error);
+		
+	return url;
 }
 
 

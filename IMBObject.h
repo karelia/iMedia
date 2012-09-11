@@ -98,6 +98,7 @@ extern NSString* kIMBObjectPasteboardType;
     BOOL _shouldDrawAdornments;
 	BOOL _shouldDisableTitle;
     BOOL _isLoadingThumbnail;
+    BOOL _isAccessible;
 	
 	id _imageLocation;
 	id _imageRepresentation;								
@@ -119,6 +120,8 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that is responsible for this object
 @property (retain) NSString* parserIdentifier;				// Identifier of IMBParser that created this object
 @property (retain) NSError* error;							// Per object error...
+
+@property (assign) BOOL isAccessible;						// Do we have access rights to this file?
 
 
 //----------------------------------------------------------------------------------------------------------------------

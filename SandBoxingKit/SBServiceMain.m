@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import <XPCKit/XPCKit.h>
+#import "IMBAccessRightsController.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +71,11 @@
 int main(int argc, const char *argv[])
 {
     NSAutoreleasePool* pool1 = [[NSAutoreleasePool alloc] init];
+    
+    // TODO/JJ: We should not have a reference to IMBAccessRightsController in here. Any way to put it outside framework?
+    // Load the access rights bookmarks to grant access to parts of the file system...
+    
+    [IMBAccessRightsController sharedAccessRightsController];
     
 	[XPCService runServiceWithConnectionHandler:^(XPCConnection* inConnection)
 	{

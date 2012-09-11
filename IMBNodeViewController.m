@@ -58,6 +58,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBObjectViewController.h"
 #import "IMBLibraryController.h"
+#import "IMBAccessRightsViewController.h"
 #import "IMBParserMessenger.h"
 #import "IMBOutlineView.h"
 #import "IMBConfig.h"
@@ -314,6 +315,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		IMBNodeCell* cell = [[[IMBNodeCell alloc] init] autorelease];	
 		[column setDataCell:cell];	
 	}
+
+	[ibNodeOutlineView setTarget:self];
+	[ibNodeOutlineView setAction:@selector(outlineViewWasClicked:)];
 		
 	// Build the initial contents of the node popup...
 	
@@ -613,14 +617,19 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView shouldExpandItem:(id)inItem
 {
 	BOOL shouldExpand = YES;
+	IMBNode* node = (IMBNode*)inItem;
 	
-	if (!_isRestoringState)
+	if (!node.isAccessible)
+	{
+		shouldExpand = NO;
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+	}
+	else if (!_isRestoringState)
 	{
 		id delegate = self.libraryController.delegate;
 		
 		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
 		{
-			IMBNode* node = (IMBNode*)inItem;
 			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
 		}
 	}
@@ -634,8 +643,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
-	IMBNode* node = (IMBNode*)item; 
-	[self.libraryController populateNode:node];
+	IMBNode* node = (IMBNode*)item;
+	
+	if (node.isAccessible)
+	{
+		[self.libraryController populateNode:node];
+	}
 }
 
 
@@ -705,9 +718,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 		if (newNode)
 		{
-			[self.libraryController populateNode:newNode];
+			if (newNode.isAccessible)
+			{
+				[self.libraryController populateNode:newNode];
+				[ibNodeOutlineView showProgressWheels];
+			}
+
 			self.selectedNodeIdentifier = newNode.identifier;
-			[ibNodeOutlineView showProgressWheels];
 		}
 
 		// Install the object view controller...
@@ -731,6 +748,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
+// If a row was clicked without changing the selection, also check for acces rights, and bring up the
+// prompt to grant access right if needed...
+
+- (IBAction) outlineViewWasClicked:(id)inSender
+{
+	NSInteger row = [ibNodeOutlineView clickedRow];
+	IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
+		
+	if (newNode != nil && newNode.isAccessible == NO)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -742,12 +774,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBNodeCell* cell = (IMBNodeCell*)inCell;
 
 	cell.isGroupCell = node.isGroupNode;
+	cell.node = node;
 	cell.icon = node.icon;
 	cell.title = node.name;
 	cell.badgeType = node.badgeTypeNormal;
 	
-	if (node.error)
+	if (!node.isAccessible)
 	{
+		cell.badgeType = kIMBBadgeTypeNoAccessRights;
+		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+		cell.badgeError = nil;
+	}
+	else if (node.error)
+	{
+		cell.badgeType = kIMBBadgeTypeWarning;
 		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
 		cell.badgeError = node.error;
 	}
@@ -1148,6 +1188,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	NSString* identifier = (NSString*) ibNodePopupButton.selectedItem.representedObject;
 	IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
+	
+	if (!node.isAccessible)
+	{
+		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+	}
+	
 	[self selectNode:node];
 }
 

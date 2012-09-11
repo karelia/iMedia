@@ -67,14 +67,6 @@
 @implementation IMBAppleMediaParserMessenger
 
 
-// Returns the list of parsers this messenger instantiated. Array should be static. Must be subclassed.
-
-+ (NSMutableArray *)parsers
-{
-	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
-    return nil;
-}
-
 // Returns the dispatch-once token. Token must be static. Must be subclassed.
 
 + (dispatch_once_t *)onceTokenRef
@@ -94,9 +86,18 @@
 }
 
 
-// Returns the key for (iPhoto/Aperture) libraries in com.apple.iApps. Must be subclassed.
+// Returns the key for known (iPhoto/Aperture) libraries in com.apple.iApps preferences file. Must be subclassed.
 
-+ (NSString *) librariesKey
++ (NSString *) preferencesLibraryPathsKey
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	return nil;
+}
+
+
+// Returns the library resource name. Must be subclassed.
+
++ (NSString *) libraryName
 {
 	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
@@ -129,17 +130,53 @@
 }
 
 
-- (id) init
+//----------------------------------------------------------------------------------------------------------------------
+// Library root is parent directory of metadata XML file
+
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
 {
-	if ((self = [super init]))
-	{
-		self.mediaSource = nil;	// Will be discovered in XPC service
-		self.mediaType = [[self class] mediaType];
-		self.isUserAdded = NO;
-	}
-	
-	return self;
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark
+#pragma mark Parser instantiation
+
+// Designated factory method for creating parsers
+
+- (IMBAppleMediaParser *)newParserWithMediaSource:(NSURL *)inMediaSource
+{
+    Class messengerClass = [self class];
+    IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[super newParser];
+    
+    // All parsers are kept in static list
+    
+    [[messengerClass parsers] addObject:parser];
+    [parser release];
+    
+    if (inMediaSource)
+    {
+        NSString* path = [inMediaSource path];
+        parser.identifier = [NSString stringWithFormat:@"%@:/%@", [[self class] identifier], path];
+        parser.mediaType = self.mediaType;
+        parser.mediaSource = inMediaSource;
+        parser.appPath = [messengerClass appPath];
+    }
+    return parser;
+}
+
+
+- (IMBParser *)newParser
+{
+    return [self newParserWithMediaSource:nil];
+}
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,30 +191,36 @@
                   ^{
                       if ([messengerClass isInstalled])
                       {
-                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)[messengerClass librariesKey],(CFStringRef)@"com.apple.iApps");
-                          NSArray* libraries = (NSArray*)recentLibraries;
+                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue(
+                                                            (CFStringRef)[messengerClass preferencesLibraryPathsKey],
+                                                            (CFStringRef)@"com.apple.iApps");
+                          
+                          // We decided it's a better user experience to only provide the most recently used library.
+                          // Most recently used library currently always stored at index 0 in library list.
+                          // (But still leave the code in place to be able to easily switch back to providing all known libraries)
+                          
+                          NSArray* libraries;
+                          if ([(NSArray*)recentLibraries count] > 0)
+                          {
+                              libraries = [NSArray arrayWithObject:[(NSArray*)recentLibraries objectAtIndex:0]];
+                          } else {
+                              libraries = [NSArray array];
+                          }
                           
                           for (NSString* library in libraries)
                           {
                               NSURL* url = [NSURL URLWithString:library];
                               NSString* path = [url path];
+                              
                               NSFileManager *fileManager = [[NSFileManager alloc] init];
                               
                               BOOL changed;
                               if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
-                              {
-                                  // Create a parser instance preconfigure with that path...
+                              {                                  
+                                  IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
+                                  parser.shouldDisplayLibraryName = [libraries count] > 1;
                                   
-                                  IMBAppleMediaParser* parser = (IMBAppleMediaParser*)[self newParser];
-                                  
-                                  parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-                                  parser.mediaType = self.mediaType;
-                                  parser.mediaSource = [NSURL fileURLWithPath:path];
-                                  parser.appPath = [messengerClass appPath];
-                                  parser.shouldDisplayLibraryName = libraries.count > 1;
-                                  
-                                  [parsers addObject:parser];
-                                  [parser release];
+                                  //NSLog(@"%@ uses library: %@", [parser class], path);
                                   
                                   // Exclude enclosing folder from being displayed by IMBFolderParser...
                                   
@@ -187,11 +230,14 @@
                               
                               [fileManager release];
                           }
-						  
-						if (recentLibraries) CFRelease(recentLibraries);
+                          if (recentLibraries) CFRelease(recentLibraries);
                       }
                   });
 	
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
 	return (NSArray*)parsers;
 }
 

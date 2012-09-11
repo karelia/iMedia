@@ -245,6 +245,27 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 }
 
 
+// Add access rights for parts of the file system...
+
+- (void) addAccessRights:(NSData*)inBookmark
+{
+	if (inBookmark)
+	{
+		if (_connection)
+		{
+			[_connection sendMessage:[XPCMessage messageWithObjectsAndKeys:
+				@"addAccessRights",@"operation",
+				inBookmark,@"bookmark",
+				nil]];
+		}
+		else
+		{
+			// Nothing to do in non-sandboxed case, as we have access rights to whole file system anyway
+		}
+	}
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

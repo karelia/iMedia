@@ -61,6 +61,7 @@
 #import "IMBObject.h"
 #import "NSObject+iMedia.h"
 #import "NSURL+iMedia.h"
+#import "NSFileManager+iMedia.h"
 #import "IMBParserMessenger.h"
 
 
@@ -88,6 +89,7 @@
 @synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
+@synthesize parserMessenger = _parserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -507,6 +509,32 @@
 }
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Being sandboxed the app may yet not have the necessary entitlements or read/write permissions to access the
+// media files of a node or object. The following two helper methods check for read/write access and set a flag
+// appropriately...
+
+- (void) checkAccessRightsForNode:(IMBNode*)inNode
+{
+	NSFileManager* manager = [[NSFileManager alloc] init];
+    NSString* path = [[inNode libraryRootURL] path];
+    inNode.isAccessible = path ? [manager imb_isPath:path accessible:kIMBAccessRead] : YES;
+	[manager release];
+    
+    //NSLog(@"Access to %@: %@", [[inNode libraryRootURL] path], inNode.isAccessible ? @"YES" : @"NO");
+}
+
+
+- (void) checkAccessRightsForObject:(IMBObject*)inObject
+{
+	NSFileManager* manager = [[NSFileManager alloc] init];
+    inObject.isAccessible = [manager imb_isPath:[inObject.location path]  accessible:kIMBAccessRead];
+	[manager release];
+}
+
+    
 //----------------------------------------------------------------------------------------------------------------------
 
 

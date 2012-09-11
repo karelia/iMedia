@@ -146,30 +146,26 @@
 	
 	// Create an empty (unpopulated) root node...
 	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"iTunes";
 	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 
 	// If we have more than one library then append the library name to the root node...
 	
 	if (self.shouldDisplayLibraryName)
 	{
-		NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,name];
+		NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+		node.name = [NSString stringWithFormat:@"%@ (%@)",node.name,libraryName];
 	}
 
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
-	// the root node down, as we have no way of finding WHAT has changed in iPhoto...
+	// the root node down, as we have no way of finding WHAT has changed in iTunes...
 	
-//	node.watcherType = kIMBWatcherTypeFSEvent;
-//	node.watchedPath = [path stringByDeletingLastPathComponent];
+	node.watcherType = kIMBWatcherTypeFSEvent;
+	node.watchedPath = [path stringByDeletingLastPathComponent];
 	
 	return node;
 }
@@ -499,13 +495,11 @@
 		{
 			// Create node for this album...
 			
-			IMBNode* playlistNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* playlistNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			playlistNode.isLeafNode = [self isLeafPlaylist:playlistDict];
 			playlistNode.icon = [self iconForPlaylist:playlistDict];
 			playlistNode.name = albumName;
-			playlistNode.mediaSource = self.mediaSource;
-			playlistNode.parserIdentifier = self.identifier;
 
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
@@ -580,6 +574,10 @@
 					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
 					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
+					// Check if we have access rights to this file...
+					
+					[self checkAccessRightsForObject:object];
+					
 					// Add metadata and convert the duration property to seconds. Also note that the original
 					// key "Total Time" is not bindings compatible as it contains a space...
 					

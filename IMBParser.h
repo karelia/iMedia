@@ -65,6 +65,7 @@
 
 @class IMBNode;
 @class IMBObject;
+@class IMBParserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,13 +80,15 @@
 	NSString* _identifier;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
+    IMBParserMessenger* _parserMessenger;
 }
 
 // Together these parameters uniquely specify a parser instance. The values are taken from IMBParserFacrtory...
 
 @property (copy) NSString* identifier;	
 @property (copy) NSString* mediaType;	
-@property (retain) NSURL* mediaSource;	
+@property (retain) NSURL* mediaSource;
+@property (assign) IMBParserMessenger* parserMessenger;
 
 // The following three methods are at the heart of parser classes and must be implemented. They will be called on
 // on the XPC service side: Together they create the iMedia data model tree, which gets serialized and sent back
@@ -156,6 +159,11 @@
 // Default implementation for getting a bookmark for an existing local file...
 
 - (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
+
+// These methods check if the necessary access rights are available and set a flag on the node or object...
+
+- (void) checkAccessRightsForNode:(IMBNode*)inNode;
+- (void) checkAccessRightsForObject:(IMBObject*)inObject;
 
 @end
 

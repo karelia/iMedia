@@ -75,7 +75,7 @@
 @property (retain) NSString* subtitle;
 @property (copy) NSDictionary* subtitleTextAttributes;
 
-@property (readwrite) CGImageRef badge;
+@property (assign) CGImageRef badge;
 
 @property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
 

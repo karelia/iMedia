@@ -210,12 +210,10 @@
 															  @"Folders",
 															  @"Name of Folders node in IMBLightroomParser");
 	
-	IMBNode* foldersNode = [[[IMBNode alloc] init] autorelease];
-	foldersNode.mediaSource = self.mediaSource;
+	IMBNode* foldersNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
 	foldersNode.icon = [self folderIcon];
-	foldersNode.parserIdentifier = self.identifier;
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
                                                    rootPath:nil
@@ -249,11 +247,10 @@
 	
 	[collectionsAttributes setValue:[NSNumber numberWithInt:IMBLightroomNodeTypeRootCollection] forKey:@"nodeType"];
 
-	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
+	IMBNode* collectionsNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
 	collectionsNode.icon = [self groupIcon];
-	collectionsNode.parserIdentifier = self.identifier;
 	collectionsNode.isLeafNode = NO;
 	collectionsNode.attributes = collectionsAttributes;
 

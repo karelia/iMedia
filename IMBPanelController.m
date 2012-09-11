@@ -56,6 +56,7 @@
 #pragma mark HEADERS
 
 #import "IMBPanelController.h"
+#import "IMBAccessRightsController.h"
 #import "IMBParserController.h"
 #import "IMBLibraryController.h"
 #import "IMBNodeViewController.h"

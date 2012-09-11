@@ -135,15 +135,11 @@
 	
 	// Create an empty (unpopulated) root node...
 	
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"Safari";
 	node.identifier = [self identifierForPath:@"/"];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 
 	// Watch the XML file. Whenever something in iTunes changes, we have to replace the WHOLE tree from  
@@ -343,10 +339,7 @@
 		NSString* title = [inPlist objectForKey:@"Title"];
 		NSImage* icon = [NSImage imb_sharedGenericFolderIcon];
 
-		subnode = [[[IMBNode alloc] init] autorelease];
-		subnode.mediaSource = self.mediaSource;
-		subnode.mediaType = self.mediaType;
-		subnode.parserIdentifier = self.identifier;
+		subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 		subnode.isLeafNode = [self isLeafPlist:inPlist];
 		subnode.identifier = [self identifierForPlist:inPlist];
 		subnode.icon = icon;

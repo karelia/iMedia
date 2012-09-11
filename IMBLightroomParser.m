@@ -241,20 +241,18 @@ static NSArray* sSupportedUTIs = nil;
 {
 	NSError* error = nil;
 
+	NSString* libraryPath = [self.mediaSource path];
+	
 	NSImage* icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:self.appPath];
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
 
 	// Create the top-level node...
 
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.icon = icon;
 	node.name = @"Lightroom";
 	node.identifier = [self rootNodeIdentifier];
-	node.mediaSource = self.mediaSource;
-	node.mediaType = self.mediaType;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	node.groupType = kIMBGroupTypeLibrary;
 	node.isIncludedInPopup = YES;
@@ -270,7 +268,7 @@ static NSArray* sSupportedUTIs = nil;
 	// WHOLE node tree, as we have no way of finding out WHAT has changed in Lightroom...
 	
 	node.watcherType = kIMBWatcherTypeFSEvent;
-	node.watchedPath = [self.mediaSource path];
+	node.watchedPath = libraryPath;
 
 	if (outError) *outError = error;
 	return node;
@@ -602,11 +600,9 @@ static NSArray* sSupportedUTIs = nil;
 														 @"Name of unnamed node in IMBLightroomParser");
 			}
 			
-			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.name = name;
 			node.icon = [self folderIcon];
-			node.parserIdentifier = self.identifier;
-			node.mediaSource = self.mediaSource;
 			node.identifier = [self identifierWithFolderId:id_local];
 			node.attributes = [self attributesWithRootFolder:id_local
 													 idLocal:id_local
@@ -689,11 +685,9 @@ static NSArray* sSupportedUTIs = nil;
 			IMBNode *node = nil;
 			
 			if ([pathFromRoot length] > 0) {
-				node = [[[IMBNode alloc] init] autorelease];
+				node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 				
 				node.icon = [self folderIcon];
-				node.parserIdentifier = self.identifier;
-				node.mediaSource = self.mediaSource;
 				node.name = [pathFromRoot lastPathComponent];
 				node.isLeafNode = NO;
 
@@ -797,12 +791,10 @@ static NSArray* sSupportedUTIs = nil;
 				}
 			}
 			
-			IMBNode* node = [[[IMBNode alloc] init] autorelease];
+			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
 			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];
-			node.parserIdentifier = self.identifier;
-			node.mediaSource = self.mediaSource;
 			node.attributes = [self attributesWithRootFolder:nil
 													 idLocal:idLocal
 													rootPath:nil
@@ -1058,6 +1050,10 @@ static NSArray* sSupportedUTIs = nil;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
 	
+    // Check whether we have access to this resource's location
+    
+    [self checkAccessRightsForObject:object];
+    
 	return object;
 }
 

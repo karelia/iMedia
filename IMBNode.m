@@ -58,8 +58,10 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
+#import "IMBParser.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,8 +138,9 @@
 
 #pragma mark
 
+// Designated initializer
 
-- (id) init
+- (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel
 {
 	if (self = [super init])
 	{
@@ -149,7 +152,7 @@
 		self.displayedObjectCount = -1;
 
 		self.isGroupNode = NO;
-		self.isTopLevelNode = NO;
+		self.isTopLevelNode = inTopLevel;
 		self.isLeafNode = NO;
 		self.isLoading = NO;
 		self.isUserAdded = NO;
@@ -161,9 +164,30 @@
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
 		self.badgeTypeMouseover = kIMBBadgeTypeNone;
+        
+        if (inParser)
+        {
+            self.mediaType = inParser.mediaType;
+            self.parserIdentifier = inParser.identifier;
+            self.mediaSource = inParser.mediaSource;
+            self.parserMessenger = inParser.parserMessenger;
+            
+            if (self.isTopLevelNode)
+            {
+                // Being sandboxed the app may yet not have entitlements to access this top level node
+                
+                [inParser checkAccessRightsForNode:self];
+            }
+        }
 	}
 	
 	return self;
+}
+
+
+- (id) init
+{
+    return [self initWithParser:nil topLevel:NO];
 }
 
 
@@ -300,20 +324,17 @@
 		NSMutableArray* objects = [inCoder decodeObjectForKey:@"objects"];
 		if (objects) self.objects = objects;
 		
-#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
-        
 		// Optimization: The icon is built from a single (small) image representation. See comments in method below...
 		
-		self.icon = [inCoder decodeObjectForKey:@"icon"];
-
-//		NSImageRep* iconRepresentation = [inCoder decodeObjectForKey:@"iconRepresentation"];
-//		
-//		if (iconRepresentation)
-//		{
-//			NSImage* icon = [[[NSImage alloc] init] autorelease];
-//			[icon addRepresentation:iconRepresentation];
-//			self.icon = icon;
-//		}
+		@try
+		{
+			self.icon = [inCoder decodeObjectForKey:@"icon"];
+		}
+		@catch (NSException *exception)
+		{
+			NSLog(@"%s Caught exception trying to decode icon for node %@: %@",__FUNCTION__,self.name,exception);
+			self.icon = [NSImage imb_sharedGenericFolderIcon];
+		}
 	}
 	
 	return self;
@@ -349,30 +370,34 @@
 	if (self.subnodes) [inCoder encodeObject:self.subnodes forKey:@"subnodes"];
 	if (self.objects) [inCoder encodeObject:self.objects forKey:@"objects"];
 	
-#warning TODO Peter, to account for retina displays I returned to keeping all image representations. We may have to cash icons in the app now. Did not notice any performance decrease though
-    
-	// Encoding the icon needs special attention. We only need 16x16 pixels, but the NSImage contains multiple
-	// high resolution representations. Instead of encoding them all, we'll simply encode the smallest one...
+	// Encoding the icon needs special attention. We only need 16x16 pixels (and 32x32 for retina displays),
+	// but the NSImage contains multiple high resolution representations. Instead of encoding them all, we'll
+	// simply encode the small ones...
 	
-	[inCoder encodeObject:self.icon forKey:@"icon"];
-
-//	NSImage* icon = self.icon;
-//	NSArray* reps = [icon representations];
-//	NSImageRep* smallestRep = nil;
-//	CGFloat smallestWidth = HUGE_VALF;
-//	
-//	for (NSImageRep* rep in reps)
-//	{
-//		NSSize size = rep.size;
-//		
-//		if (size.width < smallestWidth)
-//		{
-//			smallestWidth = size.width;
-//			smallestRep = rep;
-//		}
-//	}
-//	
-//	if (smallestRep) [inCoder encodeObject:smallestRep forKey:@"iconRepresentation"];
+	NSImage* originalIcon = self.icon;
+	NSArray* originalReps = [originalIcon representations];
+	NSImage* strippedIcon = [[NSImage alloc] initWithSize:NSMakeSize(16.0,16.0)];
+	
+	for (NSImageRep* iconRep in originalReps)
+	{
+		NSSize size = iconRep.size;
+		
+		if (size.width <= 32.0)
+		{
+//			if ([rep isKindOfClass:[NSBitmapImageRep class]])
+			if (YES)
+			{
+//				NSLog(@"%s %@ %@",__FUNCTION__,NSStringFromClass([rep class]),NSStringFromSize(size));
+				[strippedIcon addRepresentation:iconRep];
+			}
+			else
+			{
+				// TODO: convert other reps to NSBitmapImageRep
+			}
+		}
+	}
+	
+	[inCoder encodeObject:strippedIcon forKey:@"icon"];
 }
 
 
@@ -884,6 +909,14 @@
 	}
 		
 	return nil;
+}
+
+
+// Returns the root url of this node's library (may be different from self.mediaSource)
+
+- (NSURL*)libraryRootURL
+{
+    return [self.parserMessenger libraryRootURLForMediaSource:self.mediaSource];
 }
 
 

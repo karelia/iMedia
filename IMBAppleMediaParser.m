@@ -250,7 +250,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	NSDictionary* metadata = [fileManager attributesOfItemAtPath:path error:&error];
     [fileManager release];
     
-    NSLog(@"%@ metadata:\n%@", path, metadata);
+//    NSLog(@"%@ metadata:\n%@", path, metadata);
     
     if (metadata)
     {
@@ -343,37 +343,26 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	[icon setScalesWhenResized:YES];
 	[icon setSize:NSMakeSize(16.0,16.0)];
     
-	IMBNode* node = [[[IMBNode alloc] init] autorelease];
+	IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 
-    // Being sandboxed the app may yet not have entitlements to access this top level node
-    
-    node.isAccessible = [[NSFileManager defaultManager] imb_isPath:[self.mediaSource path]
-                                                        accessible:kIMBAccessRead | kIMBAccessWrite];
     
 //    NSLog(@"Node %@ is %@accessible", node, node.isAccessible ? @"" : @"NOT ");
     
 	node.icon = icon;
 	node.name = [[self class] libraryName];
 	node.identifier = [self rootNodeIdentifier];
-	node.mediaType = self.mediaType;
-	node.mediaSource = self.mediaSource;
 	node.groupType = kIMBGroupTypeLibrary;
-	node.parserIdentifier = self.identifier;
-	node.isTopLevelNode = YES;
 	node.isLeafNode = NO;
 	
 	if (node.isTopLevelNode)
 	{
-        
-#warning Display of node accessibility is preliminary
-        
-        if (self.shouldDisplayLibraryName)
+		if (self.shouldDisplayLibraryName)
         {
             NSString* path = (NSString*)[node.mediaSource path];
-            NSString* name = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
-            node.name = [NSString stringWithFormat:@"%@%@ (%@)",node.name, node.isAccessible ? @"" : @": no access!", name];
+            NSString* libraryName = [[[path stringByDeletingLastPathComponent] lastPathComponent] stringByDeletingPathExtension];
+            node.name = [NSString stringWithFormat:@"%@ (%@)",node.name, libraryName];
         } else {
-            node.name = [NSString stringWithFormat:@"%@%@",node.name, node.isAccessible ? @"" : @": no access!"];
+            node.name = [NSString stringWithFormat:@"%@",node.name];
         }
 	}
 	
@@ -884,13 +873,11 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
-			subnode.mediaSource = self.mediaSource;
-			subnode.parserIdentifier = self.identifier;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:

@@ -433,14 +433,12 @@
 		{
 			// Create node for this album...
 			
-			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* albumNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType];
 			albumNode.name = albumName;
-			albumNode.mediaSource = self.mediaSource;
-			albumNode.parserIdentifier = self.identifier;
-			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
+			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
@@ -612,13 +610,11 @@
 		{
 			// Create subnode for this node...
 			
-			IMBNode* subnode = [[[IMBNode alloc] init] autorelease];
+			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
 			subnode.icon = [self iconForAlbumType:subNodeType];
 			subnode.name = subnodeName;
-			subnode.mediaSource = self.mediaSource;
-			subnode.parserIdentifier = self.identifier;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			subnode.watcherType = kIMBWatcherTypeNone;  // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:

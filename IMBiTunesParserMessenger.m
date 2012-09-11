@@ -71,10 +71,8 @@
 
 #pragma mark GLOBALS
 
-static NSMutableArray* sAudioParsers = nil;
 static dispatch_once_t sAudioOnceToken = 0;
 
-static NSMutableArray* sMovieParsers = nil;
 static dispatch_once_t sMovieOnceToken = 0;
 
 
@@ -122,6 +120,38 @@ static dispatch_once_t sMovieOnceToken = 0;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]))
+	{
+        // decode additional properties here
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+    
+    // encode additional properties here
+}
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBiTunesParserMessenger* copy = (IMBiTunesParserMessenger*)[super copyWithZone:inZone];
+    
+    // Copy additional properties here
+    
+	return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Check if iTunes is installed...
 
 - (NSString*) iTunesPath
@@ -133,6 +163,18 @@ static dispatch_once_t sMovieOnceToken = 0;
 - (BOOL) isInstalled
 {
 	return [self iTunesPath] != nil;
+}
+
+
+// Library root is parent directory of library XML file
+
+- (NSURL *)libraryRootURLForMediaSource:(NSURL *)inMediaSource
+{
+    if (inMediaSource)
+    {
+        return [inMediaSource URLByDeletingLastPathComponent];
+    }
+    return [super libraryRootURLForMediaSource:inMediaSource];
 }
 
 
@@ -163,6 +205,20 @@ static dispatch_once_t sMovieOnceToken = 0;
 	return @"com.karelia.imedia.iTunes.audio";
 }
 
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
+    return parsers;
+}
+
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -175,13 +231,15 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
+    
     dispatch_once(&sAudioOnceToken,
     ^{
 		if ([self isInstalled])
 		{
 			CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
 			NSArray* libraries = (NSArray*)recentLibraries;
-			sAudioParsers = [[NSMutableArray alloc] initWithCapacity:libraries.count];
 			
 			for (NSString* library in libraries)
 			{
@@ -201,7 +259,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
-					[sAudioParsers addObject:parser];
+					[parsers addObject:parser];
 					[parser release];
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
@@ -217,7 +275,11 @@ static dispatch_once_t sMovieOnceToken = 0;
 		}
 	});
 
-	return (NSArray*)sAudioParsers;
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
+	return (NSArray*)parsers;
 }
 
 
@@ -248,6 +310,20 @@ static dispatch_once_t sMovieOnceToken = 0;
 	return @"com.karelia.imedia.iTunes.movie";
 }
 
+// Returns the list of parsers this messenger instantiated
+
++ (NSMutableArray *)parsers
+{
+    static NSMutableArray *parsers = nil;
+    
+    static dispatch_once_t onceToken = 0;
+    dispatch_once(&onceToken, ^{
+        parsers = [[NSMutableArray alloc] init];
+    });
+    return parsers;
+}
+
+
 + (void) load
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -260,13 +336,14 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 - (NSArray*) parserInstancesWithError:(NSError**)outError
 {
+    Class messengerClass = [self class];
+    NSMutableArray *parsers = [messengerClass parsers];
     dispatch_once(&sMovieOnceToken,
     ^{
 		if ([self isInstalled])
 		{
 			CFArrayRef recentLibraries = SBPreferencesCopyAppValue((CFStringRef)@"iTunesRecentDatabases",(CFStringRef)@"com.apple.iApps");
 			NSArray* libraries = (NSArray*)recentLibraries;
-			sMovieParsers = [[NSMutableArray alloc] initWithCapacity:libraries.count];
 			
 			for (NSString* library in libraries)
 			{
@@ -286,7 +363,7 @@ static dispatch_once_t sMovieOnceToken = 0;
 					parser.appPath = self.iTunesPath;
 					parser.shouldDisplayLibraryName = libraries.count > 1;
 
-					[sMovieParsers addObject:parser];
+					[parsers addObject:parser];
 					[parser release];
 
 					// Exclude enclosing folder from being displayed by IMBFolderParser...
@@ -302,7 +379,11 @@ static dispatch_once_t sMovieOnceToken = 0;
 		}
 	});
 
-	return (NSArray*)sMovieParsers;
+    // Every parser must have its current parser messenger set
+    
+    [self setParserMessengerForParsers];
+    
+	return (NSArray*)parsers;
 }
 
 
