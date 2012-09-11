@@ -520,7 +520,7 @@
 {
 	NSFileManager* manager = [[NSFileManager alloc] init];
     NSString* path = [[inNode libraryRootURL] path];
-    inNode.isAccessible = path ? [manager imb_isPath:path accessible:kIMBAccessRead|kIMBAccessWrite] : YES;
+    inNode.isAccessible = path ? [manager imb_isPath:path accessible:kIMBAccessRead] : YES;
 	[manager release];
     
     //NSLog(@"Access to %@: %@", [[inNode libraryRootURL] path], inNode.isAccessible ? @"YES" : @"NO");
@@ -530,7 +530,7 @@
 - (void) checkAccessRightsForObject:(IMBObject*)inObject
 {
 	NSFileManager* manager = [[NSFileManager alloc] init];
-    inObject.isAccessible = [manager imb_isPath:[inObject.location path]  accessible:kIMBAccessRead|kIMBAccessWrite];
+    inObject.isAccessible = [manager imb_isPath:[inObject.location path]  accessible:kIMBAccessRead];
 	[manager release];
 }
 
