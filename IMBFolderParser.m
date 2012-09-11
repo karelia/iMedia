@@ -114,12 +114,16 @@
 	
     // Check if the folder exists. If not then do not return a node...
 
+	NSFileManager* fileManager = [[NSFileManager alloc] init];
+    BOOL directory;
+    BOOL exists = [fileManager fileExistsAtPath:path isDirectory:&directory];
+    if (!exists || !directory) return nil;
+    
 	NSNumber* hasSubfolders = [self directoryHasVisibleSubfolders:url error:outError];
     if (!hasSubfolders) return nil;	
     
 	// Create an empty root node (unpopulated and without subnodes)...
 	
-	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 	[fileManager release];
