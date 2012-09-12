@@ -227,9 +227,10 @@
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
-	
-    files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
-
+	files = [files sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"lastPathComponent"
+                                                                                                      ascending:YES
+                                                                                                       selector:@selector(localizedStandardCompare:)]]];
+    
     NSMutableArray* subnodes = [NSMutableArray array];
     NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
     
