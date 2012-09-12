@@ -413,11 +413,23 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		NSString* mediaType = [info objectForKey:@"mediaType"];
 		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
 		
-		parser.mediaSource = [info objectForKey:@"mediaSource"];
+		// Restore bookmark
+        NSData *bookmark = [info objectForKey:@"bookmark"];
+        parser.bookmarkData = bookmark;
+        
+        NSURL *folderURL = nil;
+        if (bookmark)
+        {
+            folderURL = [NSURL URLByResolvingBookmarkData:bookmark options:0 relativeToURL:nil bookmarkDataIsStale:NULL error:NULL];
+        }
+        if (!folderURL)
+        {
+            NSString *path = [info objectForKey:@"mediaSource"];
+            if (path) folderURL = [NSURL fileURLWithPath:path isDirectory:YES];
+        }
+        
+		parser.mediaSource = [folderURL path];
 		parser.custom = YES;
-		
-    // Restore bookmark
-    parser.bookmarkData = [info objectForKey:@"bookmark"];
     
 		[self addCustomParser:parser forMediaType:parser.mediaType];
 		[parser release];
