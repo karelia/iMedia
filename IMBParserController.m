@@ -377,8 +377,7 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
             }
           }
           
-          // Create a dictionary with the information required for restoring the
-          // cusom parser:
+          // Create a dictionary with the information required for restoring the custom parser:
 					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
 						NSStringFromClass([parser class]),@"className",
 						parser.mediaSource,@"mediaSource",
