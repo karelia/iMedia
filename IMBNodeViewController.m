@@ -622,16 +622,16 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
         NSData* bookmark = [self.selectedParser bookmark];
         if (bookmark != nil)
         {
-          NSError* outError = nil;
+          NSError* error = nil;
           NSURL* securityScopedURL = 
           [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
                         bookmarkDataIsStale:NULL
-                                      error:&outError];
-          if (outError)
+                                      error:&error];
+          if (error)
           {
-            NSLog(@"Failed to resolve bookmark data: %@", outError.localizedFailureReason);
+            NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
           }
           // This call to stopAccessingSecurityScopedResource is balanced with
           // the call to startAccessingSecurityScopedResource below:
@@ -644,13 +644,13 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
         NSData* bookmark = [self.selectedParser bookmark];
         if (bookmark != nil)
         {
-          NSError* outError = nil;
+          NSError* error = nil;
           NSURL* securityScopedURL = 
           [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
                         bookmarkDataIsStale:NULL
-                                      error:&outError];
+                                      error:&error];
 
           // This requests an access to the URL for the time it is selected.
           // This approach seems to be safer and cleaner than starting/stopping
@@ -659,9 +659,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           // This call to startAccessingSecurityScopedResource is balanced with
           // the call to stopAccessingSecurityScopedResource above.
           [securityScopedURL imb_startAccessingSecurityScopedResource];
-          if (outError)
+          if (error)
           {
-            NSLog(@"Failed to resolve bookmark data: %@", outError.localizedFailureReason);
+            NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
           }
         }
       }
