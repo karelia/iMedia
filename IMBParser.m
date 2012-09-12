@@ -126,6 +126,7 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
+    [_bookmark release];
 
 	[super dealloc];
 }
