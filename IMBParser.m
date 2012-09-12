@@ -258,7 +258,7 @@
     sourceURL = [NSURL URLByResolvingBookmarkData:self.bookmark
                                           options: NSURLBookmarkResolutionWithSecurityScope
                                     relativeToURL: nil
-                              bookmarkDataIsStale: NO
+                              bookmarkDataIsStale:NULL
                                             error: &bookmarkResolvingOutError];
     if (bookmarkResolvingOutError != nil)
     {

@@ -203,7 +203,7 @@
     folderURL = [NSURL URLByResolvingBookmarkData:[self bookmark]
                                           options:NSURLBookmarkResolutionWithSecurityScope
                                     relativeToURL:nil
-                              bookmarkDataIsStale:NO
+                              bookmarkDataIsStale:NULL
                                             error:outError];
     gotAccessFromBookmark = [folderURL imb_startAccessingSecurityScopedResource];
   }

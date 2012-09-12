@@ -296,7 +296,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
       securityScopedURL = [NSURL URLByResolvingBookmarkData:[parser bookmark]
                                                     options: NSURLBookmarkResolutionWithSecurityScope
                                               relativeToURL: nil
-                                        bookmarkDataIsStale: NO
+                                        bookmarkDataIsStale:NULL
                                                       error: &error];
       if (error != nil)
         securityScopedURL = nil;      

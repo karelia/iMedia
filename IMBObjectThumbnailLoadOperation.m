@@ -109,8 +109,8 @@
       securityScopedURL = [NSURL URLByResolvingBookmarkData:[parser bookmark]
                                                     options: NSURLBookmarkResolutionWithSecurityScope
                                               relativeToURL: nil
-                                        bookmarkDataIsStale: NO
-                                                      error: &error];
+                                        bookmarkDataIsStale:NULL
+                                                      error:&error];
       if (error != nil)
         securityScopedURL = nil;
       

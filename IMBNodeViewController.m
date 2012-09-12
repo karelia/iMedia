@@ -627,7 +627,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
-                        bookmarkDataIsStale: NO error: &outError];
+                        bookmarkDataIsStale:NULL
+                                      error:&outError];
           if (outError)
           {
             NSLog(@"Failed to resolve bookmark data: %@", outError.localizedFailureReason);
@@ -648,7 +649,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
-                        bookmarkDataIsStale: NO error: &outError];
+                        bookmarkDataIsStale:NULL
+                                      error:&outError];
 
           // This requests an access to the URL for the time it is selected.
           // This approach seems to be safer and cleaner than starting/stopping
