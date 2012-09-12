@@ -359,10 +359,30 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			{
 				if (parser.isCustom)
 				{
+          if (parser.bookmarkData == nil)
+          {
+            // Create URL bookmark
+            NSError* error = nil;
+            NSURL* mediaSourceURL = [NSURL fileURLWithPath:parser.mediaSource isDirectory:YES];
+              
+              parser.bookmarkData = [mediaSourceURL bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope|NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+                                             includingResourceValuesForKeys:nil
+                                                              relativeToURL:nil
+                                                                      error:&error];
+              
+            if (!parser.bookmarkData)
+            {
+              NSLog(NSLocalizedString(@"Could not create a bookmark for URL. Error: %@", @"URL bookmark creation failed."),
+                    [error localizedFailureReason]);
+            }
+          }
+          
+          // Create a dictionary with the information required for restoring the custom parser:
 					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
 						NSStringFromClass([parser class]),@"className",
 						parser.mediaSource,@"mediaSource",
 						parser.mediaType,@"mediaType",
+            parser.bookmarkData,@"bookmark",
 						nil];
 						
 					[customParsers addObject:info];	
@@ -393,9 +413,24 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		NSString* mediaType = [info objectForKey:@"mediaType"];
 		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
 		
-		parser.mediaSource = [info objectForKey:@"mediaSource"];
+		// Restore bookmark
+        NSData *bookmark = [info objectForKey:@"bookmark"];
+        parser.bookmarkData = bookmark;
+        
+        NSURL *folderURL = nil;
+        if (bookmark)
+        {
+            folderURL = [NSURL URLByResolvingBookmarkData:bookmark options:0 relativeToURL:nil bookmarkDataIsStale:NULL error:NULL];
+        }
+        if (!folderURL)
+        {
+            NSString *path = [info objectForKey:@"mediaSource"];
+            if (path) folderURL = [NSURL fileURLWithPath:path isDirectory:YES];
+        }
+        
+		parser.mediaSource = [folderURL path];
 		parser.custom = YES;
-		
+    
 		[self addCustomParser:parser forMediaType:parser.mediaType];
 		[parser release];
 	}
