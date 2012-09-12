@@ -87,7 +87,7 @@
 @synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
 @synthesize custom = _custom;
-@synthesize bookmark = _bookmark;
+@synthesize bookmarkData = _bookmark;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -252,10 +252,10 @@
 	}
 	
   NSURL* sourceURL = nil;
-  if (self.bookmark != nil)
+  if (self.bookmarkData != nil)
   {
     NSError* bookmarkResolvingOutError = nil;
-    sourceURL = [NSURL URLByResolvingBookmarkData:self.bookmark
+    sourceURL = [NSURL URLByResolvingBookmarkData:self.bookmarkData
                                           options: NSURLBookmarkResolutionWithSecurityScope
                                     relativeToURL: nil
                               bookmarkDataIsStale:NULL

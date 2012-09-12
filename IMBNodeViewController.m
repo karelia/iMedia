@@ -619,12 +619,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		{
 			[self.selectedParser didStopUsingParser];
       {
-        NSData* bookmark = [self.selectedParser bookmark];
+        NSData* bookmark = [self.selectedParser bookmarkData];
         if (bookmark != nil)
         {
           NSError* error = nil;
           NSURL* securityScopedURL = 
-          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
+          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmarkData]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
                         bookmarkDataIsStale:NULL
@@ -641,12 +641,12 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
       
 			self.selectedParser = newNode.parser;
       {
-        NSData* bookmark = [self.selectedParser bookmark];
+        NSData* bookmark = [self.selectedParser bookmarkData];
         if (bookmark != nil)
         {
           NSError* error = nil;
           NSURL* securityScopedURL = 
-          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmark]
+          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmarkData]
                                     options: NSURLBookmarkResolutionWithSecurityScope
                               relativeToURL: nil
                         bookmarkDataIsStale:NULL

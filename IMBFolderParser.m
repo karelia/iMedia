@@ -198,9 +198,9 @@
                                           error:outError];
   
   BOOL gotAccessFromBookmark = NO;
-  if (!files && [self bookmark] != nil)
+  if (!files && [self bookmarkData] != nil)
   {
-    folderURL = [NSURL URLByResolvingBookmarkData:[self bookmark]
+    folderURL = [NSURL URLByResolvingBookmarkData:[self bookmarkData]
                                           options:NSURLBookmarkResolutionWithSecurityScope
                                     relativeToURL:nil
                               bookmarkDataIsStale:NULL
