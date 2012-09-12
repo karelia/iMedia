@@ -367,5 +367,35 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 //----------------------------------------------------------------------------------------------------------------------
 
 
++ (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler
+{
+    IMBParserMessenger* messenger = inFolderParserMessenger;
+    void(^completionHandler)(void) = [inCompletionHandler copy];
+    
+    // Create bookmark...
+    
+    NSURL* url = messenger.mediaSource;
+    NSData* bookmark = [IMBAccessRightsController bookmarkForURL:url];
+    
+    // Send it to the XPC service, so it has access to the folder...
+    
+    SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+
+        ^(NSURL* inReceivedURL,NSError* inError)
+        {
+            NSLog(@"%s  url=%@  error=%@",__FUNCTION__,inReceivedURL,inError);
+            completionHandler();
+            [completionHandler release];
+        });
+
+    // Also send it to the FSEvents service, so that it can do its job...
+    
+    [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 @end
 

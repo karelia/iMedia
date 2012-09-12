@@ -57,7 +57,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
-#import "IMBAccessRightsController.h"
+#import "IMBAccessRightsViewController.h"
 #import "IMBImageFolderParserMessenger.h"
 #import "IMBAudioFolderParserMessenger.h"
 #import "IMBMovieFolderParserMessenger.h"
@@ -1188,8 +1188,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		
 		if (parserMessenger)
 		{
-			[[IMBParserController sharedParserController] addUserAddedParserMessenger:parserMessenger];
-			[self createTopLevelNodesWithParserMessenger:parserMessenger];
+            [IMBAccessRightsViewController grantAccessRightsForFolder:parserMessenger completionHandler:^()
+            {
+                [[IMBParserController sharedParserController] addUserAddedParserMessenger:parserMessenger];
+                [self createTopLevelNodesWithParserMessenger:parserMessenger];
+            }];
 		}
 	}
 	

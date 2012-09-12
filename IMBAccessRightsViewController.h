@@ -65,6 +65,7 @@
 #pragma mark CLASSES
 
 @class IMBNode;
+@class IMBParserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,6 +90,8 @@
 
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
+
++ (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler;
 
 @end
 
