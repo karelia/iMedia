@@ -160,10 +160,6 @@
 
 - (NSData*) bookmarkForLocalFileObject:(IMBObject*)inObject error:(NSError**)outError;
 
-// Informs that some of the receiver's IMBObjects have been written to a pasteboard. Could use this to add some
-// extra parser-specific data to the pasteboard. Default implementation does nothing.
-- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
-
 // These methods check if the necessary access rights are available and set a flag on the node or object...
 
 - (void) checkAccessRightsForNode:(IMBNode*)inNode;
