@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah, Ben Uri
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -190,18 +190,25 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSString* folder = inNode.mediaSource;
-	NSFileManager* fm = [NSFileManager imb_threadSafeManager];
-	NSArray* files = [fm contentsOfDirectoryAtPath:folder error:outError];	
-	if (!files) return NO;
+    NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
+    NSFileManager* fm = [NSFileManager imb_threadSafeManager];
+    
+    NSArray* files = [fm contentsOfDirectoryAtURL:folderURL
+                       includingPropertiesForKeys:nil
+                                          options:NSDirectoryEnumerationSkipsHiddenFiles
+                                            error:outError];
+  
+    if (!files) return NO;
     
     
     NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	
-	
-    files = [files sortedArrayUsingSelector:@selector(imb_finderCompare:)];
-
+	files = [files sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"lastPathComponent"
+                                                                                                      ascending:YES
+                                                                                                       selector:@selector(localizedStandardCompare:)]]];
+    
     NSMutableArray* subnodes = [NSMutableArray array];
     NSMutableArray* objects = [NSMutableArray arrayWithCapacity:files.count];
     
@@ -209,7 +216,7 @@
     
     NSMutableArray* folders = [NSMutableArray array];
 
-    for (NSString* file in files)
+    for (NSURL* fileURL in files)
     {
         if (index%32 == 0)
         {
@@ -217,11 +224,8 @@
             pool = [[NSAutoreleasePool alloc] init];
         }
         
-        // Hidden file system items (e.g. ".thumbnails") will be skipped...
-        
-        if (![file hasPrefix:@"."])	
         {
-            NSString* path = [folder stringByAppendingPathComponent:file];
+            NSString* path = fileURL.path;
             
             // For folders will be handled later. Just remember it for now...
             BOOL isDir = NO;
@@ -242,7 +246,9 @@
             
             else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
             {
-                NSString *betterName = [fm displayNameAtPath:[file stringByDeletingPathExtension]];
+                NSString *betterName;
+                if (![fileURL getResourceValue:&betterName forKey:NSURLLocalizedNameKey error:NULL]) betterName = [fileURL lastPathComponent];
+                
                 betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
                 
                 IMBObject* object = [self objectForPath:path name:betterName index:index++];
@@ -336,7 +342,7 @@
     inNode.leaf = [subnodes count] == 0;
 	
 	IMBDrain(pool);
-					
+        
 	return result;
 }
 
