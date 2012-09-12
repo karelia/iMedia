@@ -618,9 +618,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		if (self.selectedParser != newNode.parser)
 		{
 			[self.selectedParser didStopUsingParser];
-      
 			self.selectedParser = newNode.parser;
-    	}
+		}
 	}
 
 	// Sync the selection of the popup menu...

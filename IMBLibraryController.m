@@ -288,7 +288,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		// This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
         IMBParser *parser = [self parser];
         [parser willUseParser];
-        
+		
         NSError* error = nil;
         if ([parser populateNode:self.replacementNode options:self.options error:&error])
 		{
@@ -299,7 +299,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
 			
-			// If we failed then the _oldNode is still good but needs to have its status updated
+			// If we failed then the _oldNode is still good but needs to have its status updated 
 			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
 	}
