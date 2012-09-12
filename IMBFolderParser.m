@@ -242,11 +242,8 @@
             pool = [[NSAutoreleasePool alloc] init];
         }
         
-        // Hidden file system items (e.g. ".thumbnails") will be skipped...
-        
-        // if (![file hasPrefix:@"."])
         {
-            NSString* path = fileURL.path; // [folder stringByAppendingPathComponent:file];
+            NSString* path = fileURL.path;
             
             // For folders will be handled later. Just remember it for now...
             BOOL isDir = NO;
