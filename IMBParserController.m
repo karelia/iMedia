@@ -362,17 +362,17 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
           if (parser.bookmarkData == nil)
           {
             // Create URL bookmark
-            NSError* bookmarkCreationOutError = nil;
+            NSError* error = nil;
             NSURL* mediaSourceURL = [NSURL fileURLWithPath:parser.mediaSource isDirectory:YES];
             parser.bookmarkData =
               [mediaSourceURL bookmarkDataWithOptions: NSURLBookmarkCreationWithSecurityScope
                        includingResourceValuesForKeys: nil
                                         relativeToURL: nil
-                                                error: &bookmarkCreationOutError];
-            if (bookmarkCreationOutError != nil)
+                                                error:&error];
+            if (!parser.bookmarkData)
             {
               NSLog(NSLocalizedString(@"Could not create a bookmark for URL. Error: %@", @"URL bookmark creation failed."),
-                    [bookmarkCreationOutError localizedFailureReason]);
+                    [error localizedFailureReason]);
             }
           }
           
