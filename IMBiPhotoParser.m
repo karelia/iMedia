@@ -840,24 +840,4 @@
 
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark Pasteboard
-
-- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
-{
-    [super didWriteObjects:objects toPasteboard:pasteboard];
-    
-    // Pretend we're iPhoto and write its custom metadata pasteboard type
-    [pasteboard addTypes:[NSArray arrayWithObject:@"ImageDataListPboardType"] owner:nil];
-    
-    NSArray *values = [objects valueForKey:@"preliminaryMetadata"];
-    NSArray *keys = [values valueForKey:@"iPhotoKey"];
-    NSDictionary *dataList = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
-    [pasteboard setPropertyList:dataList forType:@"ImageDataListPboardType"];
-    [dataList release];
-}
-
 @end

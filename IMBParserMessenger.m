@@ -632,6 +632,15 @@
 
 
 #pragma mark
+#pragma mark Pasteboard
+
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard; { }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark Helpers
 
 
