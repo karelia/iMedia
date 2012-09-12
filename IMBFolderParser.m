@@ -264,7 +264,9 @@
             
             else if ([NSString imb_doesFileAtPath:path conformToUTI:_fileUTI])
             {
-                NSString *betterName = [fm displayNameAtPath:[[path lastPathComponent] stringByDeletingPathExtension]];
+                NSString *betterName;
+                if (![fileURL getResourceValue:&betterName forKey:NSURLLocalizedNameKey error:NULL]) betterName = [fileURL lastPathComponent];
+                
                 betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
                 
                 IMBObject* object = [self objectForPath:path name:betterName index:index++];
