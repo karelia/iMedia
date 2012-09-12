@@ -197,30 +197,29 @@
                                         options:NSDirectoryEnumerationSkipsHiddenFiles
                                           error:outError];
   
-  BOOL gotAccessFromBookmark = NO;
-  if (!files && [self bookmarkData] != nil)
-  {
-    folderURL = [NSURL URLByResolvingBookmarkData:[self bookmarkData]
-                                          options:NSURLBookmarkResolutionWithSecurityScope
-                                    relativeToURL:nil
-                              bookmarkDataIsStale:NULL
-                                            error:outError];
-      
-      if ([folderURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
-      {
-          gotAccessFromBookmark = [folderURL startAccessingSecurityScopedResource];
-      }
-  }
+    // Maybe we don't have access to the URL yet, so resolve our security-scoped bookmark and use that
+    NSURL *securityScopedURL = nil;
+    if (!files && [self bookmarkData] != nil && [NSURL instancesRespondToSelector:@selector(startAccessingSecurityScopedResource)])
+    {
+        securityScopedURL = [NSURL URLByResolvingBookmarkData:[self bookmarkData]
+                                                  options:NSURLBookmarkResolutionWithSecurityScope
+                                            relativeToURL:nil
+                                      bookmarkDataIsStale:NULL
+                                                    error:outError];
+        
+        if (![securityScopedURL startAccessingSecurityScopedResource]) securityScopedURL = nil;
+    }
   
-  files = [fm contentsOfDirectoryAtURL:folderURL
-            includingPropertiesForKeys:nil
-                               options:NSDirectoryEnumerationSkipsHiddenFiles
-                                 error:outError];
+    files = [fm contentsOfDirectoryAtURL:folderURL
+              includingPropertiesForKeys:nil
+                                 options:NSDirectoryEnumerationSkipsHiddenFiles
+                                   error:outError];
+    
 	if (!files)
-  {
-    if (gotAccessFromBookmark) [folderURL stopAccessingSecurityScopedResource];
-    return NO;
-  }
+    {
+        [securityScopedURL stopAccessingSecurityScopedResource];
+        return NO;
+    }
     
     
     NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
@@ -365,7 +364,7 @@
 	
 	IMBDrain(pool);
     
-    if (gotAccessFromBookmark) [folderURL stopAccessingSecurityScopedResource];
+    [securityScopedURL stopAccessingSecurityScopedResource];
     
 	return result;
 }
