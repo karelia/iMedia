@@ -111,8 +111,6 @@
                                               relativeToURL: nil
                                         bookmarkDataIsStale:NULL
                                                       error:&error];
-      if (error != nil)
-        securityScopedURL = nil;
       
       if (securityScopedURL != nil)
       {

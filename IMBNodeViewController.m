@@ -629,7 +629,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
                               relativeToURL: nil
                         bookmarkDataIsStale:NULL
                                       error:&error];
-          if (error)
+          if (!securityScopedURL)
           {
             NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
           }
@@ -659,7 +659,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           // This call to startAccessingSecurityScopedResource is balanced with
           // the call to stopAccessingSecurityScopedResource above.
           [securityScopedURL imb_startAccessingSecurityScopedResource];
-          if (error)
+          if (!securityScopedURL)
           {
             NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
           }

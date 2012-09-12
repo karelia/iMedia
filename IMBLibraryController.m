@@ -298,8 +298,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
                                               relativeToURL: nil
                                         bookmarkDataIsStale:NULL
                                                       error: &error];
-      if (error != nil)
-        securityScopedURL = nil;      
       if (securityScopedURL != nil)
       {
         if (![securityScopedURL imb_startAccessingSecurityScopedResource])

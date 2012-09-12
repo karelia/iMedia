@@ -260,7 +260,7 @@
                                     relativeToURL: nil
                               bookmarkDataIsStale:NULL
                                             error: &bookmarkResolvingOutError];
-    if (bookmarkResolvingOutError != nil)
+    if (!sourceURL)
     {
       NSLog(@"Failed to resolve bookmark data: %@",
             [bookmarkResolvingOutError localizedFailureReason]);
