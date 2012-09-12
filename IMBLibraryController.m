@@ -286,27 +286,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if (self.isCancelled == NO)
 	{
 		// This was using _paser ivar directly before with indication given as to it being necessary, so I'm switching to the proper accessor to see if it fixes my crash - Mike Abdullah
-    IMBParser *parser = [self parser];
-    [parser willUseParser];
-
-    NSURL* securityScopedURL = nil;
-    if (parser.bookmarkData != nil)
-    {
-      NSError* error = nil;
-      securityScopedURL = [NSURL URLByResolvingBookmarkData:[parser bookmarkData]
-                                                    options: NSURLBookmarkResolutionWithSecurityScope
-                                              relativeToURL: nil
-                                        bookmarkDataIsStale:NULL
-                                                      error: &error];
+        IMBParser *parser = [self parser];
+        [parser willUseParser];
         
-        if ([securityScopedURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
-        {
-            if (![securityScopedURL startAccessingSecurityScopedResource]) securityScopedURL = nil;
-        }
-    }
-
-    NSError* error = nil;
-    if ([parser populateNode:self.replacementNode options:self.options error:&error])
+        NSError* error = nil;
+        if ([parser populateNode:self.replacementNode options:self.options error:&error])
 		{
 			[self performSelectorOnMainThread:@selector(_didPopulateNode:) withObject:self.replacementNode];
 			[self doReplacement];
@@ -315,14 +299,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
 			
-			// If we failed then the _oldNode is still good but needs to have its status updated 
+			// If we failed then the _oldNode is still good but needs to have its status updated
 			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
-    
-        if ([securityScopedURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)])
-        {
-            [securityScopedURL stopAccessingSecurityScopedResource];
-        }
 	}
 }
 

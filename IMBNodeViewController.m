@@ -618,55 +618,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		if (self.selectedParser != newNode.parser)
 		{
 			[self.selectedParser didStopUsingParser];
-      {
-        NSData* bookmark = [self.selectedParser bookmarkData];
-        if (bookmark != nil)
-        {
-          NSError* error = nil;
-          NSURL* securityScopedURL = 
-          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmarkData]
-                                    options: NSURLBookmarkResolutionWithSecurityScope
-                              relativeToURL: nil
-                        bookmarkDataIsStale:NULL
-                                      error:&error];
-          if (!securityScopedURL)
-          {
-            NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
-          }
-          // This call to stopAccessingSecurityScopedResource is balanced with
-          // the call to startAccessingSecurityScopedResource below:
-          if ([securityScopedURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)]) [securityScopedURL stopAccessingSecurityScopedResource];
-        }
-      }
       
 			self.selectedParser = newNode.parser;
-      {
-        NSData* bookmark = [self.selectedParser bookmarkData];
-        if (bookmark != nil)
-        {
-          NSError* error = nil;
-          NSURL* securityScopedURL = 
-          [NSURL URLByResolvingBookmarkData: [self.selectedParser bookmarkData]
-                                    options: NSURLBookmarkResolutionWithSecurityScope
-                              relativeToURL: nil
-                        bookmarkDataIsStale:NULL
-                                      error:&error];
-
-          // This requests an access to the URL for the time it is selected.
-          // This approach seems to be safer and cleaner than starting/stopping
-          // access in smaller resolution, and it's not that costly because
-          // there is only one node selected at a time.
-          // This call to startAccessingSecurityScopedResource is balanced with
-          // the call to stopAccessingSecurityScopedResource above.
-          if ([securityScopedURL respondsToSelector:@selector(startAccessingSecurityScopedResource)]) [securityScopedURL startAccessingSecurityScopedResource];
-            
-          if (!securityScopedURL)
-          {
-            NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);
-          }
-        }
-      }
-		}
+    	}
 	}
 
 	// Sync the selection of the popup menu...

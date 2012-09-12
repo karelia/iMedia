@@ -153,7 +153,8 @@
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
-  NSData* _bookmark; // Security scoped bookmark, to be used when accessing the source
+    NSData *_bookmark; // Security scoped bookmark, to be used when accessing the source
+    dispatch_once_t _bookmarkAccessToken;
 }
 
 - (id) initWithMediaType:(NSString*)inMediaType;

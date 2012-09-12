@@ -175,7 +175,33 @@
 
 - (void) willUseParser
 {
-
+    // The first time the parser is used, grant access to it. We keep this access then for the lifetime of the app since have no idea what other bits of a host app might be making use of files from the parser later on. (Dragging files in-app doesn't cause PowerBox to upgrade access to them in any way, so we're forced to effectively "leak" here)
+    dispatch_once(&_bookmarkAccessToken, ^{
+        NSData *bookmark = [self bookmarkData];
+        if (bookmark && [NSURL instancesRespondToSelector:@selector(startAccessingSecurityScopedResource)])
+        {
+            NSError *error = nil;   // must be nil, I've seen the routine fail but not fill in the error before
+            NSURL *url = [[NSURL alloc] initByResolvingBookmarkData:bookmark
+                                                            options:NSURLBookmarkResolutionWithSecurityScope
+                                                      relativeToURL:nil
+                                                bookmarkDataIsStale:NULL    // TODO: handle stale bookmark
+                                                              error:&error];
+            
+            if (url)
+            {
+                if (![url startAccessingSecurityScopedResource])
+                {
+                    NSLog(@"iMedia: Unable to start accessing security-scoped URL for custom folder");
+                }
+                
+                [url release];
+            }
+            else
+            {
+                NSLog(@"iMedia: Unable to resolve security-scoped bookmark for access to custom folder: %@", [error localizedDescription]);
+            }
+        }
+    });
 }
 
 
@@ -251,28 +277,6 @@
 		path = [url path];
 	}
 	
-  NSURL* sourceURL = nil;
-  if (self.bookmarkData != nil)
-  {
-    NSError* bookmarkResolvingOutError = nil;
-    sourceURL = [NSURL URLByResolvingBookmarkData:self.bookmarkData
-                                          options: NSURLBookmarkResolutionWithSecurityScope
-                                    relativeToURL: nil
-                              bookmarkDataIsStale:NULL
-                                            error: &bookmarkResolvingOutError];
-    if (!sourceURL)
-    {
-      NSLog(@"Failed to resolve bookmark data: %@",
-            [bookmarkResolvingOutError localizedFailureReason]);
-    }
-  }
-    
-    if ([sourceURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
-    {
-        if (![sourceURL startAccessingSecurityScopedResource]) sourceURL = nil;
-    }
-  
-  
 	// Get the uti for out object...
 	
 	NSString* uti = [NSString imb_UTIForFileAtPath:path];
@@ -389,8 +393,6 @@
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
-    if ([sourceURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)]) [sourceURL stopAccessingSecurityScopedResource];
-    
 	return imageRepresentation;
 }
 

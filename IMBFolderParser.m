@@ -190,36 +190,15 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSString* folder = inNode.mediaSource;
-  NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
-  NSFileManager* fm = [NSFileManager imb_threadSafeManager];
-  NSArray* files = [fm contentsOfDirectoryAtURL:folderURL
-                     includingPropertiesForKeys:nil
-                                        options:NSDirectoryEnumerationSkipsHiddenFiles
-                                          error:outError];
-  
-    // Maybe we don't have access to the URL yet, so resolve our security-scoped bookmark and use that
-    NSURL *securityScopedURL = nil;
-    if (!files && [self bookmarkData] != nil && [NSURL instancesRespondToSelector:@selector(startAccessingSecurityScopedResource)])
-    {
-        securityScopedURL = [NSURL URLByResolvingBookmarkData:[self bookmarkData]
-                                                  options:NSURLBookmarkResolutionWithSecurityScope
-                                            relativeToURL:nil
-                                      bookmarkDataIsStale:NULL
-                                                    error:outError];
-        
-        if (![securityScopedURL startAccessingSecurityScopedResource]) securityScopedURL = nil;
-    }
-  
-    files = [fm contentsOfDirectoryAtURL:folderURL
-              includingPropertiesForKeys:nil
-                                 options:NSDirectoryEnumerationSkipsHiddenFiles
-                                   error:outError];
+    NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
+    NSFileManager* fm = [NSFileManager imb_threadSafeManager];
     
-	if (!files)
-    {
-        [securityScopedURL stopAccessingSecurityScopedResource];
-        return NO;
-    }
+    NSArray* files = [fm contentsOfDirectoryAtURL:folderURL
+                       includingPropertiesForKeys:nil
+                                          options:NSDirectoryEnumerationSkipsHiddenFiles
+                                            error:outError];
+  
+    if (!files) return NO;
     
     
     NSWorkspace* ws = [NSWorkspace imb_threadSafeWorkspace];
@@ -363,9 +342,7 @@
     inNode.leaf = [subnodes count] == 0;
 	
 	IMBDrain(pool);
-    
-    [securityScopedURL stopAccessingSecurityScopedResource];
-    
+        
 	return result;
 }
 
