@@ -253,28 +253,4 @@
 	return metadata;
 }
 
-
-#pragma mark -
-#pragma mark Sandboxing
-
-- (BOOL)imb_startAccessingSecurityScopedResource
-{
-  if ([self respondsToSelector:@selector(startAccessingSecurityScopedResource)])
-  {
-    return [self startAccessingSecurityScopedResource];
-  }
-  else
-  {
-    return YES;
-  }
-}
-
-- (void)imb_stopAccessingSecurityScopedResource
-{
-  if ([self respondsToSelector:@selector(stopAccessingSecurityScopedResource)])
-  {
-    [self stopAccessingSecurityScopedResource];
-  }
-}
-
 @end

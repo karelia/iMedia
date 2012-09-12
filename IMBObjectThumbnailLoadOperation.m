@@ -112,11 +112,10 @@
                                         bookmarkDataIsStale:NULL
                                                       error:&error];
       
-      if (securityScopedURL != nil)
-      {
-        if (![securityScopedURL imb_startAccessingSecurityScopedResource])
-          securityScopedURL = nil; // Prevent calling to stop if start has been failed
-      }
+        if ([securityScopedURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
+        {
+            if (![securityScopedURL startAccessingSecurityScopedResource]) securityScopedURL = nil; // prevent calling to stop if start has been failed
+        }
     }
 
 		if (self.options & kIMBLoadThumbnail)
@@ -137,8 +136,8 @@
 				[object.parser loadMetadataForObject:object];
 			}
 		}
-    
-    [securityScopedURL imb_stopAccessingSecurityScopedResource];
+        
+        [securityScopedURL stopAccessingSecurityScopedResource];
 	}
 
 	@catch (NSException* inException)

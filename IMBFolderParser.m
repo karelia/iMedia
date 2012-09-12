@@ -205,7 +205,11 @@
                                     relativeToURL:nil
                               bookmarkDataIsStale:NULL
                                             error:outError];
-    gotAccessFromBookmark = [folderURL imb_startAccessingSecurityScopedResource];
+      
+      if ([folderURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
+      {
+          gotAccessFromBookmark = [folderURL startAccessingSecurityScopedResource];
+      }
   }
   
   files = [fm contentsOfDirectoryAtURL:folderURL
@@ -214,8 +218,7 @@
                                  error:outError];
 	if (!files)
   {
-    if (gotAccessFromBookmark)
-      [folderURL imb_stopAccessingSecurityScopedResource];
+    if (gotAccessFromBookmark) [folderURL stopAccessingSecurityScopedResource];
     return NO;
   }
     
@@ -360,10 +363,9 @@
     inNode.leaf = [subnodes count] == 0;
 	
 	IMBDrain(pool);
-					
-  if (gotAccessFromBookmark)
-    [folderURL imb_stopAccessingSecurityScopedResource];
-  
+    
+    if (gotAccessFromBookmark) [folderURL stopAccessingSecurityScopedResource];
+    
 	return result;
 }
 

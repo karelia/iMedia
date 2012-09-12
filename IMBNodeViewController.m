@@ -635,7 +635,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           }
           // This call to stopAccessingSecurityScopedResource is balanced with
           // the call to startAccessingSecurityScopedResource below:
-          [securityScopedURL imb_stopAccessingSecurityScopedResource];
+          if ([securityScopedURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)]) [securityScopedURL stopAccessingSecurityScopedResource];
         }
       }
       
@@ -658,7 +658,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
           // there is only one node selected at a time.
           // This call to startAccessingSecurityScopedResource is balanced with
           // the call to stopAccessingSecurityScopedResource above.
-          [securityScopedURL imb_startAccessingSecurityScopedResource];
+          if ([securityScopedURL respondsToSelector:@selector(startAccessingSecurityScopedResource)]) [securityScopedURL startAccessingSecurityScopedResource];
+            
           if (!securityScopedURL)
           {
             NSLog(@"Failed to resolve bookmark data: %@", error.localizedFailureReason);

@@ -266,11 +266,11 @@
             [bookmarkResolvingOutError localizedFailureReason]);
     }
   }
-  if (sourceURL != nil)
-  { 
-    if (![sourceURL imb_startAccessingSecurityScopedResource])
-      sourceURL = nil;
-  }
+    
+    if ([sourceURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
+    {
+        if (![sourceURL startAccessingSecurityScopedResource]) sourceURL = nil;
+    }
   
   
 	// Get the uti for out object...
@@ -389,8 +389,8 @@
 			modes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
 	}
 	
-  [sourceURL imb_stopAccessingSecurityScopedResource];
-  
+    if ([sourceURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)]) [sourceURL stopAccessingSecurityScopedResource];
+    
 	return imageRepresentation;
 }
 

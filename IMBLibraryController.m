@@ -298,11 +298,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
                                               relativeToURL: nil
                                         bookmarkDataIsStale:NULL
                                                       error: &error];
-      if (securityScopedURL != nil)
-      {
-        if (![securityScopedURL imb_startAccessingSecurityScopedResource])
-          securityScopedURL = nil;
-      }
+        
+        if ([securityScopedURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
+        {
+            if (![securityScopedURL startAccessingSecurityScopedResource]) securityScopedURL = nil;
+        }
     }
 
     NSError* error = nil;
@@ -319,7 +319,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
     
-    [securityScopedURL imb_stopAccessingSecurityScopedResource];
+        if ([securityScopedURL respondsToSelector:@selector(stopAccessingSecurityScopedResource)])
+        {
+            [securityScopedURL stopAccessingSecurityScopedResource];
+        }
 	}
 }
 
