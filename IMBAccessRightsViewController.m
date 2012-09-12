@@ -187,13 +187,17 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"Confirm Access to Media Files",
 			@"NSOpenPanel title");
 
-		_warningMessage.stringValue = NSLocalizedStringWithDefaultValue(
+        NSString* appName = [[NSProcessInfo processInfo] processName];
+        
+        NSString* format = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.openPanel.description",
 			nil,
 			IMBBundle(),
-			@"The application does not have the necessary rights to access your media files. To give the application access to your media files click the \"Confirm\" button.\n\nIf your media files are scattered across your hard disk, you may want to navigate up and select the whole hard disk, before clicking the \"Confirm\" button.",
-			@"NSOpenPanel title");
+			@"Due to new system security features that protect your data from malicious attacks, %@ does not have the necessary rights to access your media files. To give %@ access to your media files click the \"Confirm\" button.\n\nIf your media files are scattered across your hard disk, you may want to navigate up and select the whole hard disk, before clicking the \"Confirm\" button.",
+			@"NSOpenPanel description");
 
+        _warningMessage.stringValue = [NSString stringWithFormat:format,appName,appName];
+        
 		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
 
 		// We really wanted to use [panel runModal] here, because working modally (i.e. blocking everything until
