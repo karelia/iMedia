@@ -242,7 +242,9 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
         
         if (anSSB) [SSBs addObject:anSSB];
     }
+    
 	[IMBConfig setPrefsValue:SSBs forKey:kBookmarksPrefsKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 
