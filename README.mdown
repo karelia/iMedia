@@ -44,6 +44,10 @@ Recent Release Notes
 
 * When dragging or copying iPhoto images, we mimic iPhoto by also including `ImageDataListPboardType` on the pasteboard. This allows iPhoto-aware apps to properly handle image metadata without any knowledge of iMedia
 
+### 2.5.3
+
+* `+[NSImage imb_imageForResource:fromAppWithBundleIdentifier:fallbackName:]` replaces `+[imb_imageResourceNamed:fromApplication:fallbackTo:]`. Apps likely shouldn't use this method anyway as it's fairly iMedia-specific. The new method nicely returns retina-compatible images if a suitable name is specified, like the other Cocoa image APIs.
+
 
 Development
 ========
