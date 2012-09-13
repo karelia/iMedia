@@ -557,7 +557,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// For each folder path that was dropped onto the outline view create a new custom parser. Then reload the library...
+// For each folder path that was dropped onto the outline view create a new custom parser
  
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
 {
@@ -586,7 +586,6 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	}		
 	
 	[inOutlineView.window makeFirstResponder:inOutlineView];
-	[self.libraryController reload];
 	return result;
 }
 
