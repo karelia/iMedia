@@ -85,8 +85,15 @@
 	if (image==nil && imageInOurBundle!=nil)
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[IMBNode class]];		// iMedia bundle
-		NSURL *imageURL = [ourBundle URLForImageResource:imageInOurBundle];
-		image = [[NSImage alloc] initWithContentsOfURL:imageURL];
+        if ([ourBundle respondsToSelector:@selector(imageForResource:)])
+        {
+            image = [ourBundle imageForResource:imageInOurBundle];
+        }
+        else
+        {
+            NSURL *imageURL = [ourBundle URLForImageResource:imageInOurBundle];
+            image = [[NSImage alloc] initWithContentsOfURL:imageURL];
+        }
 	}
 	return image;
 }
