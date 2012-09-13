@@ -69,16 +69,16 @@
 	
 	if (pathToOtherApp)
 	{
-		NSBundle *otherApp = [NSBundle bundleWithPath:pathToOtherApp];
+		NSBundle *appBundle = [NSBundle bundleWithPath:pathToOtherApp];
         
         // Use imageForResource: if available to take advantage of possibly additionally available high res representations
         
-        if ([otherApp respondsToSelector:@selector(imageForResource:)])
+        if ([appBundle respondsToSelector:@selector(imageForResource:)])
         {
-            image = [otherApp imageForResource:[name stringByDeletingPathExtension]];
+            image = [appBundle imageForResource:[name stringByDeletingPathExtension]];
         } else {
-            NSString *pathToImage = [otherApp pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
-            image = [[[NSImage alloc] initWithContentsOfFile:pathToImage] autorelease];
+            NSURL *imageURL = [appBundle URLForImageResource:name];
+            image = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
         }
 	}
 	
