@@ -561,29 +561,29 @@
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil},	// album
-		{@"v2-2",	@"Project_I_SAlbum.tiff",			@"folder",	nil,	nil},	// smart album
-		{@"v2-3",	@"List_Icons_LibrarySAlbum.tiff",	@"folder",	nil,	nil},	// library **** ... 200X
-		{@"v2-4",	@"Project_I_Project.tiff",			@"folder",	nil,	nil},	// project
-		{@"v2-5",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (top level)
-		{@"v2-6",	@"Project_I_Folder.tiff",			@"folder",	nil,	nil},	// folder
-		{@"v2-7",	@"Project_I_ProjectFolder.tiff",	@"folder",	nil,	nil},	// sub-folder of project
-		{@"v2-8",	@"Project_I_Book.tiff",				@"folder",	nil,	nil},	// book
-		{@"v2-9",	@"Project_I_WebPage.tiff",			@"folder",	nil,	nil},	// web gallery
-		{@"v2-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
-		{@"v2-10",	@"Project_I_WebJournal.tiff",		@"folder",	nil,	nil},	// web journal
-		{@"v2-11",	@"Project_I_LightTable.tiff",		@"folder",	nil,	nil},	// light table
-		{@"v2-13",	@"Project_I_SWebGallery.tiff",		@"folder",	nil,	nil},	// smart web gallery
-		{@"v2-97",	@"Project_I_Projects.tiff",			@"folder",	nil,	nil},	// library
-		{@"v2-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
-		{@"v2-99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+		{@"v2-1",	@"Project_I_Album",             @"folder",	nil,	nil},	// album
+		{@"v2-2",	@"Project_I_SAlbum",			@"folder",	nil,	nil},	// smart album
+		{@"v2-3",	@"List_Icons_LibrarySAlbum",	@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v2-4",	@"Project_I_Project",			@"folder",	nil,	nil},	// project
+		{@"v2-5",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (top level)
+		{@"v2-6",	@"Project_I_Folder",			@"folder",	nil,	nil},	// folder
+		{@"v2-7",	@"Project_I_ProjectFolder",     @"folder",	nil,	nil},	// sub-folder of project
+		{@"v2-8",	@"Project_I_Book",				@"folder",	nil,	nil},	// book
+		{@"v2-9",	@"Project_I_WebPage",			@"folder",	nil,	nil},	// web gallery
+		{@"v2-9",	@"Project_I_WebGallery",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v2-10",	@"Project_I_WebJournal",		@"folder",	nil,	nil},	// web journal
+		{@"v2-11",	@"Project_I_LightTable",		@"folder",	nil,	nil},	// light table
+		{@"v2-13",	@"Project_I_SWebGallery",		@"folder",	nil,	nil},	// smart web gallery
+		{@"v2-97",	@"Project_I_Projects",			@"folder",	nil,	nil},	// library
+		{@"v2-98",	@"AppIcon.icns",                @"folder",	nil,	nil},	// library
+		{@"v2-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
 	};
 
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-		{@"v2-1",	@"Project_I_Album.tiff",			@"folder",	nil,	nil}	// fallback image
+		{@"v2-1",	@"Project_I_Album",			@"folder",	nil,	nil}	// fallback image
 	};
 
 	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
@@ -600,35 +600,35 @@
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		{@"v3-Photo Stream",@"SL-stream.tiff",          @"folder",	nil,	nil},   // photo stream
-		{@"v3-Faces",@"SL-faces.tiff",                  @"folder",	nil,	nil},   // faces
-		{@"v3-1",	@"SL-album.tiff",					@"folder",	nil,	nil},	// album
-		{@"v3-2",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// smart album
-		{@"v3-3",	@"SL-smartAlbum.tiff",				@"folder",	nil,	nil},	// library **** ... 200X
-		{@"v3-4",	@"SL-project.tiff",					@"folder",	nil,	nil},	// project
-		{@"v3-5",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library (top level)
-		{@"v3-6",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// folder
-		{@"v3-7",	@"SL-folder.tiff",					@"folder",	nil,	nil},	// sub-folder of project
-		{@"v3-8",	@"SL-book.tiff",					@"folder",	nil,	nil},	// book
-		{@"v3-9",	@"SL-webpage.tiff",					@"folder",	nil,	nil},	// web gallery
-		{@"v3-9",	@"Project_I_WebGallery.tiff",		@"folder",	nil,	nil},	// web gallery (alternate image)
-		{@"v3-10",	@"SL-webJournal.tiff",				@"folder",	nil,	nil},	// web journal
-		{@"v3-11",	@"SL-lightTable.tiff",				@"folder",	nil,	nil},	// light table
-		{@"v3-13",	@"sl-icon-small_webGallery.tiff",	@"folder",	nil,	nil},	// smart web gallery
-		{@"v3-19",	@"SL-slideshow.tiff",				@"folder",	nil,	nil},	// slideshow
-		{@"v3-94",	@"SL-photos.tiff",					@"folder",	nil,	nil},	// photos
-		{@"v3-95",	@"SL-flag.tif",						@"folder",	nil,	nil},	// flagged
-		{@"v3-96",	@"SL-smartLibrary.tiff",			@"folder",	nil,	nil},	// library albums
-		{@"v3-97",	@"SL-allProjects.tiff",				@"folder",	nil,	nil},	// library
+		{@"v3-Photo Stream",@"SL-stream",          @"folder",	nil,	nil},   // photo stream
+		{@"v3-Faces",@"SL-faces",                  @"folder",	nil,	nil},   // faces
+		{@"v3-1",	@"SL-album",					@"folder",	nil,	nil},	// album
+		{@"v3-2",	@"SL-smartAlbum",				@"folder",	nil,	nil},	// smart album
+		{@"v3-3",	@"SL-smartAlbum",				@"folder",	nil,	nil},	// library **** ... 200X
+		{@"v3-4",	@"SL-project",					@"folder",	nil,	nil},	// project
+		{@"v3-5",	@"SL-allProjects",				@"folder",	nil,	nil},	// library (top level)
+		{@"v3-6",	@"SL-folder",					@"folder",	nil,	nil},	// folder
+		{@"v3-7",	@"SL-folder",					@"folder",	nil,	nil},	// sub-folder of project
+		{@"v3-8",	@"SL-book",					@"folder",	nil,	nil},	// book
+		{@"v3-9",	@"SL-webpage",					@"folder",	nil,	nil},	// web gallery
+		{@"v3-9",	@"Project_I_WebGallery",		@"folder",	nil,	nil},	// web gallery (alternate image)
+		{@"v3-10",	@"SL-webJournal",				@"folder",	nil,	nil},	// web journal
+		{@"v3-11",	@"SL-lightTable",				@"folder",	nil,	nil},	// light table
+		{@"v3-13",	@"sl-icon-small_webGallery",	@"folder",	nil,	nil},	// smart web gallery
+		{@"v3-19",	@"SL-slideshow",				@"folder",	nil,	nil},	// slideshow
+		{@"v3-94",	@"SL-photos",					@"folder",	nil,	nil},	// photos
+		{@"v3-95",	@"SL-flag",						@"folder",	nil,	nil},	// flagged
+		{@"v3-96",	@"SL-smartLibrary",			@"folder",	nil,	nil},	// library albums
+		{@"v3-97",	@"SL-allProjects",				@"folder",	nil,	nil},	// library
 		{@"v3-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
-		{@"v3-99",	@"List_Icons_Library.tiff",			@"folder",	nil,	nil},	// library (knot holding all images)
+		{@"v3-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
 	};
 
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-		{@"1",	@"SL-album.tiff",					@"folder",	nil,	nil}	// fallback image
+		{@"1",	@"SL-album",					@"folder",	nil,	nil}	// fallback image
 	};
 
 	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 

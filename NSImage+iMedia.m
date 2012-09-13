@@ -62,7 +62,7 @@
 
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
++ (NSImage *)imb_imageForResource:(NSString *)name fromAppWithBundleIdentifier:(NSString *)bundleID fallbackName:(NSString *)imageInOurBundle
 {
 	NSString *pathToOtherApp = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
 	NSImage *image = nil;
@@ -75,7 +75,7 @@
         
         if ([appBundle respondsToSelector:@selector(imageForResource:)])
         {
-            image = [appBundle imageForResource:[name stringByDeletingPathExtension]];
+            image = [appBundle imageForResource:name];
         } else {
             NSURL *imageURL = [appBundle URLForImageResource:name];
             image = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
@@ -85,8 +85,8 @@
 	if (image==nil && imageInOurBundle!=nil)
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[IMBNode class]];		// iMedia bundle
-		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
-		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		NSURL *imageURL = [ourBundle URLForImageResource:imageInOurBundle];
+		image = [[NSImage alloc] initWithContentsOfURL:imageURL];
 	}
 	return image;
 }
