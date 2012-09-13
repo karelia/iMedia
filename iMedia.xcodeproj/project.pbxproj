@@ -2895,6 +2895,7 @@
 		};
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3494,6 +3495,7 @@
 		};
 		D09933591011B27000C527B7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = iMediaTester.entitlements;
 				FRAMEWORK_SEARCH_PATHS = "";
