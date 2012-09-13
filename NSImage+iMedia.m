@@ -71,6 +71,8 @@
 	{
 		NSBundle *appBundle = [NSBundle bundleWithPath:pathToOtherApp];
         
+        // SANDBOXING: To my shock, this continues to work when sandboxed (at least on 10.8). Why would Apple allow us to access other apps' resources? I tested and this seems to work regardless of what the app is named or where it is placed
+        
         // Use imageForResource: if available to take advantage of possibly additionally available high res representations
         
         if ([appBundle respondsToSelector:@selector(imageForResource:)])
