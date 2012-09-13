@@ -92,7 +92,7 @@
         else
         {
             NSURL *imageURL = [ourBundle URLForImageResource:imageInOurBundle];
-            image = [[NSImage alloc] initWithContentsOfURL:imageURL];
+            image = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
         }
 	}
 	return image;
