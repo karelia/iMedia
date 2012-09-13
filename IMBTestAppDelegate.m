@@ -164,6 +164,16 @@
                                                             delegate:self];
     self.nodeViewController.standardObjectViewController = objectViewController;
 	[self.nodeViewController installObjectViewForNode:nil];
+    
+    // Change background color of node view if you like
+    
+    [self.nodeViewController.nodeOutlineView setBackgroundColor:[NSColor lightGrayColor]];
+    [self.nodeViewController.nodeOutlineView setNeedsDisplay:YES];
+    
+    // Observe node view controller whenever it sets its object view controller
+    // so you can better adapt to your customization needs
+    
+	[self.nodeViewController addObserver:self forKeyPath:@"objectViewController" options:0 context:NULL];
 	
 	[nodeView setFrame:[ibWindow.contentView bounds]];
 	[ibWindow setContentView:nodeView];
@@ -551,6 +561,26 @@
 	}
 	IMBNodeViewController* controller = [[IMBPanelController sharedPanelController] currentNodeViewController];
 	[controller setObjectContainerViewNeedsDisplay:YES];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark -
+#pragma mark Observable framework properties
+
+- (void) observeValueForKeyPath:(NSString*)inKeyPath ofObject:(id)inObject change:(NSDictionary*)inChange context:(void*)inContext
+{
+    if ([inObject isKindOfClass:[IMBNodeViewController class]])
+    {
+        if ([inKeyPath isEqualToString:@"objectViewController"])
+        {
+            //NSLog(@"Object view controller: %@ set on node view Controller: %@", [inObject objectViewController], inObject);
+            
+            /* Add your code here */
+        }
+    }
+    //NSLog(@"Property: %@ changed on object: %@", inKeyPath, inObject);
 }
 
 
