@@ -1477,6 +1477,20 @@ static NSArray* sSupportedUTIs = nil;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark
+#pragma mark Helpers
+
+- (void) checkAccessRightsForObject:(IMBObject*)inObject
+{
+	NSFileManager* manager = [[NSFileManager alloc] init];
+    inObject.isAccessible = [manager imb_isPath:((IMBLightroomObject*)inObject).absolutePyramidPath  accessible:kIMBAccessRead];
+	[manager release];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 /*
 // For Lightroom we need a promise that splits the pyramid file
 - (IMBObjectsPromise*) objectPromiseWithObjects: (NSArray*) inObjects
