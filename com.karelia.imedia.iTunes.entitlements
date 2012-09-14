@@ -6,6 +6,10 @@
 	<true/>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
+	<key>com.apple.security.assets.movies.read-write</key>
+	<true/>
+	<key>com.apple.security.assets.music.read-write</key>
+	<true/>
 	<key>com.apple.security.temporary-exception.shared-preference.read-only</key>
 	<array>
 		<string>com.apple.iApps</string>
