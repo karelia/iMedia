@@ -304,22 +304,7 @@
 
 - (NSString*) persistentResourceIdentifierForObject:(IMBObject*)inObject
 {
-	NSURL* url = [inObject URL];
-	
-	if ([url isFileURL])
-	{
-		url = [url fileReferenceURL];
-	}
-
-    if (url)
-    {
-        return [url absoluteString];
-    } 
-	else
-	{
-        NSLog(@"Could not create persistent resource identifier for %@: resource %@ is not a file or does not exist",inObject,url);
-        return nil;
-    }
+	return [[inObject URL] absoluteString];
 }
 
 
