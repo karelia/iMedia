@@ -584,6 +584,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 					});
 				}
 			}];
+
+#warning Peter, if the requested bookmark is not set in the object due to some error (e.g. location not accessible) self will waitForBookmark forever
             
             [self waitForBookmark];
 			NSURL* url = [self URLByResolvingBookmark];
