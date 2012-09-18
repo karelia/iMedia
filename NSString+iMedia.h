@@ -62,6 +62,11 @@
 
 @interface NSString ( iMedia )
 
+// Returns the longest common sub path of self with inPath
+// Paths must be absolute paths.
+
+- (NSString *) imb_commonSubPathWithPath:(NSString *)inPath;
+
 - (NSString *)imb_pathForURLString;
 - (NSString *)imb_path;
 

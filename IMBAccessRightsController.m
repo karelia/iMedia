@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Peter Baumgartner, Jörg Jacobson
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,6 +57,7 @@
 
 #import "IMBAccessRightsController.h"
 #import "NSFileManager+iMedia.h"
+#import "NSString+iMedia.h"
 #import "IMBConfig.h"
 
 
@@ -264,7 +265,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	for (NSURL* url in inURLs)
 	{
 		NSString* path = [[url path] stringByStandardizingPath];
-		commonPath = [commonPath commonPrefixWithString:path options:NSLiteralSearch];
+        commonPath = [commonPath imb_commonSubPathWithPath:path];
 	}
 	
 	return [NSURL fileURLWithPath:commonPath];
