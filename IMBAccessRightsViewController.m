@@ -66,6 +66,7 @@
 #import "SBUtilities.h"
 #import "IMBFileSystemObserver.h"
 #import "IMBAlertPopover.h"
+#import "NSImage+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -428,7 +429,8 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	if (IMBRunningOnLionOrNewer() && inView.window != nil)
 	{
 		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
-	
+		alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+		
 		[alert addButtonWithTitle:ok block:^()
 		{
 			[alert close];
@@ -483,6 +485,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	if (IMBRunningOnLionOrNewer() && inView.window != nil)
 	{
 		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+		alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
 	
 		[alert addButtonWithTitle:ok block:^()
 		{
