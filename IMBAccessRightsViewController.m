@@ -147,7 +147,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 #pragma mark User Interface
 
 
-- (void) _showForSuggestedURL:(NSURL*)inSuggestedURL completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
+- (void) _showForSuggestedURL:(NSURL*)inSuggestedURL name:(NSString*)inName completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
 {
 	if (_isOpen == NO)
 	{
@@ -161,33 +161,42 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 		panel.accessoryView = self.view;
 		[panel setDirectoryURL:inSuggestedURL];
 
-		panel.title = NSLocalizedStringWithDefaultValue(
+		NSString* title = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.openPanel.title",
 			nil,
 			IMBBundle(),
-			@"Confirm Access to Media Files",
+			@"Allow Access to Media Files",
 			@"NSOpenPanel title");
+		
+		if (inName)
+		{
+			title = NSLocalizedStringWithDefaultValue(
+				@"IMBAccessRightsViewController.openPanel.titleWithName",
+				nil,
+				IMBBundle(),
+				@"Allow Access to %@",
+				@"NSOpenPanel title");
+				
+			title = [NSString stringWithFormat:title,inName];
+		}
+		
+		panel.title = title;
 
 		panel.message = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.openPanel.message",
 			nil,
 			IMBBundle(),
-			@"Click the \"Confirm\" button to grant access to your media files.",
+			@"Click the \"Allow\" button to grant access to your media files.",
 			@"NSOpenPanel message");
 					
 		panel.prompt = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.openPanel.prompt",
 			nil,
 			IMBBundle(),
-			@"Confirm",
+			@"Allow",
 			@"NSOpenPanel button");
 
-		_warningTitle.stringValue = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.openPanel.title",
-			nil,
-			IMBBundle(),
-			@"Confirm Access to Media Files",
-			@"NSOpenPanel title");
+		_warningTitle.stringValue = title;
 
         NSString* appName = [[NSProcessInfo processInfo] processName];
         
@@ -195,7 +204,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"IMBAccessRightsViewController.openPanel.description",
 			nil,
 			IMBBundle(),
-			@"Due to new system security features that protect your data from malicious attacks, %@ does not have the necessary rights to access your media files. To give %@ access to your media files click the \"Confirm\" button.\n\nIf your media files are scattered across your hard disk, you may want to navigate up and select the whole hard disk, before clicking the \"Confirm\" button.",
+			@"Due to system security features that protect your data from malicious attacks, %@ does not have the necessary rights to access your media files. To give %@ access to your media files click the \"Allow\" button.",
 			@"NSOpenPanel description");
 
         _warningMessage.stringValue = [NSString stringWithFormat:format,appName,appName];
@@ -246,12 +255,13 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+	IMBNode* node = nodes.count==1 ? [nodes objectAtIndex:0] : nil;
 	NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
 	NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
 	
 	// Show an NSOpenPanel with this folder...
 	
-	[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
+	[self _showForSuggestedURL:proposedURL name:node.name completionHandler:^(NSURL* inGrantedURL)
 	{
 		if (inGrantedURL)
 		{
@@ -332,7 +342,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 		
 		// Show an NSOpenPanel to grant access to this folder...
 		
-		[self _showForSuggestedURL:proposedURL completionHandler:^(NSURL* inGrantedURL)
+		[self _showForSuggestedURL:proposedURL name:inNode.name completionHandler:^(NSURL* inGrantedURL)
 		{
 			if (inGrantedURL)
 			{

@@ -2,21 +2,21 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">11E53</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
-		<string key="IBDocument.AppKitVersion">1138.47</string>
-		<string key="IBDocument.HIToolboxVersion">569.00</string>
+		<string key="IBDocument.SystemVersion">12B19</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
+		<string key="IBDocument.AppKitVersion">1187</string>
+		<string key="IBDocument.HIToolboxVersion">624.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">2182</string>
+			<string key="NS.object.0">2840</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
+			<string>NSCustomObject</string>
 			<string>NSCustomView</string>
-			<string>NSImageView</string>
 			<string>NSImageCell</string>
+			<string>NSImageView</string>
 			<string>NSTextField</string>
 			<string>NSTextFieldCell</string>
-			<string>NSCustomObject</string>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -42,7 +42,7 @@
 					<object class="NSTextField" id="892925318">
 						<reference key="NSNextResponder" ref="406056700"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{66, 0}, {435, 102}}</string>
+						<string key="NSFrame">{{66, 5}, {435, 60}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
@@ -79,11 +79,12 @@
 								</object>
 							</object>
 						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 					</object>
 					<object class="NSTextField" id="1059538923">
 						<reference key="NSNextResponder" ref="406056700"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{66, 112}, {435, 17}}</string>
+						<string key="NSFrame">{{66, 75}, {435, 17}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="892925318"/>
@@ -103,6 +104,7 @@
 							<reference key="NSBackgroundColor" ref="458671650"/>
 							<reference key="NSTextColor" ref="782783297"/>
 						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 					</object>
 					<object class="NSImageView" id="885681567">
 						<reference key="NSNextResponder" ref="406056700"/>
@@ -115,7 +117,7 @@
 							<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 							<string>NeXT TIFF v4.0 pasteboard type</string>
 						</set>
-						<string key="NSFrame">{{11, 82}, {48, 48}}</string>
+						<string key="NSFrame">{{11, 45}, {48, 48}}</string>
 						<reference key="NSSuperview" ref="406056700"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="1059538923"/>
@@ -134,10 +136,11 @@
 							<int key="NSStyle">0</int>
 							<bool key="NSAnimates">NO</bool>
 						</object>
+						<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						<bool key="NSEditable">YES</bool>
 					</object>
 				</array>
-				<string key="NSFrameSize">{518, 142}</string>
+				<string key="NSFrameSize">{518, 105}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="885681567"/>
