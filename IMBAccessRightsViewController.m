@@ -65,6 +65,7 @@
 #import "IMBConfig.h"
 #import "SBUtilities.h"
 #import "IMBFileSystemObserver.h"
+#import "IMBAlertPopover.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -391,6 +392,116 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
     // Also send it to the FSEvents service, so that it can do its job...
     
     [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) showMissingResourceAlertForNode:(IMBNode*)inNode view:(NSView*)inView relativeToRect:(NSRect)inRect
+{
+	NSString* name = inNode.name;
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingLibraryTitle",
+		nil,
+		IMBBundle(),
+		@"Library is Missing",
+		@"Alert title");
+
+	NSString* format = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingLibraryMessage",
+		nil,
+		IMBBundle(),
+		@"The %@ library cannot be used because it is missing. It may have been deleted, moved, or it may be located on a volume that is currently not mounted.",
+		@"Alert message");
+		
+	NSString* ok = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingLibraryButton",
+		nil,
+		IMBBundle(),
+		@"   OK   ",
+		@"Alert button");
+
+	NSString* message = [NSString stringWithFormat:format,name];
+	
+	if (IMBRunningOnLionOrNewer())
+	{
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+	
+		[alert addButtonWithTitle:ok block:^()
+		{
+			[alert close];
+		}];
+	
+		[alert showRelativeToRect:inRect ofView:inView preferredEdge:NSMaxYEdge];
+	}
+	else
+	{
+		NSAlert* alert = [NSAlert
+			alertWithMessageText:title
+			defaultButton:ok
+			alternateButton:nil
+			otherButton:nil
+			informativeTextWithFormat:@"%@",message];
+			
+		[alert runModal];
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) showMissingResourceAlertForObject:(IMBObject*)inObject view:(NSView*)inView relativeToRect:(NSRect)inRect
+{
+	NSString* name = inObject.name;
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingObjectTitle",
+		nil,
+		IMBBundle(),
+		@"Media File is Missing",
+		@"Alert title");
+
+	NSString* format = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingObjectMessage",
+		nil,
+		IMBBundle(),
+		@"The file %@ cannot be used because it is missing. It may have been deleted, moved, or it may be located on a volume that is currently not mounted.",
+		@"Alert message");
+		
+	NSString* ok = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.missingObjectButton",
+		nil,
+		IMBBundle(),
+		@"   OK   ",
+		@"Alert button");
+
+	NSString* message = [NSString stringWithFormat:format,name];
+	
+	if (IMBRunningOnLionOrNewer())
+	{
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+	
+		[alert addButtonWithTitle:ok block:^()
+		{
+			[alert close];
+		}];
+	
+		[alert showRelativeToRect:inRect ofView:inView preferredEdge:NSMaxYEdge];
+	}
+	else
+	{
+		NSAlert* alert = [NSAlert
+			alertWithMessageText:title
+			defaultButton:ok
+			alternateButton:nil
+			otherButton:nil
+			informativeTextWithFormat:@"%@",message];
+			
+		[alert runModal];
+	}
 }
 
 

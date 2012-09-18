@@ -65,6 +65,7 @@
 #pragma mark CLASSES
 
 @class IMBNode;
+@class IMBObject;
 @class IMBParserMessenger;
 
 
@@ -92,6 +93,9 @@
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
 
 + (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler;
+
++ (void) showMissingResourceAlertForNode:(IMBNode*)inNode view:(NSView*)inView relativeToRect:(NSRect)inRect;
++ (void) showMissingResourceAlertForObject:(IMBObject*)inObject view:(NSView*)inView relativeToRect:(NSRect)inRect;
 
 @end
 
