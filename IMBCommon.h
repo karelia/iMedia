@@ -86,6 +86,7 @@ enum
 	kIMBBadgeTypeStop,
 	kIMBBadgeTypeEject,
 	kIMBBadgeTypeOffline,
+	kIMBBadgeTypeResourceMissing,
 	kIMBBadgeTypeNoAccessRights
 };
 typedef NSUInteger IMBBadgeType;
@@ -138,12 +139,13 @@ typedef NSUInteger IMBErrorCode;
 
 // Accessibility states of an item (like library of a top level IMBNode or media of an IMBObject)
 
-typedef enum
+enum
 {
     kIMBResourceDoesNotExist,
     kIMBResourceNoPermission,   // Implies that the resource exists
     kIMBResourceIsAccessible
-} IMBResourceAccessibility;
+};
+typedef NSUInteger IMBResourceAccessibility;
 
 
 //----------------------------------------------------------------------------------------------------------------------
