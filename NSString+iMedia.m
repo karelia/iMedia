@@ -204,6 +204,48 @@
 
 @implementation NSString ( iMedia )
 
+// Returns the longest common sub path of self with inPath.
+// Paths must be absolute paths.
+
+- (NSString *) imb_commonSubPathWithPath:(NSString *)inPath
+{
+    if (!inPath || self.length == 0 || inPath.length == 0) return nil;
+    
+    NSArray *pathComponents1 = [self pathComponents];
+    NSArray *pathComponents2 = [inPath pathComponents];
+    
+    __block NSInteger lastIdenticalComponentNumber = -1;
+    
+    // Determine last identical component
+    
+    [pathComponents1 enumerateObjectsUsingBlock:^(id pathComponent1, NSUInteger idx, BOOL *stop) {
+        if ([pathComponents2 count] > idx)
+        {
+            NSString *pathComponent2 = (NSString *)[pathComponents2 objectAtIndex:idx];
+            
+            if ([pathComponent1 isEqualToString:pathComponent2])
+            {
+                lastIdenticalComponentNumber = idx;
+            } else {
+                *stop = YES;
+            }
+        } else {
+            *stop = YES;
+        }
+    }];
+    
+    // Create sub path
+    
+    if (lastIdenticalComponentNumber >= 0)
+    {
+        NSRange subRange = NSMakeRange(0, lastIdenticalComponentNumber+1);
+        NSArray *subPathComponents = [pathComponents1 subarrayWithRange:subRange];
+        return [NSString pathWithComponents:subPathComponents];
+    }
+    return @"/";
+}
+
+
 // Convert a file:// URL (as a string) to just its path
 - (NSString *)imb_pathForURLString;
 {
