@@ -611,7 +611,12 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (NSURL*) previewItemURL
 {
-	return self.URL;
+	if (self.accessibility == kIMBResourceIsAccessible)
+	{
+		return self.URL;
+	}
+	
+	return nil;
 }
 
 

@@ -2027,17 +2027,34 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 // Quicklook datasource methods...
 
+- (NSArray*) filteredSelectedObjects
+{
+	NSArray* objects = [ibObjectArrayController selectedObjects];
+	NSMutableArray* filteredObjects = [NSMutableArray arrayWithCapacity:objects.count];
+	
+	for (IMBObject* object in objects)
+	{
+		if (object.accessibility == kIMBResourceIsAccessible) [filteredObjects addObject:object];
+	}
+	
+	return (NSArray*)filteredObjects;
+}
+
+
 - (NSInteger) numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel*)inPanel
 {
-	return ibObjectArrayController.selectedObjects.count;
+	NSArray* objects = [self filteredSelectedObjects];
+	return objects.count;
 }
 
 
 - (id<QLPreviewItem>) previewPanel:(QLPreviewPanel*)inPanel previewItemAtIndex:(NSInteger)inIndex
 {
-	if (inIndex >= 0 && inIndex < ibObjectArrayController.selectedObjects.count)
+	NSArray* objects = [self filteredSelectedObjects];
+
+	if (inIndex >= 0 && inIndex < objects.count)
 	{
-		return [ibObjectArrayController.selectedObjects objectAtIndex:inIndex];
+		return [objects objectAtIndex:inIndex];
 	}
 	
 	return nil;
