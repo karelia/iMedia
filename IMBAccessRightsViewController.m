@@ -425,7 +425,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 	NSString* message = [NSString stringWithFormat:format,name];
 	
-	if (IMBRunningOnLionOrNewer())
+	if (IMBRunningOnLionOrNewer() && inView.window != nil)
 	{
 		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 	
@@ -480,7 +480,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 	NSString* message = [NSString stringWithFormat:format,name];
 	
-	if (IMBRunningOnLionOrNewer())
+	if (IMBRunningOnLionOrNewer() && inView.window != nil)
 	{
 		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 	
