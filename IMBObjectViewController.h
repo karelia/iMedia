@@ -209,6 +209,8 @@ IMBObjectFilter;
 
 - (void) unbindViews;	// Can be used by host application to tear down bindings before a window is closed (useful to break retain cycles!)
 
+- (NSRect) iconRectForTableView:(NSTableView*)inTableView row:(NSInteger)inRow inset:(CGFloat)inInset;
+
 // Event Handling
 
 @property (retain) IMBObject* clickedObject;

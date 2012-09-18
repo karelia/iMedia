@@ -79,6 +79,14 @@
 
 @property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
 
+// Layout...
+
+- (NSRect) titleRectForBounds:(NSRect)inBounds;
+- (NSRect) subtitleRectForBounds:(NSRect)inBounds;
+- (NSRect) imageRectForBounds:(NSRect)inBounds;
+- (NSRect) imageRectForFrame:(NSRect)inImageFrame imageWidth:(CGFloat)inWidth imageHeight:(CGFloat)inHeight;
+- (NSRect) badgeRectForImageRect:(NSRect)inImageRect;
+
 @end
 
 

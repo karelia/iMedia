@@ -226,7 +226,7 @@
 {
 	NSTableView* view = (NSTableView*)inSender;
 	NSInteger row = [view clickedRow];
-	NSRect rect = [view rectOfRow:row];
+	NSRect rect = [self iconRectForTableView:view row:row inset:16.0];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	NSInteger count = [objects count];
 	
@@ -271,7 +271,7 @@
 {
 	NSTableView* tableview = (NSTableView*)inNotification.object;
 	NSInteger row = [tableview selectedRow];
-//	NSRect rect = [tableview rectOfRow:row];
+//	NSRect rect = [self iconRectForTableView:tableview row:row inset:16.0];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = row>=0 ? [objects objectAtIndex:row] : nil;
 	

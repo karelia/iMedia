@@ -74,6 +74,7 @@
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
 #import "IMBButtonObject.h"
+#import "IMBComboTableView.h"
 #import "IMBComboTextCell.h"
 #import "IMBImageBrowserCell.h"
 
@@ -708,6 +709,26 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// Calculates the array of the icon in tableview...
+
+- (NSRect) iconRectForTableView:(NSTableView*)inTableView row:(NSInteger)inRow inset:(CGFloat)inInset
+{
+	NSRect rect = [inTableView frameOfCellAtColumn:0 row:inRow];
+	
+	if ([inTableView isKindOfClass:[IMBComboTableView class]])
+	{
+		IMBComboTextCell* cell = (IMBComboTextCell*)[inTableView preparedCellAtColumn:0 row:inRow];
+		rect = [cell imageRectForBounds:rect];
+		rect = NSInsetRect(rect,inInset,inInset);
+	}
+	
+	return rect;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 #pragma mark 
 
 
@@ -969,6 +990,26 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
+	// If a missing object was selected, then display an alert...
+	
+	if (self.viewType == kIMBObjectViewTypeIcon)
+	{
+		NSArray* objects = [ibObjectArrayController selectedObjects];
+		IMBObject* object = objects.count == 1 ? [objects objectAtIndex:0] : nil;
+	
+		if (object)
+		{
+			if (object.accessibility == kIMBResourceDoesNotExist)
+			{
+				NSUInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:object];
+				NSRect rect = [inView itemFrameAtIndex:index];
+				[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:inView relativeToRect:rect];
+			}
+		}
+	}
+	
+	// Notify the Quicklook panel of the selection change...
+	
 	QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
 	
 	if (panel.dataSource == (id)self)
@@ -977,6 +1018,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		[panel refreshCurrentPreviewItem];
 	}
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // First give the delegate a chance to handle the double click. It it chooses not to, then we will 
@@ -1314,10 +1358,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	id delegate = controller.delegate;
 	BOOL didHandleEvent = NO;
 	
-	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	NSTableView* view = (NSTableView*)inSender;
 	NSUInteger row = [view clickedRow];
-	NSRect rect = [view rectOfRow:row];
+	NSRect rect = [self iconRectForTableView:view row:row inset:16.0];
+	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 		
     if (object != nil)
@@ -1378,13 +1422,22 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 	// If we do not have access right for the clicked object, then prompt the user to give us access...
 	
+	NSTableView* view = (NSTableView*)inSender;
+	NSUInteger row = [view clickedRow];
+	NSRect rect = [self iconRectForTableView:view row:row inset:16.0];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	NSUInteger row = [(NSTableView*)inSender clickedRow];
 	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
-		
-	if (object != nil && object.accessibility == kIMBResourceNoPermission)
+	
+	if (object)
 	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+		if (object.accessibility == kIMBResourceDoesNotExist)
+		{
+			[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:view relativeToRect:rect];
+		}
+		else if (object.accessibility == kIMBResourceNoPermission)
+		{
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+		}
 	}
 }
 
@@ -1823,7 +1876,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	while (index != NSNotFound)
 	{
 		IMBObject* object = [objects objectAtIndex:index];
-		if ([object isSelectable]) [indexes addIndex:index];
+		if (object.isSelectable && object.accessibility == kIMBResourceIsAccessible) [indexes addIndex:index];
 		index = [inIndexes indexGreaterThanIndex:index];
 	}
 	
@@ -1844,21 +1897,17 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	for (IMBObject* object in objects)
 	{
-		if (object.accessibility == kIMBResourceIsAccessible)
-		{
-			parserMessenger = object.parserMessenger;
+		parserMessenger = object.parserMessenger;
 		
-			NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
-			[item setDataProvider:object forTypes:types];
-			[pasteboardItems addObject:item];
-			[item release];
-		}
+		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
+		[item setDataProvider:object forTypes:types];
+		[pasteboardItems addObject:item];
+		[item release];
 	}
 	
 	[inPasteboard clearContents];
 	[inPasteboard writeObjects:pasteboardItems];
 	[inPasteboard imb_setParserMessenger:parserMessenger];
-	
 
     // Let the parser messenger know its objects are writing to the pasteboard, so for iPhoto objects,
     // can add additional data mimicking iPhoto
@@ -1911,7 +1960,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 // rights to access arbitrary media files) this requires an asynchronous round trip to an XPC service. Once we do
 // get the bookmark, we can resolve it to a URL that we can access. Open it in the default app...
 	
-
 - (void) openObjects:(NSArray*)inObjects
 {
 	NSString* appPath = nil;
@@ -1920,29 +1968,32 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	for (IMBObject* object in inObjects)
 	{
-		[object requestBookmarkWithCompletionBlock:^(NSError* inError)
+		if (object.accessibility == kIMBResourceIsAccessible)
 		{
-			if (inError)
+			[object requestBookmarkWithCompletionBlock:^(NSError* inError)
 			{
-				[NSApp presentError:inError];
-			}
-			else
-			{
-				NSURL* url = [object URLByResolvingBookmark];
-				
-				if (url)
+				if (inError)
 				{
-					if (appPath != nil && [url isFileURL])
+					[NSApp presentError:inError];
+				}
+				else
+				{
+					NSURL* url = [object URLByResolvingBookmark];
+					
+					if (url)
 					{
-						[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
-					}
-					else
-					{
-						[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+						if (appPath != nil && [url isFileURL])
+						{
+							[[NSWorkspace imb_threadSafeWorkspace] openFile:url.path withApplication:appPath];
+						}
+						else
+						{
+							[[NSWorkspace imb_threadSafeWorkspace] openURL:url];
+						}
 					}
 				}
-			}
-		}];
+			}];
+		}
 	}
 }
 
