@@ -359,6 +359,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	if ([inNode isPopulated]) return;
 	if ([inNode error]) return;
 	
+	// Do not try to populate nodes if the backing library does not exist...
+	
+	else if (inNode.accessibility == kIMBResourceDoesNotExist)
+	{
+		return;
+	}
+			
 	// Ask delegate whether we should populate this node...
 			
 	if (RESPONDS(_delegate,@selector(libraryController:shouldPopulateNode:)))
@@ -371,7 +378,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	// Start populating this node...
 	
-
 	if (RESPONDS(_delegate,@selector(libraryController:willPopulateNode:)))
 	{
 		[_delegate libraryController:self willPopulateNode:inNode];

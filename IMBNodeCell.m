@@ -350,38 +350,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
-
-- (IBAction) showErrorPopover:(id)inSender
-{
-	if (IMBRunningOnLionOrNewer())
-	{
-		NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
-		NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
-		NSString* ok = @"   OK   ";
-
-		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
-		
-		[alert addButtonWithTitle:ok block:^()
-		{
-			[alert close];
-		}];
-		
-		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
-	}
-	else
-	{
-		dispatch_async(dispatch_get_main_queue(),^()
-		{
-			[NSApp presentError:_badgeError];
-		});
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 - (IBAction) showAccessRightsPopover:(id)inSender
 {
 	NSString* libraryName = self.title;
@@ -408,15 +376,67 @@
 		@"Alert button");
 
 	NSString* message = [NSString stringWithFormat:format,libraryName];
-	IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 	
-	[alert addButtonWithTitle:ok block:^()
+	if (IMBRunningOnLionOrNewer())
 	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
-		[alert close];
-	}];
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 	
-	[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
+		[alert addButtonWithTitle:ok block:^()
+		{
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
+			[alert close];
+		}];
+	
+		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
+	}
+	else
+	{
+		NSAlert* alert = [NSAlert
+			alertWithMessageText:title
+			defaultButton:ok
+			alternateButton:nil
+			otherButton:nil
+			informativeTextWithFormat:@"%@",message];
+			
+		NSInteger button = [alert runModal];
+		
+		if (button == NSOKButton)
+		{
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
+
+- (IBAction) showErrorPopover:(id)inSender
+{
+	if (IMBRunningOnLionOrNewer())
+	{
+		NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
+		NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
+		NSString* ok = @"   OK   ";
+
+		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+		
+		[alert addButtonWithTitle:ok block:^()
+		{
+			[alert close];
+		}];
+		
+		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
+	}
+	else
+	{
+		dispatch_async(dispatch_get_main_queue(),^()
+		{
+			[NSApp presentError:_badgeError];
+		});
+	}
 }
 
 

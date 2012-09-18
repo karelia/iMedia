@@ -67,6 +67,7 @@
 #import "IMBNodeCell.h"
 #import "IMBFlickrNode.h"
 #import "NSView+iMedia.h"
+#import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
 
 
@@ -621,26 +622,38 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
     switch (node.accessibility)
     {
         case kIMBResourceDoesNotExist:
+		{
+			shouldExpand = NO;
+			NSInteger row = [inOutlineView rowForItem:inItem];
+ 			NSRect rect = [ibNodeOutlineView badgeRectForRow:row];
+			[IMBAccessRightsViewController showMissingResourceAlertForNode:node view:ibNodeOutlineView relativeToRect:rect];
             break;
+		}
+
+
         case kIMBResourceNoPermission:
+		{
             shouldExpand = NO;
             [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
             break;
+		}
+		
         case kIMBResourceIsAccessible:
-            if (!_isRestoringState)
-            {
-                id delegate = self.libraryController.delegate;
+		if (!_isRestoringState)
+		{
+			id delegate = self.libraryController.delegate;
                 
-                if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
-                {
-                    shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
-                }
-            }
-            break;
+			if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
+			{
+				shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
+			}
+		}
+		break;
             
         default:
-            break;
+		break;
     }
+	
 	return shouldExpand;
 }
 
@@ -730,7 +743,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 				[self.libraryController populateNode:newNode];
 				[ibNodeOutlineView showProgressWheels];
 			}
-
+			else if (newNode.accessibility == kIMBResourceDoesNotExist)
+			{
+				NSRect rect = [ibNodeOutlineView badgeRectForRow:row];
+				[IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
+			}
+			
 			self.selectedNodeIdentifier = newNode.identifier;
 		}
 
@@ -761,19 +779,23 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (IBAction) outlineViewWasClicked:(id)inSender
 {
 	NSInteger row = [ibNodeOutlineView clickedRow];
+	NSRect rect = [ibNodeOutlineView badgeRectForRow:row];
 	IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
 		
     if (newNode != nil)
     {
-        switch (newNode.accessibility) {
-            case kIMBResourceDoesNotExist:
-                break;
+        switch (newNode.accessibility)
+		{
             case kIMBResourceNoPermission:
-                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
-                break;
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+			break;
+                
+            case kIMBResourceDoesNotExist:
+			[IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
+			break;
                 
             default:
-                break;
+			break;
         }
     }
 }
@@ -795,9 +817,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	cell.title = node.name;
 	cell.badgeType = node.badgeTypeNormal;
 	
-#warning Should distuingish non-accessibility here in terms of kIMBResourceDoesNotExist and kIMBResourceNoPermission
-    
-	if (!(node.accessibility == kIMBResourceIsAccessible))
+	if (node.accessibility == kIMBResourceDoesNotExist)
+	{
+		cell.badgeType = kIMBBadgeTypeResourceMissing;
+		cell.badgeIcon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+		cell.badgeError = nil;
+	}
+	else if (node.accessibility == kIMBResourceNoPermission)
 	{
 		cell.badgeType = kIMBBadgeTypeNoAccessRights;
 		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];

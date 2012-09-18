@@ -68,6 +68,7 @@
 @property (retain) IMBTextFieldCell* textCell;
 
 - (IMBNode*) nodeAtRow:(NSInteger)inRow;
+- (NSRect) badgeRectForRow:(NSInteger)inRow;
 - (void) showProgressWheels;
 
 @end
