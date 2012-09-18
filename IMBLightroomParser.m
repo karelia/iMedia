@@ -72,6 +72,7 @@
 //#import "IMBPyramidObjectPromise.h"
 #import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -1039,8 +1040,9 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* absolutePyramidPath = (inPyramidPath != nil) ? [self.dataPath stringByAppendingPathComponent:inPyramidPath] : nil;
 
 	object.absolutePyramidPath = absolutePyramidPath;
+    object.accessibility = [self accessibilityForObject:object];
 	object.idLocal = idLocal;
-	object.location = [NSURL fileURLWithPath:inPath];
+	object.location = [NSURL fileURLWithPath:inPath]; // Only setting location for the need of deriving identifiers
 	object.name = inName;
 	object.preliminaryMetadata = inMetadata;	// This metadata was in the XML file and is available immediately
 	object.metadata = nil;						// Build lazily when needed (takes longer)
@@ -1050,10 +1052,6 @@ static NSArray* sSupportedUTIs = nil;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
 	
-    // Check whether we have access to this resource's location
-    
-    [self checkAccessRightsForObject:object];
-    
 	return object;
 }
 
@@ -1303,6 +1301,15 @@ static NSArray* sSupportedUTIs = nil;
 	return foundDatabase;
 }
 
+// Get object's resource current accessibility status
+
+- (IMBResourceAccessibility) accessibilityForObject:(IMBObject*)inObject
+{
+    NSURL* pyramidPathURL = [NSURL fileURLWithPath:((IMBLightroomObject*)inObject).absolutePyramidPath];
+    return [pyramidPathURL imb_accessibility];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1472,20 +1479,6 @@ static NSArray* sSupportedUTIs = nil;
 	}
 	
 	return identifier;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark
-#pragma mark Helpers
-
-- (void) checkAccessRightsForObject:(IMBObject*)inObject
-{
-	NSFileManager* manager = [[NSFileManager alloc] init];
-    inObject.isAccessible = [manager imb_isPath:((IMBLightroomObject*)inObject).absolutePyramidPath  accessible:kIMBAccessRead];
-	[manager release];
 }
 
 

@@ -618,21 +618,29 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	BOOL shouldExpand = YES;
 	IMBNode* node = (IMBNode*)inItem;
 	
-	if (!node.isAccessible)
-	{
-		shouldExpand = NO;
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
-	}
-	else if (!_isRestoringState)
-	{
-		id delegate = self.libraryController.delegate;
-		
-		if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
-		{
-			shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
-		}
-	}
-	
+    switch (node.accessibility)
+    {
+        case kIMBResourceDoesNotExist:
+            break;
+        case kIMBResourceNoPermission:
+            shouldExpand = NO;
+            [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+            break;
+        case kIMBResourceIsAccessible:
+            if (!_isRestoringState)
+            {
+                id delegate = self.libraryController.delegate;
+                
+                if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
+                {
+                    shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
+                }
+            }
+            break;
+            
+        default:
+            break;
+    }
 	return shouldExpand;
 }
 
@@ -644,7 +652,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
 	IMBNode* node = (IMBNode*)item;
 	
-	if (node.isAccessible)
+	if (node.accessibility == kIMBResourceIsAccessible)
 	{
 		[self.libraryController populateNode:node];
 	}
@@ -717,7 +725,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 		if (newNode)
 		{
-			if (newNode.isAccessible)
+			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
 				[self.libraryController populateNode:newNode];
 				[ibNodeOutlineView showProgressWheels];
@@ -755,10 +763,19 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	NSInteger row = [ibNodeOutlineView clickedRow];
 	IMBNode* newNode = row>=0 ? [ibNodeOutlineView nodeAtRow:row] : nil;
 		
-	if (newNode != nil && newNode.isAccessible == NO)
-	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
-	}
+    if (newNode != nil)
+    {
+        switch (newNode.accessibility) {
+            case kIMBResourceDoesNotExist:
+                break;
+            case kIMBResourceNoPermission:
+                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 
@@ -778,7 +795,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	cell.title = node.name;
 	cell.badgeType = node.badgeTypeNormal;
 	
-	if (!node.isAccessible)
+#warning Should distuingish non-accessibility here in terms of kIMBResourceDoesNotExist and kIMBResourceNoPermission
+    
+	if (!(node.accessibility == kIMBResourceIsAccessible))
 	{
 		cell.badgeType = kIMBBadgeTypeNoAccessRights;
 		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
@@ -1201,7 +1220,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	NSString* identifier = (NSString*) ibNodePopupButton.selectedItem.representedObject;
 	IMBNode* node = [self.libraryController nodeWithIdentifier:identifier];
 	
-	if (!node.isAccessible)
+    
+	if (node.accessibility == kIMBResourceNoPermission)
 	{
 		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
 	}

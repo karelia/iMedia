@@ -92,7 +92,7 @@
 	node.isLeafNode = NO;
 	node.mediaSource = nil;
 	node.name = @"Flickr";
-	node.isAccessible = YES;
+	node.accessibility = kIMBResourceIsAccessible;
 	
 	return node;
 }

@@ -110,7 +110,7 @@
 	BOOL _isIncludedInPopup;
 	BOOL _wantsRecursiveObjects;
 	BOOL _shouldDisplayObjectView;
-    BOOL _isAccessible;
+    IMBResourceAccessibility _accessibility;
 	
 	// Observing file system changes...
 	
@@ -213,7 +213,7 @@
 @property (assign) BOOL wantsRecursiveObjects;
 @property (assign) BOOL shouldDisplayObjectView;	
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
-@property (assign) BOOL isAccessible;
+@property (assign) IMBResourceAccessibility accessibility;
 
 // Observing file system changes...
 

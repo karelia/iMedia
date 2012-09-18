@@ -62,6 +62,7 @@
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSURL+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +119,7 @@
 @synthesize isIncludedInPopup = _isIncludedInPopup;
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
-@synthesize isAccessible = _isAccessible;
+@synthesize accessibility = _accessibility;
 
 // Observing file system changes...
 
@@ -159,7 +160,7 @@
 		self.isIncludedInPopup = YES;
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
-        self.isAccessible = YES;
+        self.accessibility = kIMBResourceIsAccessible;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -175,8 +176,9 @@
             if (self.isTopLevelNode)
             {
                 // Being sandboxed the app may yet not have entitlements to access this top level node
-                
-                [inParser checkAccessRightsForNode:self];
+                // accessibility = kIMBResourceIsAccessible if media source is not a file URL (e.g. Flickr node)
+
+                self.accessibility = [self.mediaSource imb_accessibility];
             }
         }
 	}
@@ -241,7 +243,7 @@
 	copy.isIncludedInPopup = self.isIncludedInPopup;
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
-	copy.isAccessible = self.isAccessible;
+	copy.accessibility = self.accessibility;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -313,7 +315,7 @@
 		self.isIncludedInPopup = [inCoder decodeBoolForKey:@"isIncludedInPopup"];
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
-		self.isAccessible = [inCoder decodeBoolForKey:@"isAccessible"];
+		self.accessibility = (IMBResourceAccessibility)[inCoder decodeInt64ForKey:@"accessibility"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -362,7 +364,8 @@
 	[inCoder encodeBool:self.isIncludedInPopup forKey:@"isIncludedInPopup"];
 	[inCoder encodeBool:self.wantsRecursiveObjects forKey:@"wantsRecursiveObjects"];
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
-	[inCoder encodeBool:self.isAccessible forKey:@"isAccessible"];
+    int64_t accessibility = (int64_t)self.accessibility;
+	[inCoder encodeInt64:accessibility forKey:@"accessibility"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];

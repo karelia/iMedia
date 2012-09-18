@@ -136,6 +136,16 @@ enum
 typedef NSUInteger IMBErrorCode;
 
 
+// Accessibility states of an item (like library of a top level IMBNode or media of an IMBObject)
+
+typedef enum
+{
+    kIMBResourceDoesNotExist,
+    kIMBResourceNoPermission,   // Implies that the resource exists
+    kIMBResourceIsAccessible
+} IMBResourceAccessibility;
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

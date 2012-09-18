@@ -366,7 +366,7 @@
 		[self _setObjectIdentifierWithParser:parser onNodeTree:node];
 	}
 	
-	if (node.isAccessible && success == NO && error == nil)
+	if ((node.accessibility == kIMBResourceIsAccessible) && success == NO && error == nil)
 	{
 		NSString* title = @"Programmer Error";
 		

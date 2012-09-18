@@ -57,6 +57,10 @@
 + (NSDictionary *)imb_metadataFromVideoAtURL:(NSURL*)inURL;
 + (NSDictionary *)imb_metadataFromAudioAtURL:(NSURL*)inURL;
 
+// Returns accesibility of this URL.
+// Always returns kIMBResourceIsAccessible for non-file URLs (as determined with -isFileURL).
+
+- (IMBResourceAccessibility) imb_accessibility;
 
 #pragma mark Aliases
 // Like -URLByResolvingSymlinksInPath, but handles any aliases in the path too. Returns nil upon resolution error

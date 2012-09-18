@@ -211,17 +211,14 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	for (NSData* bookmark in self.bookmarks)
 	{
 		NSURL* url = [[self class] _urlForAppScopedBookmark:bookmark];
-		/*BOOL started =*/ [url startAccessingSecurityScopedResource];
-
-        // TODO/JJ: For debugging purposes (remove later)
         
-//		NSString* path = [url path];
-//		
-//		BOOL accessible = [[NSFileManager defaultManager]
-//			imb_isPath:path
-//			accessible:kIMBAccessRead|kIMBAccessWrite];
-//	
-//		NSLog(@"%s path=%@ started=%d accessible=%d",__FUNCTION__,path,started,accessible);
+        // NOTE: We do not balance -startAccessing... with a corresponding -stopAccessing somewhere else
+        //       since we want to be able to access the resource throughout the lifetime of the process
+        //       (and there is no -applicationWillTerminate equivalent hook for XPC services).
+        //       This should not matter since Apple documentation says that associated kernel resources
+        //       will be reclaimed when the process ends.
+        
+		[url startAccessingSecurityScopedResource];
 	}
 }
 

@@ -725,6 +725,7 @@
 					[object release];
 
 					object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+                    object.accessibility = [self accessibilityForObject:object];
 					object.name = caption;
 					object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 					object.metadata = nil;                              // Build lazily when needed (takes longer)
@@ -736,10 +737,6 @@
 					object.imageRepresentationType = [self requestedImageRepresentationType];
 					object.imageRepresentation = nil;
 
-                    // Check whether we have access to this resource's location
-                    
-                    [self checkAccessRightsForObject:object];
-                    
                     //NSLog(@"Access to object at %@: %@", [object.location path], object.isAccessible ? @"YES" : @"NO");
 				}
 				

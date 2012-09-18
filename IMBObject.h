@@ -82,6 +82,7 @@ extern NSString* kIMBObjectPasteboardType;
 {
 	NSURL *_location;												
 	NSData* _bookmark;
+    IMBResourceAccessibility _accessibility;
 	NSString* _name;
 	NSString* _identifier;
 	NSString* _persistentResourceIdentifier;
@@ -98,7 +99,6 @@ extern NSString* kIMBObjectPasteboardType;
     BOOL _shouldDrawAdornments;
 	BOOL _shouldDisableTitle;
     BOOL _isLoadingThumbnail;
-    BOOL _isAccessible;
 	
 	id _imageLocation;
 	id _imageRepresentation;								
@@ -108,6 +108,7 @@ extern NSString* kIMBObjectPasteboardType;
 }
 
 @property (copy) NSURL *location;
+@property (assign) IMBResourceAccessibility accessibility;	// What access do we have to the object's resource?
 @property (retain) NSString* name;							// Display name for user interface
 @property (readonly) NSImage* icon;							// Small icon to be displayed in list view
 @property (retain) NSString* identifier;					// Unique identifier for this object
@@ -120,8 +121,6 @@ extern NSString* kIMBObjectPasteboardType;
 @property (retain) IMBParserMessenger* parserMessenger;		// IMBParserMessenger that is responsible for this object
 @property (retain) NSString* parserIdentifier;				// Identifier of IMBParser that created this object
 @property (retain) NSError* error;							// Per object error...
-
-@property (assign) BOOL isAccessible;						// Do we have access rights to this file?
 
 
 //----------------------------------------------------------------------------------------------------------------------

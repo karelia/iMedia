@@ -566,6 +566,7 @@
 					// For remote files we'll use a URL (less context menu support)...
 					
 					object.location = url;
+                    object.accessibility = [self accessibilityForObject:object];
 					object.name = name;
 					object.parserIdentifier = self.identifier;
 					object.index = index++;
@@ -574,10 +575,6 @@
 					object.imageRepresentationType = IKImageBrowserCGImageRepresentationType; 
 					object.imageRepresentation = nil;	// will be loaded lazily when needed
 
-					// Check if we have access rights to this file...
-					
-					[self checkAccessRightsForObject:object];
-					
 					// Add metadata and convert the duration property to seconds. Also note that the original
 					// key "Total Time" is not bindings compatible as it contains a space...
 					

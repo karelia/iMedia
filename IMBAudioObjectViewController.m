@@ -238,13 +238,21 @@
 		}
 		else
 		{
-			if (object != nil && object.isAccessible == NO)
+			if (object != nil)
 			{
-				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-			}
-			else
-			{
-				[self startPlayingSelection:inSender];
+                switch (object.accessibility) {
+                    case kIMBResourceDoesNotExist:
+                        break;
+                    case kIMBResourceNoPermission:
+                        [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+                        break;
+                    case kIMBResourceIsAccessible:
+                        [self startPlayingSelection:inSender];
+                        break;
+                        
+                    default:
+                        break;
+                }
 			}
 		}
 	}
@@ -260,16 +268,25 @@
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = row>=0 ? [objects objectAtIndex:row] : nil;
 	
-	if (object != nil && object.isAccessible == NO)
-	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-	}
-	else if (self.audioPlayer.rate > 0.0)
-	{
-		[self startPlayingSelection:nil];
-	}
-	else
-	{
+    if (object != nil)
+    {
+        switch (object.accessibility) {
+            case kIMBResourceDoesNotExist:
+                break;
+            case kIMBResourceNoPermission:
+                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+                break;
+            case kIMBResourceIsAccessible:
+                if (self.audioPlayer.rate > 0.0)
+                {
+                    [self startPlayingSelection:nil];
+                }
+                break;
+                
+            default:
+                break;
+        }
+    } else {
 		self.audioPlayer = nil;
 	}
 }

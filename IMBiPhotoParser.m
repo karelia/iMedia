@@ -716,6 +716,7 @@
 			[object release];
 			
 			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+            object.accessibility = [self accessibilityForObject:object];
 			object.name = name;
             
             NSMutableDictionary *metadata = [imageDict mutableCopy];

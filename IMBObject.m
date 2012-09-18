@@ -143,7 +143,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @synthesize index = _index;
 @synthesize shouldDrawAdornments = _shouldDrawAdornments;
 @synthesize shouldDisableTitle = _shouldDisableTitle;
-@synthesize isAccessible = _isAccessible;
+@synthesize accessibility = _accessibility;
 
 @synthesize imageLocation = _imageLocation;
 @synthesize atomic_imageRepresentation = _imageRepresentation;
@@ -167,7 +167,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		_shouldDrawAdornments = YES;
 		_shouldDisableTitle = NO;
 		_isLoadingThumbnail = NO;
-		_isAccessible = YES;
+		_accessibility = YES;
 		_needsImageRepresentation = YES;
 		_imageVersion = 0;
 	}
@@ -224,7 +224,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		self.index = (NSUInteger)[coder decodeInt64ForKey:@"index"];
 		self.shouldDrawAdornments = [coder decodeBoolForKey:@"shouldDrawAdornments"];
 		self.shouldDisableTitle = [coder decodeBoolForKey:@"shouldDisableTitle"];
-		self.isAccessible = [coder decodeBoolForKey:@"isAccessible"];
+		self.accessibility = (IMBResourceAccessibility)[coder decodeInt64ForKey:@"accessibility"];
 		
 		self.imageLocation = [coder decodeObjectForKey:@"imageLocation"];
 		self.imageRepresentationType = [coder decodeObjectForKey:@"imageRepresentationType"];
@@ -264,7 +264,8 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	int64_t index = (int64_t)self.index; [coder encodeInt64:index forKey:@"index"];
 	[coder encodeBool:self.shouldDrawAdornments forKey:@"shouldDrawAdornments"];
 	[coder encodeBool:self.shouldDisableTitle forKey:@"shouldDisableTitle"];
-	[coder encodeBool:self.isAccessible forKey:@"isAccessible"];
+	int64_t accessibility = (int64_t)self.accessibility;
+    [coder encodeInt64:accessibility forKey:@"accessibility"];
 
 	[coder encodeObject:self.imageLocation forKey:@"imageLocation"];
 	[coder encodeObject:self.imageRepresentationType forKey:@"imageRepresentationType"];
@@ -309,7 +310,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
     copy.index = self.index;
 	copy.shouldDrawAdornments = self.shouldDrawAdornments;
 	copy.shouldDisableTitle = self.shouldDisableTitle;
-	copy.isAccessible = self.isAccessible;
+	copy.accessibility = self.accessibility;
 
 	copy.imageLocation = self.imageLocation;
 	copy.atomic_imageRepresentation = self.atomic_imageRepresentation;

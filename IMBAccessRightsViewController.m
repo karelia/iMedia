@@ -262,7 +262,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			for (IMBNode* node in nodes)
 			{
 				node.badgeTypeNormal = kIMBBadgeTypeLoading;
-				node.isAccessible = YES; // Temporarily set to yes so that loading wheel shows again
+				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
 				
 				IMBParserMessenger* messenger = node.parserMessenger;
 				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
@@ -320,7 +320,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 		
 		for (IMBObject* object in inNode.objects)
 		{
-			if (!object.isAccessible)
+			if (object.accessibility == kIMBResourceNoPermission)
 			{
 				[urls addObject:object.location];
 			}

@@ -60,7 +60,7 @@
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBFolderObject.h"
-#import "NSFileManager+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
 #import <Quartz/Quartz.h>
@@ -355,8 +355,8 @@
 {
 	NSFileManager* fileManager = [[NSFileManager alloc] init];
 
-    BOOL accessible = [[NSFileManager defaultManager] imb_isPath:[directory path] accessible:kIMBAccessRead|kIMBAccessWrite];
-	if (!accessible) return [NSNumber numberWithBool:NO];
+    IMBResourceAccessibility accessibility = [directory imb_accessibility];
+	if (!(accessibility == kIMBResourceIsAccessible)) return [NSNumber numberWithBool:NO];
 	
 	NSArray* contents = [fileManager contentsOfDirectoryAtURL:directory 
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 

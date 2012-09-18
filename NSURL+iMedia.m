@@ -246,6 +246,40 @@
 	return metadata;
 }
 
+
+// Returns accesibility of this URL.
+// Always returns kIMBResourceIsAccessible for non-file URLs (as determined with -isFileURL).
+
+- (IMBResourceAccessibility) imb_accessibility
+{
+
+    if (![self isFileURL])
+    {
+        // TODO/JJ: Deal with non-file URLs more intelligently
+        return kIMBResourceIsAccessible;
+    }
+    
+    BOOL isReadable = access([[self path] cStringUsingEncoding:NSUTF8StringEncoding], R_OK) == 0;
+    
+    if (!isReadable)
+    {
+        switch (errno)
+        {
+            case ENOENT:
+                return kIMBResourceDoesNotExist;
+                break;
+            case EPERM:
+                return kIMBResourceNoPermission;
+                break;
+                
+            default:
+                break;
+        }
+    }
+    return kIMBResourceIsAccessible;
+}
+
+
 #pragma mark Aliases
 
 - (NSURL *)imb_URLByResolvingBookmarkFilesInPath;

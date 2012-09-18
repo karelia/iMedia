@@ -912,7 +912,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[self _addNodesWithoutAccessRights:node.subnodes toList:inList];
 		}
-		else if (!node.isAccessible)
+		else if (!(node.accessibility == kIMBResourceNoPermission))
 		{
 			[inList addObject:node];
 		}
@@ -1057,14 +1057,28 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			[item setTarget:inTarget];						// Normal nodes get the desired target/action
 			[item setAction:inSelector];
 			
-			if (!inNode.isAccessible)						// Inaccessible nodes also get a warning icon appended
+			if (!(inNode.accessibility == kIMBResourceIsAccessible)) // Inaccessible nodes also get a warning icon appended
 			{
 				NSFont* font = [NSFont menuFontOfSize:[NSFont systemFontSize]];
 				NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					font,NSFontAttributeName,
 					nil];
 				
-				NSImage* icon = [[NSImage imb_imageNamed:@"warning.tiff"] copy];
+                NSString* iconName = nil;
+                switch (inNode.accessibility)
+                {
+                    case kIMBResourceDoesNotExist:
+                        iconName = @"IMBStopIcon.icns";
+                        break;
+                    case kIMBResourceNoPermission:
+                        iconName = @"warning.tiff";
+                        break;
+                        
+                    default:
+                        iconName = @"warning.tiff";
+                        break;
+                }
+				NSImage* icon = [[NSImage imb_imageNamed:iconName] copy];
 				[icon setSize:NSMakeSize(16.0,16.0)];
 				
 				NSMutableAttributedString* title = [[[NSMutableAttributedString alloc] initWithString:name attributes:attributes] autorelease];

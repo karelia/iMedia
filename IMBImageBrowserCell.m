@@ -299,12 +299,22 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 		
 		IMBObject* item = (IMBObject*) [self representedItem];
 
-        // Display warning sign badge if resource that thumbnail is representing is not accessible
+        // Display warning or error sign badge if resource that thumbnail is representing is not accessible
         
-        if (!item.isAccessible)
+        CGImageRef imageRef = NULL;
+        switch (item.accessibility)
         {
-            CGImageRef warningImageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
-            [layer addSublayer: [self imb_layerWithBadge:warningImageRef inRect:relativeImageFrame]];
+            case kIMBResourceDoesNotExist:
+                imageRef = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
+                [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+                break;
+            case kIMBResourceNoPermission:
+                imageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
+                [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+                break;
+                
+            default:
+                break;
         }
         
         // Display any kind of badge if host app wants us to (should not exceed 16x16 points)
