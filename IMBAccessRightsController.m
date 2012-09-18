@@ -156,7 +156,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	{
 		NSURL* url = [[self class] _urlForBookmark:bookmark];
 
-		if ([path hasPrefix:[url path]])
+		if (url && [path hasPrefix:[url path]])
 		{
 			return YES;
 		}
