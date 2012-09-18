@@ -308,26 +308,32 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
                 imageRef = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
                 [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
                 break;
+				
             case kIMBResourceNoPermission:
                 imageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
                 [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
                 break;
                 
+           case kIMBResourceIsAccessible:
+				{
+					// Display any kind of badge if host app wants us to (should not exceed 16x16 points)
+					
+					IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
+					id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
+					
+					if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
+					{			
+						[layer addSublayer:
+						 [self imb_layerWithBadge:[delegate objectViewController:objectViewController badgeForObject:item]
+										   inRect:relativeImageFrame]];
+					}
+				}
+				break;
+				
             default:
                 break;
         }
         
-        // Display any kind of badge if host app wants us to (should not exceed 16x16 points)
-        
-		IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
-		id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
-		
-		if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
-		{			
-            [layer addSublayer:
-             [self imb_layerWithBadge:[delegate objectViewController:objectViewController badgeForObject:item]
-                               inRect:relativeImageFrame]];
-		}
 		return layer;
 	}
 	

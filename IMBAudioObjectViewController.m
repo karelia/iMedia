@@ -224,7 +224,9 @@
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
-	NSInteger row = [(NSTableView*)inSender clickedRow];
+	NSTableView* view = (NSTableView*)inSender;
+	NSInteger row = [view clickedRow];
+	NSRect rect = [view rectOfRow:row];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	NSInteger count = [objects count];
 	
@@ -240,18 +242,22 @@
 		{
 			if (object != nil)
 			{
-                switch (object.accessibility) {
+                switch (object.accessibility)
+				{
                     case kIMBResourceDoesNotExist:
-                        break;
+					[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:view relativeToRect:rect];
+					break;
+					
                     case kIMBResourceNoPermission:
-                        [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-                        break;
+					[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+					break;
+					
                     case kIMBResourceIsAccessible:
-                        [self startPlayingSelection:inSender];
-                        break;
+					[self startPlayingSelection:inSender];
+					break;
                         
                     default:
-                        break;
+					break;
                 }
 			}
 		}
@@ -265,28 +271,32 @@
 {
 	NSTableView* tableview = (NSTableView*)inNotification.object;
 	NSInteger row = [tableview selectedRow];
+//	NSRect rect = [tableview rectOfRow:row];
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
 	IMBObject* object = row>=0 ? [objects objectAtIndex:row] : nil;
 	
     if (object != nil)
     {
-        switch (object.accessibility) {
+        switch (object.accessibility)
+		{
             case kIMBResourceDoesNotExist:
-                break;
+//			[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:tableview relativeToRect:rect];
+			break;
+			
             case kIMBResourceNoPermission:
-                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-                break;
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			break;
+			
             case kIMBResourceIsAccessible:
-                if (self.audioPlayer.rate > 0.0)
-                {
-                    [self startPlayingSelection:nil];
-                }
-                break;
+			if (self.audioPlayer.rate > 0.0) [self startPlayingSelection:nil];
+			break;
                 
             default:
-                break;
+			break;
         }
-    } else {
+    }
+	else
+	{
 		self.audioPlayer = nil;
 	}
 }
@@ -323,7 +333,19 @@
 			if (row != NSNotFound && row < [objects count])
 			{
 				IMBObject* object = (IMBObject*) [objects objectAtIndex:row];
-				[self playAudioObject:object];
+
+				if (object.accessibility == kIMBResourceDoesNotExist)
+				{
+					[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:nil relativeToRect:NSZeroRect];
+				}
+				else if (object.accessibility == kIMBResourceNoPermission)
+				{
+					NSBeep();
+				}
+				else
+				{
+					[self playAudioObject:object];
+				}
 			}
 		}
 		else

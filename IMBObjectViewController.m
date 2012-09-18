@@ -1152,23 +1152,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			
 		if ([inCell respondsToSelector:@selector(setBadge:)])
 		{
-            if (!(object.accessibility == kIMBResourceIsAccessible))
+			if (object.accessibility == kIMBResourceDoesNotExist)
             {
-                NSString* iconName = nil;
-                switch (object.accessibility)
-                {
-                    case kIMBResourceDoesNotExist:
-                        iconName = @"IMBStopIcon.icns";
-                        break;
-                    case kIMBResourceNoPermission:
-                        iconName = @"warning.tiff";
-                        break;
-                        
-                    default:
-                        iconName = @"warning.tiff";
-                        break;
-                }
-                CGImageRef warning = [NSImage imb_CGImageNamed:iconName];
+                CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
+                [inCell setBadge:stop];
+            }
+			else if (object.accessibility == kIMBResourceNoPermission)
+            {
+                CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
                 [inCell setBadge:warning];
             }
 			else 
@@ -1179,23 +1170,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 		{
-			if (!(object.accessibility == kIMBResourceIsAccessible))
+			if (object.accessibility == kIMBResourceDoesNotExist)
 			{
-                NSString* iconName = nil;
-                switch (object.accessibility)
-                {
-                    case kIMBResourceDoesNotExist:
-                        iconName = @"IMBStopIcon.icns";
-                        break;
-                    case kIMBResourceNoPermission:
-                        iconName = @"warning.tiff";
-                        break;
-                        
-                    default:
-                        iconName = @"warning.tiff";
-                        break;
-                }
-				NSImage* warning = [NSImage imb_imageNamed:iconName];
+				NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+				[inCell setImage:stop];
+			}
+			else if (object.accessibility == kIMBResourceNoPermission)
+			{
+				NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
 				[inCell setImage:warning];
 			}
 			else if (badgeRef)
@@ -1323,7 +1305,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 
 // Doubleclicking a row opens the selected items. This may trigger a download if the user selected remote objects.
-// First give the delegate a chance to handle the double click...
+// First give the delegate a chance to handle the double click. Please note that there are special cases for
+// missing media files or missing access rights...
 
 - (IBAction) tableViewWasDoubleClicked:(id)inSender
 {
@@ -1332,47 +1315,53 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	BOOL didHandleEvent = NO;
 	
 	NSArray* objects = [ibObjectArrayController arrangedObjects];
-	NSUInteger row = [(NSTableView*)inSender clickedRow];
+	NSTableView* view = (NSTableView*)inSender;
+	NSUInteger row = [view clickedRow];
+	NSRect rect = [view rectOfRow:row];
 	IMBObject* object = row!=-1 ? [objects objectAtIndex:row] : nil;
 		
     if (object != nil)
     {
-        switch (object.accessibility) {
+        switch (object.accessibility)
+		{
             case kIMBResourceDoesNotExist:
-                break;
+			[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:view relativeToRect:rect];
+			break;
+				
             case kIMBResourceNoPermission:
-                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-                break;
+			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			break;
+				
             case kIMBResourceIsAccessible:
-                if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
-                {
-                    IMBNode* node = self.currentNode;
-                    objects = [ibObjectArrayController selectedObjects];
-                    didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
-                }
-                
-                if (!didHandleEvent)
-                {
-                    objects = [ibObjectArrayController arrangedObjects];
-                    object = row!=-1 ? [objects objectAtIndex:row] : nil;
-                    
-                    if ([object isKindOfClass:[IMBNodeObject class]])
-                    {
-                        [self expandNodeObject:(IMBNodeObject*)object];
-                    }
-                    else if ([object isKindOfClass:[IMBButtonObject class]])
-                    {
-                        [(IMBButtonObject*)object sendDoubleClickAction];
-                    }
-                    else
-                    {
-                        [self openSelectedObjects:inSender];
-                    }	
-                }	
-                break;
+			if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
+			{
+				IMBNode* node = self.currentNode;
+				objects = [ibObjectArrayController selectedObjects];
+				didHandleEvent = [delegate libraryController:controller didDoubleClickSelectedObjects:objects inNode:node];
+			}
+			
+			if (!didHandleEvent)
+			{
+				objects = [ibObjectArrayController arrangedObjects];
+				object = row!=-1 ? [objects objectAtIndex:row] : nil;
+				
+				if ([object isKindOfClass:[IMBNodeObject class]])
+				{
+					[self expandNodeObject:(IMBNodeObject*)object];
+				}
+				else if ([object isKindOfClass:[IMBButtonObject class]])
+				{
+					[(IMBButtonObject*)object sendDoubleClickAction];
+				}
+				else
+				{
+					[self openSelectedObjects:inSender];
+				}	
+			}	
+			break;
                 
             default:
-                break;
+			break;
         }
     }
 }
@@ -1855,12 +1844,15 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	for (IMBObject* object in objects)
 	{
-		parserMessenger = object.parserMessenger;
+		if (object.accessibility == kIMBResourceIsAccessible)
+		{
+			parserMessenger = object.parserMessenger;
 		
-		NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
-		[item setDataProvider:object forTypes:types];
-		[pasteboardItems addObject:item];
-		[item release];
+			NSPasteboardItem* item = [[NSPasteboardItem alloc] init];
+			[item setDataProvider:object forTypes:types];
+			[pasteboardItems addObject:item];
+			[item release];
+		}
 	}
 	
 	[inPasteboard clearContents];
