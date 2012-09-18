@@ -918,7 +918,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 			[self _addNodesWithoutAccessRights:node.subnodes toList:inList];
 		}
-		else if (!(node.accessibility == kIMBResourceNoPermission))
+		else if (node.accessibility == kIMBResourceNoPermission)
 		{
 			[inList addObject:node];
 		}
