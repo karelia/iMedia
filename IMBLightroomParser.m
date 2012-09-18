@@ -1040,7 +1040,6 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* absolutePyramidPath = (inPyramidPath != nil) ? [self.dataPath stringByAppendingPathComponent:inPyramidPath] : nil;
 
 	object.absolutePyramidPath = absolutePyramidPath;
-    object.accessibility = [self accessibilityForObject:object];
 	object.idLocal = idLocal;
 	object.location = [NSURL fileURLWithPath:inPath]; // Only setting location for the need of deriving identifiers
 	object.name = inName;
@@ -1051,6 +1050,7 @@ static NSArray* sSupportedUTIs = nil;
 	object.index = inIndex;
 	object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 	object.imageRepresentation = nil;
+    object.accessibility = [self accessibilityForObject:object];
 	
 	return object;
 }
