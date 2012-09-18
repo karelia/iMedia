@@ -53,7 +53,6 @@
 
 @interface NSFileManager (iMedia)
 
-+ (BOOL) imb_isReadableFileAtFileURL:(NSURL*)inURL error:(NSError **)outError;
 - (BOOL)imb_isPathHidden:(NSString *)path;
 - (BOOL)imb_createDirectoryPath:(NSString *)path attributes:(NSDictionary *)attributes;
 - (NSString *)imb_pathResolved:(NSString *)path;
