@@ -188,51 +188,47 @@
     Class messengerClass = [self class];
     NSMutableArray *parsers = [messengerClass parsers];
     dispatch_once([messengerClass onceTokenRef],
-                  ^{
-                      if ([messengerClass isInstalled])
-                      {
-                          CFArrayRef recentLibraries = SBPreferencesCopyAppValue(
-                                                            (CFStringRef)[messengerClass preferencesLibraryPathsKey],
-                                                            (CFStringRef)@"com.apple.iApps");
-                          
-                          // We decided it's a better user experience to only provide the most recently used library.
-                          // Most recently used library currently always stored at index 0 in library list.
-                          // (But still leave the code in place to be able to easily switch back to providing all known libraries)
-                          
-                          NSArray* libraries;
-                          if ([(NSArray*)recentLibraries count] > 0)
-                          {
-                              libraries = [NSArray arrayWithObject:[(NSArray*)recentLibraries objectAtIndex:0]];
-                          } else {
-                              libraries = [NSArray array];
-                          }
-                          
-                          for (NSString* library in libraries)
-                          {
-                              NSURL* url = [NSURL URLWithString:library];
-                              NSString* path = [url path];
-                              
-                              NSFileManager *fileManager = [[NSFileManager alloc] init];
-                              
-                              BOOL changed;
-                              if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
-                              {                                  
-                                  IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
-                                  parser.shouldDisplayLibraryName = [libraries count] > 1;
-                                  
-                                  //NSLog(@"%@ uses library: %@", [parser class], path);
-                                  
-                                  // Exclude enclosing folder from being displayed by IMBFolderParser...
-                                  
-                                  NSString* libraryPath = [path stringByDeletingLastPathComponent];
-                                  [IMBConfig registerLibraryPath:libraryPath];
-                              }
-                              
-                              [fileManager release];
-                          }
-                          if (recentLibraries) CFRelease(recentLibraries);
-                      }
-                  });
+	^{
+		if ([messengerClass isInstalled])
+		{
+			CFArrayRef recentLibraries = SBPreferencesCopyAppValue(
+											(CFStringRef)[messengerClass preferencesLibraryPathsKey],
+											(CFStringRef)@"com.apple.iApps");
+
+			// We decided it's a better user experience to only provide the most recently used library.
+			// Most recently used library currently always stored at index 0 in library list.
+			// (But still leave the code in place to be able to easily switch back to providing all known libraries)
+
+			NSArray* libraries;
+			if ([(NSArray*)recentLibraries count] > 0)
+			{
+				libraries = [NSArray arrayWithObject:[(NSArray*)recentLibraries objectAtIndex:0]];
+			} else {
+				libraries = [NSArray array];
+			}
+
+			for (NSString* library in libraries)
+			{
+				NSURL* url = [NSURL URLWithString:library];
+				NSString* path = [url path];
+
+				NSFileManager *fileManager = [[NSFileManager alloc] init];
+
+				IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
+				parser.shouldDisplayLibraryName = [libraries count] > 1;
+				  
+				//NSLog(@"%@ uses library: %@", [parser class], path);
+				  
+				// Exclude enclosing folder from being displayed by IMBFolderParser...
+				  
+				NSString* libraryPath = [path stringByDeletingLastPathComponent];
+				[IMBConfig registerLibraryPath:libraryPath];
+
+				[fileManager release];
+			}
+			if (recentLibraries) CFRelease(recentLibraries);
+		}
+	});
 	
     // Every parser must have its current parser messenger set
     
