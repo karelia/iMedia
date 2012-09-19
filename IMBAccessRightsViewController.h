@@ -76,7 +76,6 @@
 
 @interface IMBAccessRightsViewController : NSViewController
 {
-	BOOL _isOpen;
 	IBOutlet NSTextField* _warningTitle;
 	IBOutlet NSTextField* _warningMessage;
 }

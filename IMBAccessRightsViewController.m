@@ -151,93 +151,82 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 - (void) _showForSuggestedURL:(NSURL*)inSuggestedURL name:(NSString*)inName completionHandler:(IMBOpenPanelCompletionHandler)inCompletionBlock;
 {
-	if (_isOpen == NO)
-	{
-		_isOpen = YES;
+	// Customize an NSOpenPanel so that it explains why the user needs to allow access...
 	
-		NSOpenPanel* panel = [NSOpenPanel openPanel];
-		panel.canChooseDirectories = YES;
-		panel.allowsMultipleSelection = NO;
-		panel.canCreateDirectories = NO;
-		
-		panel.accessoryView = self.view;
-		[panel setDirectoryURL:inSuggestedURL];
+	NSOpenPanel* panel = [NSOpenPanel openPanel];
+	panel.canChooseDirectories = YES;
+	panel.allowsMultipleSelection = NO;
+	panel.canCreateDirectories = NO;
 
-		NSString* title = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.openPanel.title",
+	panel.accessoryView = self.view;
+	[panel setDirectoryURL:inSuggestedURL];
+
+	NSString* title = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.openPanel.title",
+		nil,
+		IMBBundle(),
+		@"Allow Access to Media Files",
+		@"NSOpenPanel title");
+	
+	if (inName)
+	{
+		title = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.openPanel.titleWithName",
 			nil,
 			IMBBundle(),
-			@"Allow Access to Media Files",
+			@"Allow Access to %@",
 			@"NSOpenPanel title");
-		
-		if (inName)
-		{
-			title = NSLocalizedStringWithDefaultValue(
-				@"IMBAccessRightsViewController.openPanel.titleWithName",
-				nil,
-				IMBBundle(),
-				@"Allow Access to %@",
-				@"NSOpenPanel title");
-				
-			title = [NSString stringWithFormat:title,inName];
-		}
-		
-		panel.title = title;
-
-		panel.message = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.openPanel.message",
-			nil,
-			IMBBundle(),
-			@"Click the \"Allow\" button to grant access to your media files.",
-			@"NSOpenPanel message");
-					
-		panel.prompt = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.openPanel.prompt",
-			nil,
-			IMBBundle(),
-			@"Allow",
-			@"NSOpenPanel button");
-
-		_warningTitle.stringValue = title;
-
-        NSString* appName = [[NSProcessInfo processInfo] processName];
-        
-        NSString* format = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.openPanel.description",
-			nil,
-			IMBBundle(),
-			@"Due to system security features that protect your data from malicious attacks, %@ does not have the necessary rights to access your media files. To give %@ access to your media files click the \"Allow\" button.",
-			@"NSOpenPanel description");
-
-        _warningMessage.stringValue = [NSString stringWithFormat:format,appName,appName];
-        
-		IMBOpenPanelCompletionHandler completionBlock = [inCompletionBlock copy];
-
-		// We really wanted to use [panel runModal] here, because working modally (i.e. blocking everything until
-		// the panel is dismissed) would be the right thing here. However, runModal has a serious bug in sandboxed
-		// apps. It simply stops working the second time you show an NSOpenPanel. It freezes, until you send the app
-		// the the background and bring it to the front again.
-		
-		// For this reason we had to use the modern completion block based API - which has the drawback that it
-		// doesn't work modally. To guard against having two NSOpenPanels showing at the same time, we introduced
-		// the stupid _isOpen flag...
-		
-		[panel beginWithCompletionHandler:^(NSInteger button)
-		{
-			if (button == NSFileHandlingPanelOKButton)
-			{
-				NSURL* url = [panel URL];
-				completionBlock(url);
-			}
-			else
-			{
-				completionBlock(nil);
-			}
 			
-			[completionBlock release];
-			_isOpen = NO;
-		}];
+		title = [NSString stringWithFormat:title,inName];
 	}
+	
+	panel.title = title;
+
+	panel.message = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.openPanel.message",
+		nil,
+		IMBBundle(),
+		@"Click the \"Allow\" button to grant access to your media files.",
+		@"NSOpenPanel message");
+				
+	panel.prompt = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.openPanel.prompt",
+		nil,
+		IMBBundle(),
+		@"Allow",
+		@"NSOpenPanel button");
+
+	_warningTitle.stringValue = title;
+
+	NSString* appName = [[NSProcessInfo processInfo] processName];
+	
+	NSString* format = NSLocalizedStringWithDefaultValue(
+		@"IMBAccessRightsViewController.openPanel.description",
+		nil,
+		IMBBundle(),
+		@"Due to system security features that protect your data from malicious attacks, %@ does not have the necessary rights to access your media files. To give %@ access to your media files click the \"Allow\" button.",
+		@"NSOpenPanel description");
+
+	_warningMessage.stringValue = [NSString stringWithFormat:format,appName,appName];
+  
+	// Run the NSOpenPanel. Please note the special saving and restoring of keyWindow. This is essential here, or
+	// the Powerbox will become unresponsive the second time we try to call it. Then call the completion block...
+	
+	NSWindow* keyWindow = [NSApp keyWindow];
+	
+	NSInteger button = [panel runModal];
+
+	if (button == NSFileHandlingPanelOKButton)
+	{
+		NSURL* url = [panel URL];
+		inCompletionBlock(url);
+	}
+	else
+	{
+		inCompletionBlock(nil);
+	}
+	
+	[keyWindow makeKeyWindow];
 }
 
 
