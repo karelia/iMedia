@@ -204,9 +204,21 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			object:nil];
 			
 		[[[NSWorkspace sharedWorkspace] notificationCenter]
-			addObserver:self 
-			selector:@selector(_didMountVolume:)
-			name:NSWorkspaceDidMountNotification 
+			addObserver:self
+			selector:@selector(_volumesDidChange)
+			name:NSWorkspaceDidMountNotification
+			object:nil];
+
+		[[[NSWorkspace sharedWorkspace] notificationCenter]
+			addObserver:self
+			selector:@selector(_volumesDidChange)
+			name:NSWorkspaceDidUnmountNotification
+			object:nil];
+
+		[[[NSWorkspace sharedWorkspace] notificationCenter]
+			addObserver:self
+			selector:@selector(_volumesDidChange)
+			name:NSWorkspaceDidRenameVolumeNotification
 			object:nil];
 	}
 	
@@ -217,7 +229,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
+	[[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
 
 	IMBRelease(_mediaType);
 	IMBRelease(_subnodes);
@@ -1289,8 +1301,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 // When unmounting a volume, we need to stop the file watcher, or unmounting will fail. In this case we have to walk
-// through the node tree and check which nodes are affected. These nodes are removed from the tree. This will also
-// take care of removing the offending file watcher...
+// through the node tree and check which nodes are affected...
 
 
 - (void) _willUnmountVolume:(NSNotification*)inNotification 
@@ -1315,37 +1326,29 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 			if ([path hasPrefix:inVolume])
 			{
-				[self _replaceNode:node withNode:nil parentNodeIdentifier:node.parentNode.identifier];
+				NSString* watchedPath = node.watchedPath;
+				if (watchedPath != nil && node.watcherType == kIMBWatcherTypeFSEvent)
+				{
+					[[IMBFileSystemObserver sharedObserver] removePath:watchedPath];
+				}
 			}
 		}
 	}
 }
 
 
-// When a new volume is mounted, go through all messengers and check if this concerns us here. If yes, then
-// request the top-level node...
+// The list of volume has changes (mount, unmount, or rename). We should really reload everything...
 
-- (void) _didMountVolume:(NSNotification*)inNotification 
+- (void) _volumesDidChange
 {
-	NSString* volume = [[inNotification userInfo] objectForKey:@"NSDevicePath"];
-	NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
-	BOOL didPostNotification = NO;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(__volumesDidChange) object:nil];
+	[self performSelector:@selector(__volumesDidChange) withObject:nil afterDelay:2.0];
+}
 
-	for (IMBParserMessenger* messenger in messengers)
-	{
-		NSURL* url = messenger.mediaSource;
-		NSString* path = [[url path] stringByStandardizingPath];
-		
-		if ([path hasPrefix:volume])
-		{
-			if (!didPostNotification)
-			{
-				[[NSNotificationCenter defaultCenter] postNotificationName:kIMBNodesWillReloadNotification object:self];
-			}
-			
-			[self createTopLevelNodesWithParserMessenger:messenger];
-		}
-	}
+
+- (void) __volumesDidChange
+{
+	[self reload];
 }
 
 

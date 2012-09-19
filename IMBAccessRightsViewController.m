@@ -494,13 +494,26 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"Reload",
 			@"Alert button");
 
+//		NSString* cancel = NSLocalizedStringWithDefaultValue(
+//			@"IMBAccessRightsViewController.cancel",
+//			nil,
+//			IMBBundle(),
+//			@"Cancel",
+//			@"Alert button");
+
 		NSString* message = [NSString stringWithFormat:format,name,volume];
 		
 		if (IMBRunningOnLionOrNewer() && inView.window != nil)
 		{
 			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 			alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+//+			alert.behavior = NSPopoverBehaviorApplicationDefined;
 			
+//			[alert addButtonWithTitle:cancel block:^()
+//			{
+//				[alert close];
+//			}];
+
 			[alert addButtonWithTitle:ok block:^()
 			{
 				[[IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType] reload];
@@ -616,13 +629,26 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"Reload",
 			@"Alert button");
 
-		NSString* message = [NSString stringWithFormat:format,name];
+//		NSString* cancel = NSLocalizedStringWithDefaultValue(
+//			@"IMBAccessRightsViewController.cancel",
+//			nil,
+//			IMBBundle(),
+//			@"Cancel",
+//			@"Alert button");
+
+		NSString* message = [NSString stringWithFormat:format,name,volume];
 		
 		if (IMBRunningOnLionOrNewer() && inView.window != nil)
 		{
 			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
 			alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+//			alert.behavior = NSPopoverBehaviorApplicationDefined;
 		
+//			[alert addButtonWithTitle:cancel block:^()
+//			{
+//				[alert close];
+//			}];
+
 			[alert addButtonWithTitle:ok block:^()
 			{
 				[[IMBLibraryController sharedLibraryControllerWithMediaType:inObject.mediaType] reload];

@@ -1005,6 +1005,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 				NSRect rect = [inView itemFrameAtIndex:index];
 				[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:inView relativeToRect:rect];
 			}
+			else if (object.accessibility == kIMBResourceNoPermission)
+			{
+				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			}
 		}
 	}
 	
@@ -1190,49 +1194,51 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
+	CGImageRef badgeRef = NULL;
+	
 	if ([self.delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
-		CGImageRef badgeRef = [self.delegate objectViewController:self badgeForObject:object];
+		badgeRef = [self.delegate objectViewController:self badgeForObject:object];
+	}
 			
-		if ([inCell respondsToSelector:@selector(setBadge:)])
+	if ([inCell respondsToSelector:@selector(setBadge:)])
+	{
+		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
-			if (object.accessibility == kIMBResourceDoesNotExist)
-            {
-                CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
-                [inCell setBadge:stop];
-            }
-			else if (object.accessibility == kIMBResourceNoPermission)
-            {
-                CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
-                [inCell setBadge:warning];
-            }
-			else 
-			{
-				[inCell setBadge:badgeRef];
-			}
+			CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
+			[inCell setBadge:stop];
 		}
-
-		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
+		else if (object.accessibility == kIMBResourceNoPermission)
 		{
-			if (object.accessibility == kIMBResourceDoesNotExist)
-			{
-				NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
-				[inCell setImage:stop];
-			}
-			else if (object.accessibility == kIMBResourceNoPermission)
-			{
-				NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
-				[inCell setImage:warning];
-			}
-			else if (badgeRef)
-			{
-				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
-				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
-				NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
-				[badge addRepresentation:bitmapImageRep];
-				
-				[inCell setImage:badge];
-			}
+			CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
+			[inCell setBadge:warning];
+		}
+		else 
+		{
+			[inCell setBadge:badgeRef];
+		}
+	}
+
+	if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
+	{
+		if (object.accessibility == kIMBResourceDoesNotExist)
+		{
+			NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+			[inCell setImage:stop];
+		}
+		else if (object.accessibility == kIMBResourceNoPermission)
+		{
+			NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
+			[inCell setImage:warning];
+		}
+		else if (badgeRef)
+		{
+			NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
+			NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
+			NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
+			[badge addRepresentation:bitmapImageRep];
+			
+			[inCell setImage:badge];
 		}
 	}
 }
@@ -1366,17 +1372,16 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
     if (object != nil)
     {
-        switch (object.accessibility)
+		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
-            case kIMBResourceDoesNotExist:
 			[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:view relativeToRect:rect];
-			break;
-				
-            case kIMBResourceNoPermission:
+		}
+		else if (object.accessibility == kIMBResourceNoPermission)
+		{
 			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-			break;
-				
-            case kIMBResourceIsAccessible:
+		}
+		else 
+		{
 			if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 			{
 				IMBNode* node = self.currentNode;
@@ -1402,11 +1407,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 					[self openSelectedObjects:inSender];
 				}	
 			}	
-			break;
-                
-            default:
-			break;
-        }
+		}
     }
 }
 

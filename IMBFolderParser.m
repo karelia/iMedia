@@ -340,6 +340,8 @@
 	object.imageRepresentation = nil;		// will be loaded lazily when needed
 	object.metadata = nil;					// will be loaded lazily when needed
 	
+	object.accessibility = [self accessibilityForObject:object];
+
 	return object;
 }
 

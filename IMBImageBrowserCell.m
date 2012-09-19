@@ -55,6 +55,8 @@
 #import "IMBImageBrowserCell.h"
 #import "IMBObject.h"
 #import "IMBNode.h"
+#import "IMBButtonObject.h"
+#import "IMBNodeObject.h"
 #import "IMBCommon.h"
 #import "IMBObjectViewController.h"
 #import "NSImage+iMedia.h"
@@ -302,37 +304,31 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
         // Display warning or error sign badge if resource that thumbnail is representing is not accessible
         
         CGImageRef imageRef = NULL;
-        switch (item.accessibility)
-        {
-            case kIMBResourceDoesNotExist:
-                imageRef = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
-                [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
-                break;
-				
-            case kIMBResourceNoPermission:
-                imageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
-                [layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
-                break;
-                
-           case kIMBResourceIsAccessible:
-				{
-					// Display any kind of badge if host app wants us to (should not exceed 16x16 points)
-					
-					IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
-					id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
-					
-					if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
-					{			
-						[layer addSublayer:
-						 [self imb_layerWithBadge:[delegate objectViewController:objectViewController badgeForObject:item]
-										   inRect:relativeImageFrame]];
-					}
-				}
-				break;
-				
-            default:
-                break;
-        }
+		
+		if (item.accessibility == kIMBResourceDoesNotExist)
+		{
+			imageRef = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
+			[layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+		}
+		else if (item.accessibility == kIMBResourceNoPermission)
+		{
+			imageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
+			[layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+		}
+		else if (item.accessibility == kIMBResourceIsAccessible)
+		{
+			// Display any kind of badge if host app wants us to (should not exceed 16x16 points)
+			
+			IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
+			id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
+			
+			if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
+			{			
+				[layer addSublayer:
+				 [self imb_layerWithBadge:[delegate objectViewController:objectViewController badgeForObject:item]
+								   inRect:relativeImageFrame]];
+			}
+		}
         
 		return layer;
 	}
