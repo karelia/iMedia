@@ -417,7 +417,9 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	NSString* volume = [inNode.libraryRootURL imb_externalVolumeName];
 	BOOL mounted = [[NSFileManager defaultManager] imb_isVolumeMounted:volume];
 	
-	if (mounted)
+	// For missing libraries alert the user that we cannot use this node...
+	
+	if (volume == nil || mounted)
 	{
 		NSString* title = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.missingLibraryTitle",
@@ -466,6 +468,9 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			[alert runModal];
 		}
 	}
+	
+	// For libraries on an unmounted volume, ask the user to mount the volume and reload...
+	
 	else
 	{
 		NSString* title = NSLocalizedStringWithDefaultValue(
