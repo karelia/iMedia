@@ -1090,8 +1090,10 @@
             ![assetIds member:photoStreamAssetId] &&
             [self shouldUseObject:imageDict])
 		{
+            NSMutableDictionary *metadata = [imageDict mutableCopy];
+            [metadata setObject:imageKey forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
             [assetIds addObject:photoStreamAssetId];
-            [photoStreamObjectDictionaries addObject:imageDict];
+            [photoStreamObjectDictionaries addObject:metadata];
         }
     }
     // After collecting all Photo Stream object dictionaries sort them by date
