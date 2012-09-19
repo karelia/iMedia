@@ -3,7 +3,7 @@
 //  IMBPopover.h
 //
 //  Author:		Peter Baumgartner, peter@baumgartner.com
-//  Copyright:	©2011 by IMAGINE GbR. All rights reserved.
+//  Copyright:	©2011-2012 by IMAGINE GbR. All rights reserved.
 //	Abstract:	Convenience class to dynamically create popovers from nib files
 //
 //**********************************************************************************************************************
@@ -15,6 +15,8 @@
 - (id) initWithNibName:(NSString*)inNibName;
 
 + (Class) viewControllerClass;
+
++ (void) closeAllPopovers;
 
 @end
 
