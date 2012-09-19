@@ -765,8 +765,10 @@
             ![assetIds member:photoStreamAssetId] &&
             [self shouldUseObject:imageDict])
 		{
+            NSMutableDictionary *metadata = [imageDict mutableCopy];
+            [metadata setObject:imageKey forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
             [assetIds addObject:photoStreamAssetId];
-            [photoStreamObjectDictionaries addObject:imageDict];
+            [photoStreamObjectDictionaries addObject:metadata];
         }
     }
     // After collecting all Photo Stream object dictionaries sort them by date
@@ -822,6 +824,7 @@
         [object release];
         
         object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+        object.accessibility = [self accessibilityForObject:object];
         object.name = name;
         object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
         object.metadata = nil;					// Build lazily when needed (takes longer)
