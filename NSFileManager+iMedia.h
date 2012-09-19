@@ -68,5 +68,6 @@
 - (BOOL) imb_fileExistsAtPath:(NSString**)ioPath wasChanged:(BOOL*)outWasChanged;
 - (NSString *) imb_generateUniqueFileNameAtPath:(NSString *)path base:(NSString *)basename extension:(NSString *)extension;
 - (NSInteger) imb_modeForPath:(NSString *)inPath;
+- (BOOL) imb_isVolumeMounted:(NSString*)inVolumeName;
 
 @end

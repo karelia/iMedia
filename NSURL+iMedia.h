@@ -62,6 +62,9 @@
 
 - (IMBResourceAccessibility) imb_accessibility;
 
+// Return name of volume for this URL (or nil if on boot volume).
+- (NSString*) imb_externalVolumeName;
+
 #pragma mark Aliases
 // Like -URLByResolvingSymlinksInPath, but handles any aliases in the path too. Returns nil upon resolution error
 - (NSURL *)imb_URLByResolvingSymlinksAndBookmarkFilesInPath;

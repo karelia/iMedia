@@ -280,6 +280,30 @@
 }
 
 
+// Returns the name of the volume this file resides on (or nil if on boot volume)...
+
+- (NSString*) imb_externalVolumeName
+{
+	if ([self isFileURL])
+	{
+		NSString* path = [[self path] stringByStandardizingPath];
+		
+		if ([path hasPrefix:@"/Volumes/"])
+		{
+			NSArray* components = [path pathComponents];
+			
+			if (components.count >= 3)
+			{
+				NSString* name = [components objectAtIndex:2];
+				return name;
+			}
+		}
+	}
+	
+	return nil;
+}
+
+
 #pragma mark Aliases
 
 - (NSURL *)imb_URLByResolvingBookmarkFilesInPath;

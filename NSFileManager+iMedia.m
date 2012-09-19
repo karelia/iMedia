@@ -317,4 +317,15 @@
 }
 
 
+// Check if a specified volume is currently mounted...
+
+- (BOOL) imb_isVolumeMounted:(NSString*)inVolumeName
+{
+	NSString* path = [NSString stringWithFormat:@"/Volumes/%@/",inVolumeName];
+	BOOL exists,directory;
+	return [self fileExistsAtPath:path isDirectory:&directory];
+	return exists && directory;
+}
+
+
 @end
