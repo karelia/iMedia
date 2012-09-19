@@ -1163,6 +1163,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
+	BOOL isButtonObject = [object isKindOfClass:[IMBButtonObject class]];
+	BOOL isNodeObject = [object isKindOfClass:[IMBNodeObject class]];
+	BOOL isNormalObject = !(isButtonObject || isNodeObject);
 	NSString* columnIdentifier = [inTableColumn identifier];
 	
 	// If we are in combo view, then assign thumbnail, title, subd subtitle (metadataDescription). If they are
@@ -1190,49 +1193,51 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
+	CGImageRef badgeRef = NULL;
+	
 	if ([self.delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
-		CGImageRef badgeRef = [self.delegate objectViewController:self badgeForObject:object];
+		badgeRef = [self.delegate objectViewController:self badgeForObject:object];
+	}
 			
-		if ([inCell respondsToSelector:@selector(setBadge:)])
+	if ([inCell respondsToSelector:@selector(setBadge:)])
+	{
+		if (object.accessibility == kIMBResourceDoesNotExist && isNormalObject)
 		{
-			if (object.accessibility == kIMBResourceDoesNotExist)
-            {
-                CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
-                [inCell setBadge:stop];
-            }
-			else if (object.accessibility == kIMBResourceNoPermission)
-            {
-                CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
-                [inCell setBadge:warning];
-            }
-			else 
-			{
-				[inCell setBadge:badgeRef];
-			}
+			CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
+			[inCell setBadge:stop];
 		}
-
-		if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
+		else if (object.accessibility == kIMBResourceNoPermission && isNormalObject)
 		{
-			if (object.accessibility == kIMBResourceDoesNotExist)
-			{
-				NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
-				[inCell setImage:stop];
-			}
-			else if (object.accessibility == kIMBResourceNoPermission)
-			{
-				NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
-				[inCell setImage:warning];
-			}
-			else if (badgeRef)
-			{
-				NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
-				NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
-				NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
-				[badge addRepresentation:bitmapImageRep];
-				
-				[inCell setImage:badge];
-			}
+			CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
+			[inCell setBadge:warning];
+		}
+		else 
+		{
+			[inCell setBadge:badgeRef];
+		}
+	}
+
+	if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
+	{
+		if (object.accessibility == kIMBResourceDoesNotExist && isNormalObject)
+		{
+			NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+			[inCell setImage:stop];
+		}
+		else if (object.accessibility == kIMBResourceNoPermission && isNormalObject)
+		{
+			NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
+			[inCell setImage:warning];
+		}
+		else if (badgeRef)
+		{
+			NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
+			NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
+			NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
+			[badge addRepresentation:bitmapImageRep];
+			
+			[inCell setImage:badge];
 		}
 	}
 }
