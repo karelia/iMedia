@@ -121,6 +121,12 @@
 }
 
 
+- (IMBResourceAccessibility) accessibility
+{
+	return kIMBResourceIsAccessible;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

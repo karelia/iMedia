@@ -1167,9 +1167,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) tableView:(NSTableView*)inTableView willDisplayCell:(id)inCell forTableColumn:(NSTableColumn*)inTableColumn row:(NSInteger)inRow
 {
 	IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inRow];
-	BOOL isButtonObject = [object isKindOfClass:[IMBButtonObject class]];
-	BOOL isNodeObject = [object isKindOfClass:[IMBNodeObject class]];
-	BOOL isNormalObject = !(isButtonObject || isNodeObject);
 	NSString* columnIdentifier = [inTableColumn identifier];
 	
 	// If we are in combo view, then assign thumbnail, title, subd subtitle (metadataDescription). If they are
@@ -1206,12 +1203,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			
 	if ([inCell respondsToSelector:@selector(setBadge:)])
 	{
-		if (object.accessibility == kIMBResourceDoesNotExist && isNormalObject)
+		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
 			CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
 			[inCell setBadge:stop];
 		}
-		else if (object.accessibility == kIMBResourceNoPermission && isNormalObject)
+		else if (object.accessibility == kIMBResourceNoPermission)
 		{
 			CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
 			[inCell setBadge:warning];
@@ -1224,12 +1221,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 	if ([columnIdentifier isEqualToString:@"icon"] && [inCell isKindOfClass:[NSImageCell class]])
 	{
-		if (object.accessibility == kIMBResourceDoesNotExist && isNormalObject)
+		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
 			NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
 			[inCell setImage:stop];
 		}
-		else if (object.accessibility == kIMBResourceNoPermission && isNormalObject)
+		else if (object.accessibility == kIMBResourceNoPermission)
 		{
 			NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
 			[inCell setImage:warning];
@@ -1375,17 +1372,16 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		
     if (object != nil)
     {
-        switch (object.accessibility)
+		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
-            case kIMBResourceDoesNotExist:
 			[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:view relativeToRect:rect];
-			break;
-				
-            case kIMBResourceNoPermission:
+		}
+		else if (object.accessibility == kIMBResourceNoPermission)
+		{
 			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
-			break;
-				
-            case kIMBResourceIsAccessible:
+		}
+		else 
+		{
 			if ([delegate respondsToSelector:@selector(libraryController:didDoubleClickSelectedObjects:inNode:)])
 			{
 				IMBNode* node = self.currentNode;
@@ -1411,11 +1407,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 					[self openSelectedObjects:inSender];
 				}	
 			}	
-			break;
-                
-            default:
-			break;
-        }
+		}
     }
 }
 
