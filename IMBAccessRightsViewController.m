@@ -67,6 +67,8 @@
 #import "IMBFileSystemObserver.h"
 #import "IMBAlertPopover.h"
 #import "NSImage+iMedia.h"
+#import "NSURL+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -412,53 +414,114 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 + (void) showMissingResourceAlertForNode:(IMBNode*)inNode view:(NSView*)inView relativeToRect:(NSRect)inRect
 {
 	NSString* name = inNode.name;
-
-	NSString* title = NSLocalizedStringWithDefaultValue(
-		@"IMBAccessRightsViewController.missingLibraryTitle",
-		nil,
-		IMBBundle(),
-		@"Library is Missing",
-		@"Alert title");
-
-	NSString* format = NSLocalizedStringWithDefaultValue(
-		@"IMBAccessRightsViewController.missingLibraryMessage",
-		nil,
-		IMBBundle(),
-		@"The %@ library cannot be used because it is missing. It may have been deleted, moved, or it may be located on a volume that is currently not mounted.",
-		@"Alert message");
-		
-	NSString* ok = NSLocalizedStringWithDefaultValue(
-		@"IMBAccessRightsViewController.missingLibraryButton",
-		nil,
-		IMBBundle(),
-		@"   OK   ",
-		@"Alert button");
-
-	NSString* message = [NSString stringWithFormat:format,name];
+	NSString* volume = [inNode.libraryRootURL imb_externalVolumeName];
+	BOOL mounted = [[NSFileManager defaultManager] imb_isVolumeMounted:volume];
 	
-	if (IMBRunningOnLionOrNewer() && inView.window != nil)
+	if (mounted)
 	{
-		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
-		alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+		NSString* title = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.missingLibraryTitle",
+			nil,
+			IMBBundle(),
+			@"Library is Missing",
+			@"Alert title");
+
+		NSString* format = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.missingLibraryMessage",
+			nil,
+			IMBBundle(),
+			@"The %@ library cannot be used because it is missing. It may have been deleted, moved, or renamed.",
+			@"Alert message");
+			
+		NSString* ok = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.missingLibraryButton",
+			nil,
+			IMBBundle(),
+			@"   OK   ",
+			@"Alert button");
+
+		NSString* message = [NSString stringWithFormat:format,name];
 		
-		[alert addButtonWithTitle:ok block:^()
+		if (IMBRunningOnLionOrNewer() && inView.window != nil)
 		{
-			[alert close];
-		}];
-	
-		[alert showRelativeToRect:inRect ofView:inView preferredEdge:NSMaxYEdge];
+			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+			alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+			
+			[alert addButtonWithTitle:ok block:^()
+			{
+				[alert close];
+			}];
+		
+			[alert showRelativeToRect:inRect ofView:inView preferredEdge:NSMaxYEdge];
+		}
+		else
+		{
+			NSAlert* alert = [NSAlert
+				alertWithMessageText:title
+				defaultButton:ok
+				alternateButton:nil
+				otherButton:nil
+				informativeTextWithFormat:@"%@",message];
+				
+			[alert runModal];
+		}
 	}
 	else
 	{
-		NSAlert* alert = [NSAlert
-			alertWithMessageText:title
-			defaultButton:ok
-			alternateButton:nil
-			otherButton:nil
-			informativeTextWithFormat:@"%@",message];
+		NSString* title = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.offlineLibraryTitle",
+			nil,
+			IMBBundle(),
+			@"Library is Offline",
+			@"Alert title");
+
+		NSString* format = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.offlineLibraryMessage",
+			nil,
+			IMBBundle(),
+			@"The %@ library cannot be used because it is located on a volume that is currently not mounted.\n\nMount the volume %@ and then click on the \"Reload\" button.",
+			@"Alert message");
 			
-		[alert runModal];
+		NSString* ok = NSLocalizedStringWithDefaultValue(
+			@"IMBAccessRightsViewController.offlineLibraryButton",
+			nil,
+			IMBBundle(),
+			@"Reload",
+			@"Alert button");
+
+		NSString* message = [NSString stringWithFormat:format,name,volume];
+		
+		if (IMBRunningOnLionOrNewer() && inView.window != nil)
+		{
+			IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:message footer:nil];
+			alert.icon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+			
+			[alert addButtonWithTitle:ok block:^()
+			{
+				[[IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType] reload];
+				[alert close];
+			}];
+		
+			[alert showRelativeToRect:inRect ofView:inView preferredEdge:NSMaxYEdge];
+		}
+		else
+		{
+			NSAlert* alert = [NSAlert
+				alertWithMessageText:title
+				defaultButton:ok
+				alternateButton:nil
+				otherButton:nil
+				informativeTextWithFormat:@"%@",message];
+				
+			NSInteger button = [alert runModal];
+			
+			if (button == NSOKButton)
+			{
+				[[IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType] reload];
+			}
+		}
 	}
+	
 }
 
 
