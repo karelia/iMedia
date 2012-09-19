@@ -822,6 +822,7 @@
         [object release];
         
         object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+        object.accessibility = [self accessibilityForObject:object];
         object.name = name;
         object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
         object.metadata = nil;					// Build lazily when needed (takes longer)
