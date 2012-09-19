@@ -1005,6 +1005,10 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 				NSRect rect = [inView itemFrameAtIndex:index];
 				[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:inView relativeToRect:rect];
 			}
+			else if (object.accessibility == kIMBResourceNoPermission)
+			{
+				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			}
 		}
 	}
 	
