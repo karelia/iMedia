@@ -247,26 +247,22 @@ static dispatch_once_t sMovieOnceToken = 0;
 				NSString* path = [url path];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
-                BOOL changed;
-				if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
-				{
-					// Create a parser instance preconfigure with that path...
-					
-					IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
-					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-					parser.mediaType = self.mediaType;
-					parser.mediaSource = url;
-					parser.appPath = self.iTunesPath;
-					parser.shouldDisplayLibraryName = libraries.count > 1;
+				// Create a parser instance preconfigure with that path...
+				
+				IMBiTunesAudioParser* parser = (IMBiTunesAudioParser*)[self newParser];
+				parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+				parser.mediaType = self.mediaType;
+				parser.mediaSource = url;
+				parser.appPath = self.iTunesPath;
+				parser.shouldDisplayLibraryName = libraries.count > 1;
 
-					[parsers addObject:parser];
-					[parser release];
+				[parsers addObject:parser];
+				[parser release];
 
-					// Exclude enclosing folder from being displayed by IMBFolderParser...
-					
-					NSString* libraryPath = [path stringByDeletingLastPathComponent];
-					[IMBConfig registerLibraryPath:libraryPath];
-				}
+				// Exclude enclosing folder from being displayed by IMBFolderParser...
+				
+				NSString* libraryPath = [path stringByDeletingLastPathComponent];
+				[IMBConfig registerLibraryPath:libraryPath];
                 
                 [fileManager release];
 			}
@@ -351,26 +347,22 @@ static dispatch_once_t sMovieOnceToken = 0;
 				NSString* path = [url path];
                 NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
-                BOOL changed;
-				if ([fileManager imb_fileExistsAtPath:&path wasChanged:&changed])
-				{
-					// Create a parser instance preconfigure with that path...
-					
-					IMBiTunesMovieParser* parser = (IMBiTunesMovieParser*)[self newParser];
-					parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
-					parser.mediaType = self.mediaType;
-					parser.mediaSource = url;
-					parser.appPath = self.iTunesPath;
-					parser.shouldDisplayLibraryName = libraries.count > 1;
+				// Create a parser instance preconfigure with that path...
+				
+				IMBiTunesMovieParser* parser = (IMBiTunesMovieParser*)[self newParser];
+				parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],path];
+				parser.mediaType = self.mediaType;
+				parser.mediaSource = url;
+				parser.appPath = self.iTunesPath;
+				parser.shouldDisplayLibraryName = libraries.count > 1;
 
-					[parsers addObject:parser];
-					[parser release];
+				[parsers addObject:parser];
+				[parser release];
 
-					// Exclude enclosing folder from being displayed by IMBFolderParser...
-					
-					NSString* libraryPath = [path stringByDeletingLastPathComponent];
-					[IMBConfig registerLibraryPath:libraryPath];
-				}
+				// Exclude enclosing folder from being displayed by IMBFolderParser...
+				
+				NSString* libraryPath = [path stringByDeletingLastPathComponent];
+				[IMBConfig registerLibraryPath:libraryPath];
                 
                 [fileManager release];
 			}
