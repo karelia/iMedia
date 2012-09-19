@@ -58,6 +58,7 @@
 #import "IMBImageObjectViewController.h"
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
 #import <iMedia/IMBFaceObjectViewController.h>
+#import <iMedia/IMBOutlineView.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
 #import "IMBTestFaceBrowserCell.h"
 #import "IMBTestFacesBackgroundLayer.h"
@@ -165,10 +166,33 @@
     self.nodeViewController.standardObjectViewController = objectViewController;
 	[self.nodeViewController installObjectViewForNode:nil];
     
-    // Change background color of node view if you like
+    // Customize appearence of outline view
     
-    [self.nodeViewController.nodeOutlineView setBackgroundColor:[NSColor lightGrayColor]];
-    [self.nodeViewController.nodeOutlineView setNeedsDisplay:YES];
+    IMBOutlineView* outlineView = self.nodeViewController.nodeOutlineView;
+    
+    IMBTableViewFormat* tableViewFormat = [[[IMBTableViewFormat alloc] init] autorelease];
+    
+    tableViewFormat.keyWindowHighlightGradient =
+    [[NSGradient alloc] initWithColorsAndLocations:
+     [NSColor colorWithDeviceRed:(float)62/255 green:(float)133/255 blue:(float)197/255 alpha:1.0], 0.0,
+     [NSColor colorWithDeviceRed:(float)48/255 green:(float)95/255 blue:(float)152/255 alpha:1.0], 1.0, nil];
+    
+    tableViewFormat.nonKeyWindowHighlightGradient =
+    [[NSGradient alloc] initWithColorsAndLocations:
+     [NSColor colorWithDeviceRed:(float)190/255 green:(float)190/255 blue:(float)190/255 alpha:1.0], 0.0,
+     [NSColor colorWithDeviceRed:(float)150/255 green:(float)150/255 blue:(float)150/255 alpha:1.0], 1.0, nil];
+    
+    tableViewFormat.dataCellTextColor = [NSColor lightGrayColor];
+    tableViewFormat.dataCellTextHighlightColor = [NSColor yellowColor];
+    tableViewFormat.groupCellTextColor = [NSColor lightGrayColor];
+    
+    outlineView.format = tableViewFormat;
+    
+    // Change background color of node view
+    
+    [outlineView setBackgroundColor:[NSColor darkGrayColor]];
+    
+    [outlineView setNeedsDisplay:YES];
     
     // Observe node view controller whenever it sets its object view controller
     // so you can better adapt to your customization needs

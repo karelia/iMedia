@@ -19,20 +19,20 @@
  persons to whom the Software is furnished to do so, subject to the following
  conditions:
  
-	Redistributions of source code must retain the original terms stated here,
-	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
+ Redistributions of source code must retain the original terms stated here,
+ including this list of conditions, the disclaimer noted below, and the
+ following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
  
-	Redistributions in binary form must include, in an end-user-visible manner,
-	e.g., About window, Acknowledgments window, or similar, either a) the original
-	terms stated here, including this list of conditions, the disclaimer noted
-	below, and the aforementioned copyright notice, or b) the aforementioned
-	copyright notice and a link to karelia.com/imedia.
+ Redistributions in binary form must include, in an end-user-visible manner,
+ e.g., About window, Acknowledgments window, or similar, either a) the original
+ terms stated here, including this list of conditions, the disclaimer noted
+ below, and the aforementioned copyright notice, or b) the aforementioned
+ copyright notice and a link to karelia.com/imedia.
  
-	Neither the name of Karelia Software, nor Sandvox, nor the names of
-	contributors to iMedia Browser may be used to endorse or promote products
-	derived from the Software without prior and express written permission from
-	Karelia Software or individual contributors, as appropriate.
+ Neither the name of Karelia Software, nor Sandvox, nor the names of
+ contributors to iMedia Browser may be used to endorse or promote products
+ derived from the Software without prior and express written permission from
+ Karelia Software or individual contributors, as appropriate.
  
  Disclaimer: THE SOFTWARE IS PROVIDED BY THE COPYRIGHT OWNER AND CONTRIBUTORS
  "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -41,38 +41,22 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
-// Author: Peter Baumgartner
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
 #import "IMBTableViewFormat.h"
-@class IMBTextFieldCell;
-@class IMBNode;
 
+@implementation IMBTableViewFormat
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-@interface IMBOutlineView : NSOutlineView
-{
-	NSMutableDictionary* _subviewsInVisibleRows;
-	NSString* _draggingPrompt;
-	IMBTextFieldCell* _textCell;
-    IMBTableViewFormat *_format;
-}
-
-@property (retain) NSString* draggingPrompt;
-@property (retain) IMBTextFieldCell* textCell;
-@property (retain) IMBTableViewFormat *format;
-
-- (IMBNode*) nodeAtRow:(NSInteger)inRow;
-- (NSRect) badgeRectForRow:(NSInteger)inRow;
-- (void) showProgressWheels;
+@synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
+@synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
+@synthesize dataCellTextColor = _dataCellTextColor;
+@synthesize dataCellTextHighlightColor = _dataCellTextHighlightColor;
+@synthesize groupCellTextColor = _groupCellTextColor;
 
 @end
-
-
-//----------------------------------------------------------------------------------------------------------------------

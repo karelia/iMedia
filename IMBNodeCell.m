@@ -155,19 +155,6 @@
 {
 	BOOL isFlipped = inControlView.isFlipped;
 
-	// Set title font and color...
-	
-	if ([self isGroupCell])
-	{
-		self.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
-		self.textColor = [NSColor disabledControlTextColor];
-	}
-	else
-	{
-		self.font = [NSFont systemFontOfSize:[NSFont systemFontSize]];
-		self.textColor = [NSColor controlTextColor];
-	}
-
 	// Draw the image...
 	
 	if (_icon)

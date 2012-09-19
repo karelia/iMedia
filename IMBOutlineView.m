@@ -69,6 +69,7 @@
 
 @synthesize draggingPrompt = _draggingPrompt;
 @synthesize textCell = _textCell;
+@synthesize format = _format;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -103,6 +104,7 @@
 	IMBRelease(_subviewsInVisibleRows);
 	IMBRelease(_draggingPrompt);
 	IMBRelease(_textCell);
+	IMBRelease(_format);
  
 	[super dealloc];
 }
@@ -173,6 +175,110 @@
 {
 	[super viewWillDraw];
 	[self showProgressWheels];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This method is asking us to draw the hightlights for
+// all of the selected rows that are visible inside theClipRect
+
+// 1. get the range of row indexes that are currently visible
+// 2. get a list of selected rows
+// 3. iterate over the visible rows and if their index is selected
+// 4. draw our custom highlight in the rect of that row.
+
+- (void)highlightSelectionInClipRect:(NSRect)theClipRect
+{
+    if (!self.format || !self.format.keyWindowHighlightGradient || !self.format.nonKeyWindowHighlightGradient)
+    {
+        [super highlightSelectionInClipRect:theClipRect];
+        return;
+    }
+    IMBTableViewFormat *tableViewFormat = self.format;
+    
+    NSRange         aVisibleRowIndexes = [self rowsInRect:theClipRect];
+    NSIndexSet *    aSelectedRowIndexes = [self selectedRowIndexes];
+    int             aRow = aVisibleRowIndexes.location;
+    int             anEndRow = aRow + aVisibleRowIndexes.length;
+    NSGradient *    gradient;
+    NSColor *       pathColor;
+    
+    // if the view is focused, use highlight color, otherwise use the out-of-focus highlight color
+    if (self == [[self window] firstResponder] && [[self window] isMainWindow] && [[self window] isKeyWindow])
+    {
+        gradient = tableViewFormat.keyWindowHighlightGradient;
+    }
+    else
+    {
+        gradient = tableViewFormat.nonKeyWindowHighlightGradient;
+    }
+    pathColor = [gradient interpolatedColorAtLocation:1.0];
+    
+    // draw highlight for the visible, selected rows
+    for (int aRow; aRow < anEndRow; aRow++)
+    {
+        if([aSelectedRowIndexes containsIndex:aRow])
+        {
+            NSRect aRowRect = NSInsetRect([self rectOfRow:aRow], 0, 1); //first is horizontal, second is vertical
+            NSBezierPath * path = [NSBezierPath bezierPathWithRoundedRect:aRowRect xRadius:0.0 yRadius:0.0]; //6.0
+            [path setLineWidth: 2];
+            [pathColor set];
+            [path stroke];
+            
+            [gradient drawInBezierPath:path angle:90];
+        }
+    }
+}
+
+
+// If we are using custom background and highlight colors, we may have to adjust the text colors accordingly,
+// to make sure that text is always clearly readable...
+
+- (NSCell*) preparedCellAtColumn:(NSInteger)inColumn row:(NSInteger)inRow
+{
+	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
+    
+    IMBTableViewFormat *tableViewFormat = self.format;
+    
+	if ([cell isKindOfClass:[IMBNodeCell class]])
+	{
+        IMBNodeCell *nodeCell = (IMBNodeCell *) cell;
+        if ([nodeCell isGroupCell])
+        {
+            if (tableViewFormat && tableViewFormat.groupCellTextColor)
+            {
+                nodeCell.textColor = tableViewFormat.groupCellTextColor;
+            } else {
+                nodeCell.textColor = [NSColor disabledControlTextColor];
+            }
+            nodeCell.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
+        }
+        else
+        {
+            if ([cell isHighlighted])
+            {
+                if (tableViewFormat && tableViewFormat.dataCellTextHighlightColor)
+                {
+                    nodeCell.textColor = tableViewFormat.dataCellTextHighlightColor;
+                } else {
+                    nodeCell.textColor = [NSColor controlTextColor];
+                }
+            }
+            else
+            {
+                if (tableViewFormat && tableViewFormat.dataCellTextColor)
+                {
+                    nodeCell.textColor = tableViewFormat.dataCellTextColor;
+                } else {
+                    nodeCell.textColor = [NSColor controlTextColor];
+                }
+            }
+            nodeCell.font = [NSFont systemFontOfSize:[NSFont systemFontSize]];
+        }
+	}
+	return cell;
 }
 
 
