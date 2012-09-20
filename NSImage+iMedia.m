@@ -379,17 +379,19 @@
 
 - (NSImage *) imb_imageCroppedToRect:(NSRect)inCropRect
 {
-	NSRect dstRect = NSZeroRect;
-	dstRect.size = self.size;
-	dstRect.origin.x = -inCropRect.origin.x;
-	dstRect.origin.y = -inCropRect.origin.y;
-	
-	NSImage *croppedImage = [[[NSImage alloc] initWithSize:inCropRect.size] autorelease];
-	[croppedImage lockFocus];
-	[self drawAtPoint:dstRect.origin fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0];
-	[croppedImage unlockFocus];
-	
-	return croppedImage;
+    NSImage* croppedImage = nil;
+    
+    [self lockFocus];
+    NSBitmapImageRep* bitmapRep = [[[NSBitmapImageRep alloc] initWithFocusedViewRect:inCropRect] autorelease];
+    [self unlockFocus];
+    
+    if (bitmapRep)
+    {
+        croppedImage = [[[NSImage alloc] initWithSize:bitmapRep.size] autorelease];
+        [croppedImage addRepresentation:bitmapRep];
+    }
+    
+    return croppedImage;
 }
 
 
