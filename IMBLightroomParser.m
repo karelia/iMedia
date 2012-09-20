@@ -1314,8 +1314,11 @@ static NSArray* sSupportedUTIs = nil;
 
 - (IMBResourceAccessibility) accessibilityForObject:(IMBObject*)inObject
 {
-    NSURL* pyramidPathURL = [NSURL fileURLWithPath:((IMBLightroomObject*)inObject).absolutePyramidPath];
-    return [pyramidPathURL imb_accessibility];
+    NSString* absolutePyramidPath = ((IMBLightroomObject*)inObject).absolutePyramidPath;
+    
+    if (absolutePyramidPath) return [[NSURL fileURLWithPath:absolutePyramidPath] imb_accessibility];
+
+    return kIMBResourceDoesNotExist;
 }
 
 
