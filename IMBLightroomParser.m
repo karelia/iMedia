@@ -75,6 +75,7 @@
 #import "NSImage+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSURL+iMedia.h"
 #import "SBUtilities.h"
 
 #import <Quartz/Quartz.h>
@@ -443,18 +444,18 @@ static NSArray* sSupportedUTIs = nil;
 // (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
 // This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
 // Please note that this method may be called on a background thread...
-// NOTE: This method will only provide metadata surpassing preliminaryMetadata if the app is not sandboxed.
+// NOTE: This method will only provide metadata surpassing preliminaryMetadata if the object's URL is already accessible.
 
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	NSDictionary* metadata = inObject.preliminaryMetadata;
 	
-    // Being sandboxed we do not query the master resource for extra metadata
-    // since it may very well reside in a not yet entitled location (e.g. on an additional storage device)
-    // thus prompting the user for granting even more entitlements involving the need to chose
-    // an appropriate to be entitled directory carefully.
+    // If the master resource resides in a not yet entitled location (e.g. on an additional storage device)
+    // we do not query it for extra metadata thus not prompting the user for granting even more entitlements
+    // which also involved the need to chose an appropriate to be entitled directory carefully.
     
-	if (!SBIsSandboxed() && [inObject isKindOfClass:[IMBLightroomObject class]])
+	if ([inObject.URL imb_accessibility] == kIMBResourceIsAccessible &&
+        [inObject isKindOfClass:[IMBLightroomObject class]])
 	{
 		IMBLightroomObject* object = (IMBLightroomObject*)inObject;
         
