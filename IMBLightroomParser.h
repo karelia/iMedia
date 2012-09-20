@@ -99,7 +99,7 @@ IMBLightroomNodeType;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSString* dataPath;
+@property (retain) NSString* atomicDataPath;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (nonatomic, retain) NSMutableDictionary *databases;
 @property (nonatomic, retain) NSMutableDictionary *thumbnailDatabases;

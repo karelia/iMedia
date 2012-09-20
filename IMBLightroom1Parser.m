@@ -124,23 +124,10 @@
 		NSArray* libraryPaths = [self libraryPaths];
 		
 		for (NSString* libraryPath in libraryPaths) {
-			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
-								   stringByAppendingString:@" Previews"]
-								  stringByAppendingPathExtension:@"lrdata"];
-            
-            NSURL *dataURL = [NSURL fileURLWithPath:dataPath isDirectory:YES];
-			
-			NSNumber *isDirectory;
-			if (![dataURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] || ![isDirectory boolValue])
-            {
-				dataPath = nil;
-			}
-			
 			IMBLightroom1Parser* parser = [[[self class] alloc] init];
 			parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],libraryPath];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.mediaType = inMediaType;
-			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
 			[parserInstances addObject:parser];

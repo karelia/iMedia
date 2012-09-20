@@ -139,10 +139,40 @@ static NSArray* sSupportedUTIs = nil;
 @implementation IMBLightroomParser
 
 @synthesize appPath = _appPath;
-@synthesize dataPath = _dataPath;
+@synthesize atomicDataPath = _dataPath;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize databases = _databases;
 @synthesize thumbnailDatabases = _thumbnailDatabases;
+
+
+// Returns the path to the previews database as soon as the mediaSource is accessible.
+// If so, sets atomicDataPath lazily and draws from atomicDataPath from then on.
+// This construction is necessary because parsers are cached and thus would provide a nil dataPath
+// even if the library is later granted accessible (library could have been non-existent because it was
+// renamed or moved in the file system).
+
+- (NSString*) dataPath
+{
+    if (!self.atomicDataPath)
+    {
+        NSString* libraryPath = [self.mediaSource path];
+        
+        NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
+                               stringByAppendingString:@" Previews"]
+                              stringByAppendingPathExtension:@"lrdata"];
+        
+        NSURL *dataURL = [NSURL fileURLWithPath:dataPath isDirectory:YES];
+        
+        NSNumber *isDirectory;
+        if (![dataURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:NULL] || ![isDirectory boolValue])
+        {
+            dataPath = nil;
+        }
+        
+        self.atomicDataPath = dataPath;
+    }
+    return self.atomicDataPath;
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
