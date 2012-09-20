@@ -62,12 +62,12 @@
 #import "IMBAudioFolderParserMessenger.h"
 #import "IMBMovieFolderParserMessenger.h"
 #import "IMBConfig.h"
-#import "IMBKQueue.h"
 #import "IMBFileSystemObserver.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
-#import <XPCKit/XPCKit.h>
 #import "SBUtilities.h"
+#import "IMBPopover.h"
+#import <XPCKit/XPCKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1348,6 +1348,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) __volumesDidChange
 {
+	[IMBPopover closeAllPopovers];
 	[self reload];
 }
 

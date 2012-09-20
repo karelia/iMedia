@@ -340,7 +340,7 @@
 				}
 				else if (object.accessibility == kIMBResourceNoPermission)
 				{
-					NSBeep();
+					[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
 				}
 				else
 				{

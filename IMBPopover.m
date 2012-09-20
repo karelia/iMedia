@@ -3,7 +3,7 @@
 //  BXPopover.m
 //
 //  Author:		Peter Baumgartner, peter@baumgartner.com
-//  Copyright:	©2011 by IMAGINE GbR. All rights reserved.
+//  Copyright:	©2011-2012 by IMAGINE GbR. All rights reserved.
 //	Abstract:	Convenience class to dynamically create popovers from nib files
 //
 //**********************************************************************************************************************
@@ -12,6 +12,14 @@
 #pragma HEADERS
 
 #import "IMBPopover.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma CONSTANTS
+
+#define kIMBCloseAllPopoversNotification @"IMBCloseAllPopovers"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -50,6 +58,12 @@
 			autorelease];
 			
 		self.behavior = NSPopoverBehaviorTransient;
+		
+		[[NSNotificationCenter defaultCenter]
+			addObserver:self
+			selector:@selector(close)
+			name:kIMBCloseAllPopoversNotification
+			object:nil];
 	}
 	
 	return self;
@@ -94,6 +108,15 @@
 	{
 		[self performClose:self];
 	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) closeAllPopovers
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBCloseAllPopoversNotification object:nil];
 }
 
 
