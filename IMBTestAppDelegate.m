@@ -173,14 +173,14 @@
     IMBTableViewFormat* tableViewFormat = [[[IMBTableViewFormat alloc] init] autorelease];
     
     tableViewFormat.keyWindowHighlightGradient =
-    [[NSGradient alloc] initWithColorsAndLocations:
+    [[[NSGradient alloc] initWithColorsAndLocations:
      [NSColor colorWithDeviceRed:(float)62/255 green:(float)133/255 blue:(float)197/255 alpha:1.0], 0.0,
-     [NSColor colorWithDeviceRed:(float)48/255 green:(float)95/255 blue:(float)152/255 alpha:1.0], 1.0, nil];
+     [NSColor colorWithDeviceRed:(float)48/255 green:(float)95/255 blue:(float)152/255 alpha:1.0], 1.0, nil] autorelease];
     
     tableViewFormat.nonKeyWindowHighlightGradient =
-    [[NSGradient alloc] initWithColorsAndLocations:
+    [[[NSGradient alloc] initWithColorsAndLocations:
      [NSColor colorWithDeviceRed:(float)190/255 green:(float)190/255 blue:(float)190/255 alpha:1.0], 0.0,
-     [NSColor colorWithDeviceRed:(float)150/255 green:(float)150/255 blue:(float)150/255 alpha:1.0], 1.0, nil];
+     [NSColor colorWithDeviceRed:(float)150/255 green:(float)150/255 blue:(float)150/255 alpha:1.0], 1.0, nil] autorelease];
     
     tableViewFormat.dataCellTextColor = [NSColor lightGrayColor];
     tableViewFormat.dataCellTextHighlightColor = [NSColor yellowColor];
