@@ -619,41 +619,44 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	BOOL shouldExpand = YES;
 	IMBNode* node = (IMBNode*)inItem;
 	
-    switch (node.accessibility)
+    if (!_isRestoringState)
     {
-        case kIMBResourceDoesNotExist:
-		{
-			shouldExpand = NO;
-			NSInteger row = [inOutlineView rowForItem:inItem];
- 			NSRect rect = [ibNodeOutlineView badgeRectForRow:row];
-			[IMBAccessRightsViewController showMissingResourceAlertForNode:node view:ibNodeOutlineView relativeToRect:rect];
-            break;
-		}
+        switch (node.accessibility)
+        {
+            case kIMBResourceDoesNotExist:
+            {
+                shouldExpand = NO;
+                NSInteger row = [inOutlineView rowForItem:inItem];
+                NSRect rect = [ibNodeOutlineView badgeRectForRow:row];
+                [IMBAccessRightsViewController showMissingResourceAlertForNode:node view:ibNodeOutlineView relativeToRect:rect];
+                break;
+            }
 
 
-        case kIMBResourceNoPermission:
-		{
-            shouldExpand = NO;
-            [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
-            break;
-		}
-		
-        case kIMBResourceIsAccessible:
-		if (!_isRestoringState)
-		{
-			id delegate = self.libraryController.delegate;
-                
-			if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
-			{
-				shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
-			}
-		}
-		break;
+            case kIMBResourceNoPermission:
+            {
+                shouldExpand = NO;
+                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+                break;
+            }
             
-        default:
-		break;
-    }
-	
+            case kIMBResourceIsAccessible:
+            if (!_isRestoringState)
+            {
+                id delegate = self.libraryController.delegate;
+                    
+                if ([delegate respondsToSelector:@selector(libraryController:shouldPopulateNode:)])
+                {
+                    shouldExpand = [delegate libraryController:self.libraryController shouldPopulateNode:node];
+                }
+            }
+            break;
+                
+            default:
+            break;
+        }
+	}
+    
 	return shouldExpand;
 }
 
@@ -1045,13 +1048,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	IMBNode* node;
 	NSString* identifier;
 	
-	// Update the internal data structures...
-	
-	[ibNodeOutlineView reloadData];
-	
 	// Temporarily disable storing of saved state (we only want that when the user actually clicks in the UI...
 	
 	_isRestoringState = YES;
+	
+	// Update the internal data structures...
+	
+	[ibNodeOutlineView reloadData];
 	
 	// Restore the expanded nodes...
 	
