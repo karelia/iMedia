@@ -187,12 +187,6 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	{
 		self.viewControllers = [NSMutableArray array];
 		self.loadedLibraries = [NSMutableDictionary dictionary];
-		
-		[[NSNotificationCenter defaultCenter] 
-			addObserver:self 
-			selector:@selector(applicationWillTerminate:) 
-			name:NSApplicationWillTerminateNotification 
-			object:nil];
 	}
 	
 	return self;
@@ -355,19 +349,13 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 		
 	// Restore window size and selected tab...
 	
-	[self.window setContentMinSize:largestMinimumSize];
+    NSWindow *window = [self window];
+	[window setContentMinSize:largestMinimumSize];
 	[self restoreStateFromPreferences];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// We need to save preferences before tha app quits...
-		
-- (void) applicationWillTerminate:(NSNotification*)inNotification
-{
-	[self saveStateToPreferences];
+    
+    // Keep an eye out for changes
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveWindowStateToPreferences) name:NSWindowDidMoveNotification object:window];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveWindowStateToPreferences) name:NSWindowDidResizeNotification object:window];
 }
 
 
@@ -385,13 +373,22 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 - (void) saveStateToPreferences
 {
-	NSString* frame = NSStringFromRect(self.window.frame);
+    [self saveSelectedMedaiaTypeToPreferences];
+	[self saveWindowStateToPreferences];
+}
+
+- (void)saveSelectedMedaiaTypeToPreferences;
+{
+    NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
+	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
+}
+
+- (void)saveWindowStateToPreferences;
+{
+    NSString* frame = NSStringFromRect(self.window.frame);
 	if (frame) [IMBConfig setPrefsValue:frame forKey:@"windowFrame"];
 	
-	NSString* mediaType = ibTabView.selectedTabViewItem.identifier;
-	if (mediaType) [IMBConfig setPrefsValue:mediaType forKey:@"selectedMediaType"];
-
-	int sizeMode = 	[ibToolbar sizeMode];
+    int sizeMode = 	[ibToolbar sizeMode];
 	BOOL isSmall = (sizeMode == NSToolbarSizeModeSmall);
 	[IMBConfig setPrefsValue:[NSNumber numberWithBool:isSmall] forKey:@"toolbarIsSmall"];
 	
@@ -763,6 +760,9 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 	{
 		[_delegate panelController:self didShowPanelForMediaType:newMediaType];
 	}
+    
+    // Record the state
+    [self saveSelectedMedaiaTypeToPreferences];
 }
 
 

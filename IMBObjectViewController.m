@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,6 +90,7 @@ static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kQuickLookImageKeyPath = @"arrangedObjects.quickLookImage";
 static NSString* kObjectCountStringKey = @"objectCountString";
+static NSString * const kSelectionObservationKeyPath = @"selectionIndexes";
 static NSString* kIMBPrivateItemIndexPasteboardType = @"com.karelia.imedia.imbobjectviewcontroller.itemindex";
 
 NSString* kIMBPublicTitleListPasteboardType = @"imedia.title";
@@ -102,47 +103,6 @@ NSString* kGlobalViewTypeKeyPath = @"globalViewType";
 // Keys to be used by delegate
 
 NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl";	/* Segmented control for object view selection */
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// While we're building with a pre-10.6 SDK, we need to declare some 10.6 pasteboard stuff that we'll use 
-// conditionally if we detect we are running on 10.6 or later.
-
-#if !defined(MAC_OS_X_VERSION_10_6)
-
-#pragma mark 
-
-@interface NSPasteboard (IMBObjectViewControllerSnowLeopard)
-
-- (NSInteger)clearContents;
-- (BOOL)writeObjects:(NSArray *)objects;
-
-@end
-
-@class NSPasteboardItem;
-
-#pragma mark 
-
-@interface NSObject (IMBObjectViewControllerSnowLeopard)
-
-- (BOOL)setDataProvider:(id /*<NSPasteboardItemDataProvider>*/)dataProvider forTypes:(NSArray *)types;
-- (BOOL)setString:(NSString *)string forType:(NSString *)type;
-- (NSString *)stringForType:(NSString *)type;
-- (NSData *)dataForType:(NSString *)type;
-
-@end
-
-// A 10.6+ attribute on IKImageBrowserView, which we use to implement smarter toolTip configuration
-
-@interface IKImageBrowserView (IKImageBrowserViewSnowLeopard)
-
-- (NSIndexSet *)visibleItemIndexes;
-
-@end
-
-#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,12 +147,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 @synthesize objectArrayController = ibObjectArrayController;
 @synthesize progressWindowController = _progressWindowController;
 
-@synthesize viewType = _viewType;
 @synthesize tabView = ibTabView;
 @synthesize iconView = ibIconView;
 @synthesize listView = ibListView;
 @synthesize comboView = ibComboView;
-@synthesize iconSize = _iconSize;
 
 @synthesize objectCountFormatSingular = _objectCountFormatSingular;
 @synthesize objectCountFormatPlural = _objectCountFormatPlural;
@@ -369,6 +327,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[ibObjectArrayController addObserver:self forKeyPath:kArrangedObjectsKey options:0 context:(void*)kArrangedObjectsKey];
 	[ibObjectArrayController addObserver:self forKeyPath:kImageRepresentationKeyPath options:NSKeyValueObservingOptionNew context:(void*)kImageRepresentationKeyPath];
 	[ibObjectArrayController addObserver:self forKeyPath:kQuickLookImageKeyPath options:NSKeyValueObservingOptionNew context:(void*)kQuickLookImageKeyPath];
+    [ibObjectArrayController addObserver:self forKeyPath:kSelectionObservationKeyPath options:0 context:kSelectionObservationKeyPath];
 
 	// For tooltip display, we pay attention to changes in the icon view's scroller clip view, because 
 	// that will naturally indicate a change in visible items (unfortunately IKImageBrowserView's visibleItemIndexes
@@ -384,14 +343,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 		}
 	}
 
-	// We need to save preferences before the app quits...
-	
-	[[NSNotificationCenter defaultCenter] 
-		 addObserver:self 
-		 selector:@selector(_saveStateToPreferences) 
-		 name:NSApplicationWillTerminateNotification 
-		 object:nil];
-	
 	// Observe changes by other controllers to global view type preference if we use global view type
 	// so we can change our own view type accordingly
 	
@@ -457,7 +408,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	}
 	
 	// Stop observing the array...
-	
+	[ibObjectArrayController removeObserver:self forKeyPath:kSelectionObservationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kQuickLookImageKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kImageRepresentationKeyPath];
 	[ibObjectArrayController removeObserver:self forKeyPath:kArrangedObjectsKey];
@@ -547,6 +498,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 				arrayWithObject:NSRunLoopCommonModes]];
 		}
     }
+    else if (inContext == kSelectionObservationKeyPath)
+    {
+        [self _saveStateToPreferences];
+    }
 	else
 	{
 		[super observeValueForKeyPath:inKeyPath ofObject:inObject change:inChange context:inContext];
@@ -617,7 +572,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 - (void) _loadStateFromPreferences
 {
-	NSMutableDictionary* stateDict = [self _preferences];
+	NSDictionary* stateDict = [IMBConfig prefsForClass:self.class];
 	self.viewType = [[stateDict objectForKey:@"viewType"] unsignedIntegerValue];
 	self.iconSize = [[stateDict objectForKey:@"iconSize"] doubleValue];
 	
@@ -769,6 +724,10 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	[self willChangeValueForKey:@"canUseIconSize"];
 	_viewType = inViewType;
 	[IMBConfig setGlobalViewType:[NSNumber numberWithUnsignedInteger:inViewType]];
+    
+    // Persist
+    [self _saveStateToPreferences];
+    
 	[self didChangeValueForKey:@"canUseIconSize"];
 }
 
@@ -854,6 +813,9 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 	// Tooltips in the icon view need to be rebuilt...
 	
 	[self _updateTooltips];
+    
+    // Persist
+    [self _saveStateToPreferences];
 }
 
 
@@ -1857,8 +1819,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 						IMBObject* thisObject = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 						if (thisObject != nil)
 						{
-							// Allocate class indirectly since we compiling against the 10.5 SDK, not the 10.6
-							NSPasteboardItem* thisItem = [[[NSClassFromString(@"NSPasteboardItem") alloc] init] autorelease];
+							NSPasteboardItem* thisItem = [[[NSPasteboardItem alloc] init] autorelease];
 							
 							// We need to be declare kUTTypeFileURL in order to get file drags to work as expected to e.g. the Finder,
 							// but we have to be careful not to declare kUTTypeFileURL for e.g. bookmark URLs. We might want to put this 
@@ -1907,10 +1868,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 										 nil]; 
 						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
 						
-						NSUInteger thisIndex = [indexes firstIndex];
-						while (thisIndex != NSNotFound)
+						for (IMBObject *object in [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes])
 						{
-							IMBObject *object = [[ibObjectArrayController arrangedObjects] objectAtIndex:thisIndex];
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
 							if ( [type length] == 0  )	type = NSFileTypeForHFSTypeCode( kDragPseudoFileTypeDirectory );	// type is a directory
@@ -1921,8 +1880,6 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 								[titles addObject:object.name];
 								[metadatas addObject:object.metadata];								
 							}
-							
-							thisIndex = [indexes indexGreaterThanIndex:thisIndex];
 						}
 					}
 					else
@@ -1948,6 +1905,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 //						#endif
 					}
 				}
+                
+                [parser didWriteObjects:promise.objects toPasteboard:inPasteboard];
 				
 				_isDragging = YES;
 				itemsWritten = objects.count;

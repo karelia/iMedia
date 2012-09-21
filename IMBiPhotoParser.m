@@ -660,34 +660,34 @@
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		// iPhoto 7
-		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
-		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
-		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
-		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
-		{@"Faces",					@"sl-icon-small_people.tiff",			@"folder",	nil,				nil},
-		{@"Flagged",				@"sl-icon-small_flag.tiff",				@"folder",	nil,				nil},
-		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
-		{@"Photo Stream",			@"sl-icon-small_photostream.tiff",		@"folder",	nil,				nil},
-		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
-		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
-		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
-		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
-		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
-		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
-		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
-		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
-		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
-		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
+		{@"Book",					@"sl-icon-small_book",				@"folder",	nil,				nil},
+		{@"Calendar",				@"sl-icon-small_calendar",			@"folder",	nil,				nil},
+		{@"Card",					@"sl-icon-small_card",				@"folder",	nil,				nil},
+		{@"Event",					@"sl-icon-small_event",             @"folder",	nil,				nil},
+		{@"Events",					@"sl-icon-small_events",			@"folder",	nil,				nil},
+		{@"Faces",					@"sl-icon-small_people",			@"folder",	nil,				nil},
+		{@"Flagged",				@"sl-icon-small_flag",				@"folder",	nil,				nil},
+		{@"Folder",					@"sl-icon-small_folder",			@"folder",	nil,				nil},
+		{@"Photo Stream",			@"sl-icon-small_photostream",		@"folder",	nil,				nil},
+		{@"Photocasts",				@"sl-icon-small_subscriptions",     @"folder",	nil,				nil},
+		{@"Photos",					@"sl-icon-small_library",			@"folder",	nil,				nil},
+		{@"Published",				@"sl-icon-small_publishedAlbum",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
+		{@"Regular",				@"sl-icon-small_album",             @"folder",	nil,				nil},
+		{@"Roll",					@"sl-icon-small_roll",				@"folder",	nil,				nil},
+		{@"Selected Event Album",	@"sl-icon-small_event",             @"folder",	nil,				nil},
+		{@"Shelf",					@"sl-icon_flag",					@"folder",	nil,				nil},
+		{@"Slideshow",				@"sl-icon-small_slideshow",         @"folder",	nil,				nil},
+		{@"Smart",					@"sl-icon-small_smartAlbum",		@"folder",	nil,				nil},
+		{@"Special Month",			@"sl-icon-small_cal",				@"folder",	nil,				nil},
+		{@"Special Roll",			@"sl-icon_lastImport",				@"folder",	nil,				nil},
+		{@"Subscribed",				@"sl-icon-small_subscribedAlbum",	@"folder",	nil,				nil},
 	};
 	
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
+		{@"Regular",				@"sl-icon-small_album",			@"folder",	nil,				nil}	// fallback image
 	};
 	
 	NSString* type = inAlbumType;
@@ -715,6 +715,15 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+// Returns whether inAlbumDict is an "Event" album.
+
+- (BOOL) isEventAlbum:(NSDictionary*)inAlbumDict
+{
+	return [[inAlbumDict objectForKey:@"Album Type"] isEqualToString:@"Event"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (BOOL) isFlaggedAlbum:(NSDictionary*)inAlbumDict
@@ -727,7 +736,8 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// NOTE: This method is neither being used to add events sub nodes nor to add faces sub nodes.
+//       This is done in their respective populate methods.
 
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages
 {
@@ -750,7 +760,8 @@
 		// parent always from same id space for non top-level albums
 		NSString* parentIdentifier = parentId ? [self identifierForId:parentId inSpace:albumIdSpace] : [self identifierForPath:@"/"];
 		
-		if ([self shouldUseAlbumType:albumType] && 
+		if (![self isEventAlbum:albumDict] &&
+            [self shouldUseAlbumType:albumType] &&
 			[inParentNode.identifier isEqualToString:parentIdentifier] && 
 			[self shouldUseAlbum:albumDict images:inImages])
 		{
@@ -1035,7 +1046,12 @@
 			
 			object.location = (id)path;
 			object.name = name;
-			object.preliminaryMetadata = imageDict;	// This metadata from the XML file is available immediately
+            
+            NSMutableDictionary *metadata = [imageDict mutableCopy];
+            [metadata setObject:key forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
+			object.preliminaryMetadata = metadata;	// This metadata from the XML file is available immediately
+            [metadata release];
+            
 			object.metadata = nil;					// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;		// Build lazily when needed (takes longer)
 			object.parser = self;
@@ -1153,5 +1169,21 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark Pasteboard
+
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
+{
+    [super didWriteObjects:objects toPasteboard:pasteboard];
+    
+    // Pretend we're iPhoto and write its custom metadata pasteboard type
+    [pasteboard addTypes:[NSArray arrayWithObject:@"ImageDataListPboardType"] owner:nil];
+    
+    NSArray *values = [objects valueForKey:@"preliminaryMetadata"];
+    NSArray *keys = [values valueForKey:@"iPhotoKey"];
+    NSDictionary *dataList = [[NSDictionary alloc] initWithObjects:values forKeys:keys];
+    [pasteboard setPropertyList:dataList forType:@"ImageDataListPboardType"];
+    [dataList release];
+}
 
 @end

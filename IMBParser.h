@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,6 +86,7 @@
 
 @property (copy, readonly) NSString* mediaType;
 @property (getter=isCustom) BOOL custom;
+@property (retain) NSData *bookmarkData;
 
 // ATTENTION: inOldNode is readonly and is only passed in for reference, but must not be modified by the parser in 
 // a background operation. It is passed as an argument to the parser so that existing old nodes can be recreated
@@ -152,6 +153,8 @@
 	NSString* _mediaSource;
 	NSString* _mediaType;
 	BOOL _custom;
+    NSData *_bookmark; // Security scoped bookmark, to be used when accessing the source
+    dispatch_once_t _bookmarkAccessToken;
 }
 
 - (id) initWithMediaType:(NSString*)inMediaType;
@@ -173,6 +176,10 @@
 - (NSViewController*) customHeaderViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) customObjectViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) customFooterViewControllerForNode:(IMBNode*)inNode;
+
+// Informs that some of the receiver's IMBObjects have been written to a pasteboard. Could use this to add some
+// extra parser-specific data to the pasteboard. Default implementation does nothing.
+- (void)didWriteObjects:(NSArray *)objects toPasteboard:(NSPasteboard *)pasteboard;
 
 @end
 

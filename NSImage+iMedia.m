@@ -62,25 +62,42 @@
 
 
 // Try to load an image out of the bundle for another application and if not found fallback to one of our own.
-+ (NSImage *)imb_imageResourceNamed:(NSString *)name fromApplication:(NSString *)bundleID fallbackTo:(NSString *)imageInOurBundle
++ (NSImage *)imb_imageForResource:(NSString *)name fromAppWithBundleIdentifier:(NSString *)bundleID fallbackName:(NSString *)imageInOurBundle
 {
 	NSString *pathToOtherApp = [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:bundleID];
 	NSImage *image = nil;
 	
 	if (pathToOtherApp)
 	{
-		NSBundle *otherApp = [NSBundle bundleWithPath:pathToOtherApp];
-		NSString *pathToImage = [otherApp pathForResource:[name stringByDeletingPathExtension] ofType:[name pathExtension]];
-		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+		NSBundle *appBundle = [NSBundle bundleWithPath:pathToOtherApp];
+        
+        // SANDBOXING: To my shock, this continues to work when sandboxed (at least on 10.8). Why would Apple allow us to access other apps' resources? I tested and this seems to work regardless of what the app is named or where it is placed
+        
+        // Use imageForResource: if available to take advantage of possibly additionally available high res representations
+        
+        if ([appBundle respondsToSelector:@selector(imageForResource:)])
+        {
+            image = [appBundle imageForResource:name];
+        } else {
+            NSURL *imageURL = [appBundle URLForImageResource:name];
+            image = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
+        }
 	}
 	
 	if (image==nil && imageInOurBundle!=nil)
 	{
 		NSBundle *ourBundle = [NSBundle bundleForClass:[IMBNode class]];		// iMedia bundle
-		NSString *pathToImage = [ourBundle pathForResource:[imageInOurBundle stringByDeletingPathExtension] ofType:[imageInOurBundle pathExtension]];
-		image = [[NSImage alloc] initWithContentsOfFile:pathToImage];
+        if ([ourBundle respondsToSelector:@selector(imageForResource:)])
+        {
+            image = [ourBundle imageForResource:imageInOurBundle];
+        }
+        else
+        {
+            NSURL *imageURL = [ourBundle URLForImageResource:imageInOurBundle];
+            image = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
+        }
 	}
-	return [image autorelease];
+	return image;
 }
 
 // Return a dictionary with these properties: width (NSNumber), height (NSNumber), dateTimeLocalized (NSString)
