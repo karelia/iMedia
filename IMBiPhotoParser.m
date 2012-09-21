@@ -660,16 +660,25 @@
 			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
 			
 			path = [keyPhotoDict objectForKey:@"ImagePath"];
-			
-			object.representedNodeIdentifier = subnode.identifier;
-			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
-			object.name = subnode.name;
-			object.parserIdentifier = [self identifier];
-			object.index = index++;
-			
-			object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
-			object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-			object.imageRepresentation = nil;
+
+			if (path)
+			{
+				object.representedNodeIdentifier = subnode.identifier;
+				object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+				object.name = subnode.name;
+				object.parserIdentifier = [self identifier];
+				object.index = index++;
+				
+				object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
+				object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+				object.imageRepresentation = nil;
+			}
+			else
+			{
+				#warning @Jörg This is a preliminary "fix" for the Events bug with iPhoto 9.4
+				NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
+				[objects removeObjectIdenticalTo:object];
+			}
 		}
 		[pool drain];
 	}	
