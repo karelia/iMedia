@@ -483,7 +483,7 @@ static NSArray* sSupportedUTIs = nil;
     // If the master resource resides in a not yet entitled location (e.g. on an additional storage device)
     // we do not query it for extra metadata thus not prompting the user for granting even more entitlements
     // which also involved the need to chose an appropriate to be entitled directory carefully.
-    
+    /*
 	if ([inObject.URL imb_accessibility] == kIMBResourceIsAccessible &&
         [inObject isKindOfClass:[IMBLightroomObject class]])
 	{
@@ -493,7 +493,7 @@ static NSArray* sSupportedUTIs = nil;
         [mutableMetadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:object.URL checkSpotlightComments:NO]];
         metadata = (NSDictionary*)mutableMetadata;
 	}
-
+	*/
 	return metadata;
 }
 
@@ -914,6 +914,7 @@ static NSArray* sSupportedUTIs = nil;
 		while ([results next]) {
 			NSString* filename = [results stringForColumn:@"idx_filename"];
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
+			NSString* captureTime = [results stringForColumn:@"captureTime"];
 			NSNumber* fileHeight = [NSNumber numberWithDouble:[results doubleForColumn:@"fileHeight"]];
 			NSNumber* fileWidth = [NSNumber numberWithDouble:[results doubleForColumn:@"fileWidth"]];
 			NSString* orientation = [results stringForColumn:@"orientation"];
@@ -938,6 +939,10 @@ static NSArray* sSupportedUTIs = nil;
 				
 				if (name) {
 					[metadata setObject:name forKey:@"name"];
+				}
+				
+				if (captureTime) {
+					[metadata setObject:captureTime forKey:@"dateTime"];
 				}
 				
 				IMBObject* object = [self objectWithPath:path

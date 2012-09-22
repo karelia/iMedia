@@ -278,7 +278,7 @@
 	
 	if (dateTime != nil)
 	{
-		NSString *dateTimeDesc = [dateTime imb_exifDateToLocalizedDisplayDate];
+		NSString *dateTimeDesc = [dateTime imb_localizedDisplayDate];
 		if (dateTimeDesc)
 		{
 			if (metaDesc.length > 0) [metaDesc imb_appendNewline];

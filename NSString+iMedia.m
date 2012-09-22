@@ -305,20 +305,41 @@
 // below, to avoid multiple crashes in the Release and Test builds. Both use an NSOperationQueue with multiple
 // cores, which caused the above method to fail badly, despite the fact that I tried to safeguard it with the 
 // @synchronized directive...
+// JJ 2012/09/22: Changed method name and adapted to more formats
 
-// Note: This below may return nil, if it can't be parsed, e.g. "0000:00:00 00:00:00"
+// Note: This method will return nil if not one of the following formats is met:
+//
+// @"yyyy':'MM':'dd kk':'mm':'ss"           (EXIF)
+// @"yyyy'-'MM'-'dd'T'kk':'mm':'ss'.'SS"    (Lightroom)
+// @"yyyy'-'MM'-'dd'T'kk':'mm':'ss"         (Lightroom)
 
-- (NSString *)imb_exifDateToLocalizedDisplayDate
+- (NSString *)imb_localizedDisplayDate
 {
 	NSDateFormatter *parser = [[NSDateFormatter alloc] init];
-	[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];
-	
+    
+    // This is for EXIF-formatted dates
+    
+	[parser setDateFormat:@"yyyy':'MM':'dd kk':'mm':'ss"];	
+	NSDate *date = [parser dateFromString:self];
+    
+    // This is for Lightroom-formatted dates
+    
+    if (!date)
+    {
+        [parser setDateFormat:@"yyyy'-'MM'-'dd'T'kk':'mm':'ss'.'SS"];
+        date = [parser dateFromString:self];
+    }
+    if (!date)
+    {
+        [parser setDateFormat:@"yyyy'-'MM'-'dd'T'kk':'mm':'ss"];
+        date = [parser dateFromString:self];
+    }
+    
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-	[formatter setDateStyle:NSDateFormatterMediumStyle];	// medium date
-	[formatter setTimeStyle:NSDateFormatterShortStyle];	// no seconds
+	[formatter setDateStyle:NSDateFormatterMediumStyle];    // medium date
+	[formatter setTimeStyle:NSDateFormatterShortStyle];     // no seconds
 
-	NSDate *date = [parser dateFromString:self];
 	NSString *result = [formatter stringFromDate:date];
 
 	[formatter release];

@@ -72,7 +72,7 @@
 
 + (id)uuid;
 
-- (NSString *)imb_exifDateToLocalizedDisplayDate;
+- (NSString *)imb_localizedDisplayDate;
 
 + (NSString *)imb_stringFromStarRating:(NSUInteger)aRating;
 
