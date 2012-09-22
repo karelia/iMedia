@@ -782,12 +782,11 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				faceDict = [NSMutableDictionary dictionaryWithDictionary:faceDict];
 				[facesDict setObject:faceDict forKey:imageFaceKey];
 				
-                // Since iPhoto 9.4 changed the identifier stored under "key image" from image key to image GUID.
-                // Be smart and see whether the image we are currently investigating is the face's key image.
-                // If so provide this key image key under an event-compatible key
+                // Provide key image key under event-compatible key "KeyPhotoKey" once current image matches.
+                // NOTE: iPhoto 9.4 changed the value stored under "key image" from image key to image GUID.
                 
-                NSString* imageGUID = [imageDict objectForKey:@"GUID"];
                 NSString* keyImage = [faceDict objectForKey:@"key image"];
+                NSString* imageGUID = [imageDict objectForKey:@"GUID"];
                 
                 if ((imageGUID  && [imageGUID isEqualToString:keyImage]) ||     // Should be YES once for >= iPhoto 9.4
                     [imageDictKey isEqualToString:keyImage])                    // Should be YES once for < iPhoto 9.4
@@ -849,13 +848,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			imageFaceMetadataList = [NSArray array];
 		}
 		[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"]; // JJ/2012-09-21: again?????
-		
-//		// Also provide key image key under an event-compatible key for iPhoto <= 9.3
-//        // For iPhoto >= 9.4 "key image" no longer holds the image's key but its GUID
-//        if (![faceDict objectForKey:@"KeyPhotoKey"])
-//        {
-//            [faceDict setObject:[faceDict objectForKey:@"key image"] forKey:@"KeyPhotoKey"];
-//        }
 		
         // Also store a sorted key list in face dictionary
 		[faceDict setObject:[imageFaceMetadataList valueForKey:@"image key"] forKey:@"KeyList"];
