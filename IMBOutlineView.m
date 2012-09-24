@@ -217,7 +217,7 @@
     pathColor = [gradient interpolatedColorAtLocation:1.0];
     
     // draw highlight for the visible, selected rows
-    for (int aRow; aRow < anEndRow; aRow++)
+    for (; aRow < anEndRow; aRow++)
     {
         if([aSelectedRowIndexes containsIndex:aRow])
         {
