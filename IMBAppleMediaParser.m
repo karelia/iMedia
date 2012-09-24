@@ -1121,4 +1121,25 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     return nil;
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark -
+#pragma mark Consistency
+
+// Checks inKey whether it is a valid key in resource list and returns it if valid.
+// If not checks all other candidates for validity and returns the first that is valid.
+// If not returns nil.
+
+- (NSString *)validatedResourceKey:(NSString *)inKey relativeToResourceList:(NSDictionary *)inResources otherCandidates:(NSArray *)inKeyList
+{
+    if ([inResources objectForKey:inKey]) return inKey;
+
+    for (id aKey in inKeyList)
+    {
+        if ([inResources objectForKey:aKey]) return aKey;
+    }
+    return nil;
+}
+
 @end

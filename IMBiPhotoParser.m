@@ -595,9 +595,9 @@
 	
 	// Events node is populated with node objects that represent events
 	
-	NSString* eventKeyPhotoKey = nil;
 	NSString* path = nil;
 	IMBiPhotoEventNodeObject* object = nil;
+    NSMutableDictionary* mutableSubnodeDict = nil;
 	
 	for (NSDictionary* subnodeDict in inEvents)
 	{
@@ -608,6 +608,30 @@
 		if ([self shouldUseAlbumType:subNodeType] && 
 			[self shouldUseAlbum:subnodeDict images:inImages])
 		{
+            // We need a mutable version of sub node dictionary
+            
+            mutableSubnodeDict = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
+            
+            // Check for valid key photo key in node dict and try to replace with some other if necessary
+            // (We've had occurences since iPhoto 9.4 where key photo key was invalid (not key in master image list))
+
+            NSString* keyPhotoKeyCandidate = [mutableSubnodeDict objectForKey:@"KeyPhotoKey"];
+            NSString* validKeyPhotoKey = [self validatedResourceKey:keyPhotoKeyCandidate
+                                             relativeToResourceList:inImages
+                                                    otherCandidates:[mutableSubnodeDict objectForKey:@"KeyList"]];
+            
+            if (!validKeyPhotoKey)
+            {
+                NSLog(@"%s Could not create event node %@ because could not determine key photo",__FUNCTION__,subnodeName);
+                continue;
+            }
+
+            if (![keyPhotoKeyCandidate isEqualToString:validKeyPhotoKey])
+            {
+                // Replace
+                [mutableSubnodeDict setObject:validKeyPhotoKey forKey:@"KeyPhotoKey"];
+            }
+            
 			// Create subnode for this node...
 			
 			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
@@ -622,14 +646,14 @@
 			// Keep a ref to the subnode dictionary for potential later use
 			
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  subnodeDict, @"nodeSource",
+                                  mutableSubnodeDict, @"nodeSource",
                                   [self nodeTypeForNode:subnode], @"nodeType", nil];
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
 			
-			NSNumber* subnodeId = [subnodeDict objectForKey:@"RollID"];
+			NSNumber* subnodeId = [mutableSubnodeDict objectForKey:@"RollID"];
 			if (subnodeId == nil) subnodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
 			subnode.identifier = [self identifierForId:subnodeId inSpace:EVENTS_ID_SPACE];
 			
@@ -646,39 +670,40 @@
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
 			// images are not jointly displayed in iMedia browser...
 			
-			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
+			NSMutableDictionary* preliminaryMetadata = mutableSubnodeDict;
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
 
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
             [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
+            object.name = subnode.name;
 			
 			// Obtain key photo dictionary (key photo is displayed while not skimming)
 			
-			eventKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
-			
-			path = [keyPhotoDict objectForKey:@"ImagePath"];
+            if (validKeyPhotoKey)
+            {
+                NSDictionary* keyPhotoDict = [inImages objectForKey:validKeyPhotoKey];
+                path = [keyPhotoDict objectForKey:@"ImagePath"];
 
-			if (path)
-			{
-				object.representedNodeIdentifier = subnode.identifier;
-				object.location = [NSURL fileURLWithPath:path isDirectory:NO];
-				object.name = subnode.name;
-				object.parserIdentifier = [self identifier];
-				object.index = index++;
-				
-				object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
-				object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-				object.imageRepresentation = nil;
-			}
-			else
-			{
-				#warning @Jörg This is a preliminary "fix" for the Events bug with iPhoto 9.4
-				NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
-				[objects removeObjectIdenticalTo:object];
-			}
+                if (path)
+                {
+                    object.representedNodeIdentifier = subnode.identifier;
+                    object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+                    object.parserIdentifier = [self identifier];
+                    object.index = index++;
+                    
+                    object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
+                    object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+                    object.imageRepresentation = nil;
+                }
+                else
+                {
+                    NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
+                    [objects removeObjectIdenticalTo:object];
+                    [subnodes removeObjectIdenticalTo:subnode];
+                }
+            }
 		}
 		[pool drain];
 	}	
