@@ -237,13 +237,16 @@
 
 
 // iPhoto supports Photo Stream through AlbumData.xml since version 9.2.1
+// ...but revokes support with version 9.4 (key "PhotoStreamAssetId" removed from image dictionaries)
 
 - (BOOL) supportsPhotoStreamFeatureInVersion:(NSString*)inVersion
 {
     if (inVersion && inVersion.length > 0)
     {
-        NSComparisonResult compareResult = [inVersion localizedStandardCompare:@"9.2.1"];
-        return (compareResult >= 0);
+        NSComparisonResult shouldBeDescendingOrSame = [inVersion localizedStandardCompare:@"9.2.1"];
+        NSComparisonResult shouldBeAscending = [inVersion localizedStandardCompare:@"9.4"];
+        return ((shouldBeDescendingOrSame == NSOrderedDescending || shouldBeDescendingOrSame == NSOrderedSame) &&
+                shouldBeAscending == NSOrderedAscending);
     }
     return NO;
 }
