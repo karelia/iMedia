@@ -56,6 +56,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSString+iMedia.h"
+#import "SBUtilities.h"
 
 
 
@@ -110,7 +111,7 @@
         //  add objects...
         inFlickrNode.objects = [NSMutableArray array];
     } else {
-        xpc_transaction_begin ();
+        if (SBIsSandboxed()) xpc_transaction_begin ();
 
         //	lazy initialize the flickr context...
         if (_flickrContext == nil) {
@@ -139,7 +140,7 @@
         }
         [session release];                
 
-        xpc_transaction_end ();
+        if (SBIsSandboxed()) xpc_transaction_end ();
     }
     
     return YES;
@@ -166,7 +167,7 @@
 - (id) thumbnailForObject: (IMBObject*) inObject error: (NSError**) outError {
 	if (outError) *outError = nil;
     
-    xpc_transaction_begin ();
+    if (SBIsSandboxed()) xpc_transaction_begin ();
 
     //  determine preview URL...
     NSString* thumbnailURLString = [inObject.preliminaryMetadata objectForKey:@"url_m"];
@@ -209,7 +210,7 @@
     }
     return (id) image;
 
-    xpc_transaction_end ();
+    if (SBIsSandboxed()) xpc_transaction_end ();
 }
 
 
