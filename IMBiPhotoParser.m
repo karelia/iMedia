@@ -324,34 +324,34 @@
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
 		// iPhoto 7
-		{@"Book",					@"sl-icon-small_book.tiff",				@"folder",	nil,				nil},
-		{@"Calendar",				@"sl-icon-small_calendar.tiff",			@"folder",	nil,				nil},
-		{@"Card",					@"sl-icon-small_card.tiff",				@"folder",	nil,				nil},
-		{@"Event",					@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Events",					@"sl-icon-small_events.tiff",			@"folder",	nil,				nil},
-		{@"Faces",					@"sl-icon-small_people.tiff",			@"folder",	nil,				nil},
-		{@"Flagged",				@"sl-icon-small_flag.tiff",				@"folder",	nil,				nil},
-		{@"Folder",					@"sl-icon-small_folder.tiff",			@"folder",	nil,				nil},
-		{@"Photo Stream",			@"sl-icon-small_photostream.tiff",		@"folder",	nil,				nil},
-		{@"Photocasts",				@"sl-icon-small_subscriptions.tiff",	@"folder",	nil,				nil},
-		{@"Photos",					@"sl-icon-small_library.tiff",			@"folder",	nil,				nil},
-		{@"Published",				@"sl-icon-small_publishedAlbum.tiff",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil},
-		{@"Roll",					@"sl-icon-small_roll.tiff",				@"folder",	nil,				nil},
-		{@"Selected Event Album",	@"sl-icon-small_event.tiff",			@"folder",	nil,				nil},
-		{@"Shelf",					@"sl-icon_flag.tiff",					@"folder",	nil,				nil},
-		{@"Slideshow",				@"sl-icon-small_slideshow.tiff",		@"folder",	nil,				nil},
-		{@"Smart",					@"sl-icon-small_smartAlbum.tiff",		@"folder",	nil,				nil},
-		{@"Special Month",			@"sl-icon-small_cal.tiff",				@"folder",	nil,				nil},
-		{@"Special Roll",			@"sl-icon_lastImport.tiff",				@"folder",	nil,				nil},
-		{@"Subscribed",				@"sl-icon-small_subscribedAlbum.tiff",	@"folder",	nil,				nil},
+		{@"Book",					@"sl-icon-small_book",				@"folder",	nil,				nil},
+		{@"Calendar",				@"sl-icon-small_calendar",			@"folder",	nil,				nil},
+		{@"Card",					@"sl-icon-small_card",				@"folder",	nil,				nil},
+		{@"Event",					@"sl-icon-small_event",             @"folder",	nil,				nil},
+		{@"Events",					@"sl-icon-small_events",			@"folder",	nil,				nil},
+		{@"Faces",					@"sl-icon-small_people",			@"folder",	nil,				nil},
+		{@"Flagged",				@"sl-icon-small_flag",				@"folder",	nil,				nil},
+		{@"Folder",					@"sl-icon-small_folder",			@"folder",	nil,				nil},
+		{@"Photo Stream",			@"sl-icon-small_photostream",		@"folder",	nil,				nil},
+		{@"Photocasts",				@"sl-icon-small_subscriptions",     @"folder",	nil,				nil},
+		{@"Photos",					@"sl-icon-small_library",			@"folder",	nil,				nil},
+		{@"Published",				@"sl-icon-small_publishedAlbum",	nil,		@"dotMacLogo.icns",	@"/System/Library/CoreServices/CoreTypes.bundle"},
+		{@"Regular",				@"sl-icon-small_album",             @"folder",	nil,				nil},
+		{@"Roll",					@"sl-icon-small_roll",				@"folder",	nil,				nil},
+		{@"Selected Event Album",	@"sl-icon-small_event",             @"folder",	nil,				nil},
+		{@"Shelf",					@"sl-icon_flag",					@"folder",	nil,				nil},
+		{@"Slideshow",				@"sl-icon-small_slideshow",         @"folder",	nil,				nil},
+		{@"Smart",					@"sl-icon-small_smartAlbum",		@"folder",	nil,				nil},
+		{@"Special Month",			@"sl-icon-small_cal",				@"folder",	nil,				nil},
+		{@"Special Roll",			@"sl-icon_lastImport",				@"folder",	nil,				nil},
+		{@"Subscribed",				@"sl-icon-small_subscribedAlbum",	@"folder",	nil,				nil},
 	};
 	
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-		{@"Regular",				@"sl-icon-small_album.tiff",			@"folder",	nil,				nil}	// fallback image
+		{@"Regular",				@"sl-icon-small_album",			@"folder",	nil,				nil}	// fallback image
 	};
 	
 	NSString* type = inAlbumType;

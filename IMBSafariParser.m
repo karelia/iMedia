@@ -278,15 +278,13 @@
 				if ([subnode.name isEqualToString:@"BookmarksMenu"])
 				{
 					subnode.name = NSLocalizedStringWithDefaultValue(
-						@"IMBSafariBookmarkParser.bookmarksMenu",
-						nil,IMBBundle(),
-						@"Bookmarks Menu",
-						@"top-level bookmark name");
-							  
-					newImage = [NSImage 
-						imb_imageResourceNamed:@"tiny_menu.tiff"
-						fromApplication:@"com.apple.Safari"
-						fallbackTo:nil];
+							  @"IMBSafariBookmarkParser.bookmarksMenu",
+							  nil,IMBBundle(),
+							  @"Bookmarks Menu",
+							  @"top-level bookmark name");
+					newImage = [NSImage imb_imageForResource:@"tiny_menu"
+										   fromAppWithBundleIdentifier:@"com.apple.Safari"
+												fallbackName:nil];
 					
 				}
 				else if ([subnode.name isEqualToString:@"BookmarksBar"])
@@ -297,10 +295,9 @@
 						@"Bookmarks Bar",
 						@"top-level bookmark name");
 					
-					newImage = [NSImage 
-						imb_imageResourceNamed:@"FavoritesBar.tif"
-						fromApplication:@"com.apple.Safari"
-						fallbackTo:nil];
+					newImage = [NSImage imb_imageForResource:@"FavoritesBar"
+										   fromAppWithBundleIdentifier:@"com.apple.Safari"
+												fallbackName:nil];
 				}
 				
 				if (newImage)
