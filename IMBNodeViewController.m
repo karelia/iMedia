@@ -558,6 +558,19 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
+// This method is required since we switched from Cocoa bindings to data source protocol (otherwise will throw exception in 10.6).
+// Note though that we use an IMBNodeCell (setup in -outlineView:willDisplayCell:forTableColumn:item:) to display nodes
+// so this method is almost likely irrelevant.
+
+- (id)outlineView:(NSOutlineView *)inOutlineView objectValueForTableColumn:(NSTableColumn *)inTableColumn byItem:(id)inItem
+{
+    return inItem;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // For each folder path that was dropped onto the outline view create a new custom parser
  
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView acceptDrop:(id<NSDraggingInfo>)inInfo item:(id)inItem childIndex:(NSInteger)inIndex
