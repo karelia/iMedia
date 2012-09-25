@@ -80,27 +80,11 @@
 @synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
 @synthesize title = _title;
-@synthesize titleTextAttributes = _titleTextAttributes;
 @synthesize subtitle = _subtitle;
+@synthesize badge = _badge;
+@synthesize titleTextAttributes = _titleTextAttributes;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
 @synthesize isDisabledFromDragging = _isDisabledFromDragging;
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (CGImageRef) badge
-{
-	return _badge;
-}
-
-
-- (void) setBadge:(CGImageRef)inBadge
-{
-	CGImageRef old = _badge;
-	_badge = CGImageRetain(inBadge);
-	CGImageRelease(old);
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,8 +155,9 @@
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
 	IMBRelease(_title);
-	IMBRelease(_titleTextAttributes);
 	IMBRelease(_subtitle);
+	IMBRelease(_badge);
+	IMBRelease(_titleTextAttributes);
 	IMBRelease(_subtitleTextAttributes);
 	
     [super dealloc];
@@ -320,7 +305,7 @@
 	if (_badge) 
 	{
 		NSRect badgeRect = [self badgeRectForImageRect:rect];
-		CGContextDrawImage(context, NSRectToCGRect(badgeRect), _badge);
+		[_badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
 	}
 	
 	CGContextRestoreGState(context);

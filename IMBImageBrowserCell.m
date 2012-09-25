@@ -85,7 +85,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 @interface IMBImageBrowserCell()
 
-- (CALayer *)imb_layerWithBadge:(CGImageRef)inBadge inRect:(NSRect)inRect;
+- (CALayer *)imb_layerWithBadge:(NSImage*)inBadge inRect:(NSRect)inRect;
 
 @end
 //----------------------------------------------------------------------------------------------------------------------
@@ -301,32 +301,30 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 		
 		IMBObject* item = (IMBObject*) [self representedItem];
 
-        // Display warning or error sign badge if resource that thumbnail is representing is not accessible
-        
-        CGImageRef imageRef = NULL;
+        // Display a warning or error badge if resource that thumbnail is representing is not accessible.
+		// Display any kind of badge if host app wants us to (should not exceed 16x16 points)...
+
+        NSImage* badge = NULL;
 		
 		if (item.accessibility == kIMBResourceDoesNotExist)
 		{
-			imageRef = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
-			[layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+			badge = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+			[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
 		}
 		else if (item.accessibility == kIMBResourceNoPermission)
 		{
-			imageRef = [NSImage imb_CGImageNamed:@"warning.tiff"];
-			[layer addSublayer: [self imb_layerWithBadge:imageRef inRect:relativeImageFrame]];
+			badge = [NSImage imb_imageNamed:@"warning.tiff"];
+			[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
 		}
 		else if (item.accessibility == kIMBResourceIsAccessible)
 		{
-			// Display any kind of badge if host app wants us to (should not exceed 16x16 points)
-			
 			IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
 			id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
 			
 			if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
-			{			
-				[layer addSublayer:
-				 [self imb_layerWithBadge:[delegate objectViewController:objectViewController badgeForObject:item]
-								   inRect:relativeImageFrame]];
+			{
+				badge = [delegate objectViewController:objectViewController badgeForObject:item];
+				[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
 			}
 		}
         
@@ -415,7 +413,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 // Returns a layer that displays inBadge in the lower right corner relative to inRect
 
-- (CALayer *)imb_layerWithBadge:(CGImageRef)inBadge inRect:(NSRect)inRect
+- (CALayer *)imb_layerWithBadge:(NSImage*)inBadge inRect:(NSRect)inRect
 {
     CALayer *badgeLayer = nil;
 	

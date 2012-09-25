@@ -59,7 +59,7 @@
 	NSString* _imageRepresentationType;		
 	NSString* _title;
 	NSString* _subtitle;
-	CGImageRef _badge;				// An optional badge probably provided by host application 
+	NSImage* _badge;				// An optional badge probably provided by host application
 	BOOL _isDisabledFromDragging;
 	
 	NSDictionary* _titleTextAttributes;
@@ -75,7 +75,7 @@
 @property (retain) NSString* subtitle;
 @property (copy) NSDictionary* subtitleTextAttributes;
 
-@property (assign) CGImageRef badge;
+@property (retain) NSImage* badge;
 
 @property (assign, setter=setDisabledFromDragging:) BOOL isDisabledFromDragging;
 
