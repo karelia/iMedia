@@ -1194,28 +1194,26 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	// Host app delegate may provide badge image here. In the list view the icon will be replaced in the NSImageCell...
 	
-	CGImageRef badgeRef = NULL;
+	NSImage* badge = nil;
 	
 	if ([self.delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
 	{
-		badgeRef = [self.delegate objectViewController:self badgeForObject:object];
+		badge = [self.delegate objectViewController:self badgeForObject:object];
 	}
 			
 	if ([inCell respondsToSelector:@selector(setBadge:)])
 	{
 		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
-			CGImageRef stop = [NSImage imb_CGImageNamed:@"IMBStopIcon.icns"];
-			[inCell setBadge:stop];
+			[inCell setBadge:[NSImage imb_imageNamed:@"IMBStopIcon.icns"]];
 		}
 		else if (object.accessibility == kIMBResourceNoPermission)
 		{
-			CGImageRef warning = [NSImage imb_CGImageNamed:@"warning.tiff"];
-			[inCell setBadge:warning];
+			[inCell setBadge:[NSImage imb_imageNamed:@"warning.tiff"]];
 		}
 		else 
 		{
-			[inCell setBadge:badgeRef];
+			[inCell setBadge:badge];
 		}
 	}
 
@@ -1223,21 +1221,14 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	{
 		if (object.accessibility == kIMBResourceDoesNotExist)
 		{
-			NSImage* stop = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
-			[inCell setImage:stop];
+			[inCell setImage:[NSImage imb_imageNamed:@"IMBStopIcon.icns"]];
 		}
 		else if (object.accessibility == kIMBResourceNoPermission)
 		{
-			NSImage* warning = [NSImage imb_imageNamed:@"warning.tiff"];
-			[inCell setImage:warning];
+			[inCell setImage:[NSImage imb_imageNamed:@"warning.tiff"]];
 		}
-		else if (badgeRef)
+		else if (badge)
 		{
-			NSSize badgeSize = NSMakeSize(CGImageGetWidth(badgeRef), CGImageGetHeight(badgeRef));
-			NSBitmapImageRep* bitmapImageRep = [[[NSBitmapImageRep alloc] initWithCGImage:badgeRef] autorelease];
-			NSImage* badge = [[[NSImage alloc] initWithSize:badgeSize] autorelease];
-			[badge addRepresentation:bitmapImageRep];
-			
 			[inCell setImage:badge];
 		}
 	}

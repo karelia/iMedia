@@ -245,7 +245,7 @@ IMBObjectFilter;
 
 // The delegate may provide a badge to decorate the thumbnail of inObject...
 
-- (CGImageRef) objectViewController:(IMBObjectViewController*)inController badgeForObject:(IMBObject*)inObject;
+- (NSImage*) objectViewController:(IMBObjectViewController*)inController badgeForObject:(IMBObject*)inObject;
 
 // If the delegate implements this method, then it can request a custom cell for the IKImageBrowserView...
 

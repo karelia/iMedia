@@ -59,6 +59,7 @@
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
 #import <iMedia/IMBFaceObjectViewController.h>
 #import <iMedia/IMBOutlineView.h>
+#import <iMedia/NSImage+iMedia.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
 #import "IMBTestFaceBrowserCell.h"
 #import "IMBTestFacesBackgroundLayer.h"
@@ -82,7 +83,7 @@
 #pragma mark 
 
 @interface IMBTestAppDelegate ()
-- (CGImageRef) badgeForObject:(IMBObject*) inObject;
+- (NSImage*) badgeForObject:(IMBObject*) inObject;
 @end
 
 
@@ -521,7 +522,7 @@
 }
 
 
-- (CGImageRef) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
+- (NSImage*) objectViewController:(IMBObjectViewController*) inController badgeForObject:(IMBObject*) inObject
 {
 	// Suppress badges on skimmable objects like events or faces
 	if ([inController isKindOfClass:[IMBSkimmableObjectViewController class]])
@@ -613,35 +614,14 @@
 #pragma mark -
 #pragma mark Helper
 
-- (CGImageRef) badgeForObject:(IMBObject*)inObject
+- (NSImage*) badgeForObject:(IMBObject*)inObject
 {
-	static CGImageRef badgeImage = NULL;
-	
 	if (inObject.persistentResourceIdentifier && [self.usedObjects valueForKey:inObject.persistentResourceIdentifier])
 	{
-		if (badgeImage == NULL)
-		{
-			NSString* imageName = @"badge_checkbox.png";
-			NSString* path = [[NSBundle mainBundle] pathForResource:[imageName stringByDeletingPathExtension] ofType:[imageName pathExtension]];
-
-			if(path)
-			{
-				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
-				
-				if(imageSource)
-				{
-					badgeImage = CGImageSourceCreateImageAtIndex(imageSource, 0, NULL);
-					CFRelease(imageSource);
-				}
-			}
-		}
-		
-		return badgeImage;
+		return [NSImage imb_imageNamed:@"badge_checkbox.png"];
 	} 
-	else
-	{
-		return NULL;
-	}
+	
+	return nil;
 }
 
 @end
