@@ -418,17 +418,21 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 - (CALayer *)imb_layerWithBadge:(CGImageRef)inBadge inRect:(NSRect)inRect
 {
     CALayer *badgeLayer = nil;
+	
     if (inBadge)
     {
         badgeLayer = [CALayer layer];
         [badgeLayer setContents:(id)inBadge];
         
-        NSUInteger squareSize = 18;
-        badgeLayer.frame = CGRectMake(inRect.origin.x + inRect.size.width - squareSize - 3,
-                                      inRect.origin.y + 3,
-                                      squareSize,
-                                      squareSize);
+        CGFloat size = 18.0;
+        CGFloat offset = 4.0;
+        badgeLayer.frame = CGRectMake(
+			inRect.origin.x + inRect.size.width - size - offset,
+			inRect.origin.y + offset,
+			size,
+			size);
     }
+	
     return badgeLayer;
 }
 
