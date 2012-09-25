@@ -69,4 +69,6 @@
 	NSDictionary* _userInfo;
 }
 
+- (id) initForNode:(IMBNode*)inNode;
+
 @end

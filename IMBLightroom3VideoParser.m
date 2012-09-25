@@ -76,7 +76,7 @@
 - (NSString*) folderObjectsQuery
 {
 	NSString* query =
-		@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+		@" SELECT	alf.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation,"
 		@"			iptc.caption"
 		@" FROM Adobe_images ai"
 		@" LEFT JOIN AgLibraryFile alf ON ai.rootFile = alf.id_local"
@@ -96,7 +96,7 @@
 {
 	NSString* query = 
 		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-		@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, "
+		@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
 		@"        iptc.caption"
 		@" FROM Adobe_images ai"
 		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
@@ -119,7 +119,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Lightroom database
 // (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
 // This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
 // Please note that this method may be called on a background thread...

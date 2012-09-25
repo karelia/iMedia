@@ -56,6 +56,7 @@
 #import "IMBNodeViewController.h"
 #import	"IMBSkimmableObjectViewController.h"
 #import "IMBSkimmableObject.h"
+#import "IMBNode.h"
 #import "IMBConfig.h"
 
 @interface IMBSkimmableObjectViewController ()
@@ -124,7 +125,7 @@
 
 // Designated initializer
 
-- (id) init
+- (id) initForNode:(IMBNode*)inNode
 {
     NSString *nibName = [[self class] nibName];
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
@@ -145,8 +146,7 @@
 		// (NodeViewController will be set later when this controller is used by a NodeViewController -
 		// see -[IMBNodeViewController _customObjectViewControllerForNode])
 		
-		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:[[self class]mediaType]];
-		self.libraryController = libraryController;
+		self.libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 	}
 	
 	return self;

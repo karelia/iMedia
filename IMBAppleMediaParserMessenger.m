@@ -318,13 +318,13 @@
     
     if ([[self class] isEventsNode:inNode])
     {
-        NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] init] autorelease];
+        NSViewController* viewController = [[[IMBiPhotoEventObjectViewController alloc] initForNode:inNode] autorelease];
         return viewController;
     }
     
     if ([[self class] isFacesNode:inNode])
     {
-        NSViewController* viewController = [[[IMBFaceObjectViewController alloc] init] autorelease];
+        NSViewController* viewController = [[[IMBFaceObjectViewController alloc] initForNode:inNode] autorelease];
         return viewController;
     }
     
