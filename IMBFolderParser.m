@@ -164,7 +164,6 @@
 - (BOOL) populateNode:(IMBNode*)inNode error:(NSError**)outError
 {
 	NSError* error = nil;
-	NSFileManager* fileManager = [[NSFileManager alloc] init];
 	NSAutoreleasePool* pool = nil;
 	NSInteger index = 0;
 	BOOL ok;
@@ -172,6 +171,8 @@
 	
 	// Scan the folder for files and directories...
 	
+	NSFileManager* fileManager = [[NSFileManager alloc] init];
+
 	NSArray* urls = [fileManager contentsOfDirectoryAtURL:
 		inNode.mediaSource 
 		includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLLocalizedNameKey,NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
@@ -180,6 +181,13 @@
 
     [fileManager release];
 
+	// Sort in Finder-like manner...
+	
+	urls = [urls sortedArrayUsingComparator:^NSComparisonResult(NSURL* url1,NSURL* url2)
+	{
+		return [url1.path localizedStandardCompare:url2.path];
+	}];
+	
 	if (urls)
 	{
 		NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
