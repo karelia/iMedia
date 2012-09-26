@@ -573,13 +573,16 @@
 
 
 // iPhoto supports Photo Stream through AlbumData.xml since version 9.2.1
+// ...but revokes support with version 9.4 (key "PhotoStreamAssetId" removed from image dictionaries)
 
 - (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion
 {
     if (inVersion && inVersion.length > 0)
     {
-        NSComparisonResult compareResult = [inVersion imb_finderCompare:@"9.2.1"];
-        return (compareResult >= 0);
+        NSComparisonResult shouldBeDescendingOrSame = [inVersion localizedStandardCompare:@"9.2.1"];
+        NSComparisonResult shouldBeAscending = [inVersion localizedStandardCompare:@"9.4"];
+        return ((shouldBeDescendingOrSame == NSOrderedDescending || shouldBeDescendingOrSame == NSOrderedSame) &&
+                shouldBeAscending == NSOrderedAscending);
     }
     return NO;
 }
@@ -929,9 +932,9 @@
 	
 	// Events node is populated with node objects that represent events
 	
-	NSString* eventKeyPhotoKey = nil;
 	NSString* path = nil;
 	IMBiPhotoEventNodeObject* object = nil;
+    NSMutableDictionary* mutableSubnodeDict = nil;
 	
 	for (NSDictionary* subNodeDict in inEvents)
 	{
@@ -942,6 +945,30 @@
 		if ([self shouldUseAlbumType:subNodeType] && 
 			[self shouldUseAlbum:subNodeDict images:inImages])
 		{
+            // We need a mutable version of sub node dictionary
+            
+            mutableSubnodeDict = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
+            
+            // Check for valid key photo key in node dict and try to replace with some other if necessary
+            // (We've had occurences since iPhoto 9.4 where key photo key was invalid (not key in master image list))
+
+            NSString* keyPhotoKeyCandidate = [mutableSubnodeDict objectForKey:@"KeyPhotoKey"];
+            NSString* validKeyPhotoKey = [self validatedResourceKey:keyPhotoKeyCandidate
+                                             relativeToResourceList:inImages
+                                                    otherCandidates:[mutableSubnodeDict objectForKey:@"KeyList"]];
+            
+            if (!validKeyPhotoKey)
+            {
+                NSLog(@"%s Could not create event node %@ because could not determine key photo",__FUNCTION__,subNodeName);
+                continue;
+            }
+
+            if (![keyPhotoKeyCandidate isEqualToString:validKeyPhotoKey])
+            {
+                // Replace
+                [mutableSubnodeDict setObject:validKeyPhotoKey forKey:@"KeyPhotoKey"];
+            }
+            
 			// Create subnode for this node...
 			
 			IMBNode* subNode = [[[IMBNode alloc] init] autorelease];
@@ -954,13 +981,13 @@
 			
 			// Keep a ref to the subnode dictionary for potential later use
 			
-			subNode.attributes = subNodeDict;
+			subNode.attributes = mutableSubnodeDict;
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
 			
-			NSNumber* subNodeId = [subNodeDict objectForKey:@"RollID"];
+			NSNumber* subNodeId = [mutableSubnodeDict objectForKey:@"RollID"];
 			if (subNodeId == nil) subNodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
 			subNode.identifier = [self identifierForId:subNodeId inSpace:EVENTS_ID_SPACE];
 			
@@ -977,29 +1004,40 @@
 			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
 			// images are not jointly displayed in iMedia browser...
 			
-			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:subNodeDict];
+			NSMutableDictionary* preliminaryMetadata = mutableSubnodeDict;
 			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subNode images:inImages]];
 
 			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
+            object.name = subNode.name;
 			
 			// Obtain key photo dictionary (key photo is displayed while not skimming)
 			
-			eventKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-			NSDictionary* keyPhotoDict = [inImages objectForKey:eventKeyPhotoKey];
-			
-			path = [keyPhotoDict objectForKey:@"ImagePath"];
-			
-			object.representedNodeIdentifier = subNode.identifier;
-			object.location = (id)path;
-			object.name = subNode.name;
-			object.parser = self;
-			object.index = index++;
-			
-			object.imageLocation = [self imageLocationForObject:keyPhotoDict];
-			object.imageRepresentationType = [self requestedImageRepresentationType];
-			object.imageRepresentation = nil;
+            if (validKeyPhotoKey)
+            {
+                NSDictionary* keyPhotoDict = [inImages objectForKey:validKeyPhotoKey];
+                path = [keyPhotoDict objectForKey:@"ImagePath"];
+                
+                if (path)
+                {
+                    object.representedNodeIdentifier = subNode.identifier;
+                    object.location = (id)path;
+                    object.parser = self;
+                    object.index = index++;
+                    
+                    object.imageLocation = [self imageLocationForObject:keyPhotoDict];
+                    object.imageRepresentationType = [self requestedImageRepresentationType];
+                    object.imageRepresentation = nil;
+                }
+                else
+                {
+                    #warning @Jörg This is a preliminary "fix" for the Events bug with iPhoto 9.4
+                    NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
+                    [objects removeObjectIdenticalTo:object];
+                    [subNodes removeObjectIdenticalTo:subNode];
+                }
+            }
 		}
 		[pool drain];
 	}	
@@ -1091,8 +1129,10 @@
             ![assetIds member:photoStreamAssetId] &&
             [self shouldUseObject:imageDict])
 		{
+            NSMutableDictionary *metadata = [imageDict mutableCopy];
+            [metadata setObject:imageKey forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
             [assetIds addObject:photoStreamAssetId];
-            [photoStreamObjectDictionaries addObject:imageDict];
+            [photoStreamObjectDictionaries addObject:metadata];
         }
     }
     // After collecting all Photo Stream object dictionaries sort them by date

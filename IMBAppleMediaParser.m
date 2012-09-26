@@ -606,6 +606,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				faceDict = [NSMutableDictionary dictionaryWithDictionary:faceDict];
 				[facesDict setObject:faceDict forKey:imageFaceKey];
 				
+                // Provide key image key under event-compatible key "KeyPhotoKey" once current image matches.
+                // NOTE: iPhoto 9.4 changed the value stored under "key image" from image key to image GUID.
+                
+                NSString* keyImage = [faceDict objectForKey:@"key image"];
+                NSString* imageGUID = [imageDict objectForKey:@"GUID"];
+                
+                if ((imageGUID  && [imageGUID isEqualToString:keyImage]) ||     // Should be YES once for >= iPhoto 9.4
+                    [imageDictKey isEqualToString:keyImage])                    // Should be YES once for < iPhoto 9.4
+                {
+                    [faceDict setObject:imageDictKey forKey:@"KeyPhotoKey"];
+                }
+                
 				// Add image face meta data to this face (need this later)
 				// (Create meta data list when first occurence of face in some image is detected)
 				
@@ -655,12 +667,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			// Create an empty metadata list to avoid crash.
 			imageFaceMetadataList = [NSArray array];
 		}
-		[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"];
+		[faceDict setObject:imageFaceMetadataList forKey:@"ImageFaceMetadataList"]; // JJ/2012-09-21: again?????
 		
-		// Also provide key image key under an event-compatible key
-		[faceDict setObject:[faceDict objectForKey:@"key image"] forKey:@"KeyPhotoKey"];
-		
-		// Also store a sorted key list in face dictionary
+        // Also store a sorted key list in face dictionary
 		[faceDict setObject:[imageFaceMetadataList valueForKey:@"image key"] forKey:@"KeyList"];
 	}
 	
@@ -981,5 +990,25 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	return [self isNode:inNode withId:PHOTO_STREAM_NODE_ID inSpace:PHOTO_STREAM_ID_SPACE];
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark -
+#pragma mark Consistency
+
+// Checks inKey whether it is a valid key in resource list and returns it if valid.
+// If not checks all other candidates for validity and returns the first that is valid.
+// If not returns nil.
+
+- (NSString *)validatedResourceKey:(NSString *)inKey relativeToResourceList:(NSDictionary *)inResources otherCandidates:(NSArray *)inKeyList
+{
+    if ([inResources objectForKey:inKey]) return inKey;
+
+    for (id aKey in inKeyList)
+    {
+        if ([inResources objectForKey:aKey]) return aKey;
+    }
+    return nil;
+}
 
 @end
