@@ -49,25 +49,48 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import <Foundation/Foundation.h>
+#import "IMBTableViewAppearance+iMediaPrivate.h"
 
-@interface IMBTableViewFormat : NSObject
+@implementation IMBTableViewAppearance
+
+@synthesize view = _view;
+@synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
+@synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
+@synthesize rowTextAttributes = _rowTextAttributes;
+@synthesize rowTextHighlightAttributes = _rowTextHighlightAttributes;
+@synthesize sectionHeaderTextAttributes = _sectionHeaderTextAttributes;
+@synthesize swapIconAndHighlightIcon = _swapIconAndHighlightIcon;
+
+
+- (void) invalidateFormat
 {
-    NSTableView *_tableView;
-    NSGradient *_keyWindowHighlightGradient;
-    NSGradient *_nonKeyWindowHighlightGradient;
-    NSDictionary *_rowTextAttributes;
-    NSDictionary *_rowTextHighlightAttributes;
-    NSDictionary *_sectionHeaderTextAttributes;
-    BOOL _swapIconAndHighlightIcon;
+    if (self.view)
+    {
+        [self.view setNeedsDisplay:YES];
+    }
 }
 
-@property (assign, readonly) NSTableView *tableView;
-@property (retain) NSGradient *keyWindowHighlightGradient;
-@property (retain) NSGradient *nonKeyWindowHighlightGradient;
-@property (retain) NSDictionary *rowTextAttributes;
-@property (retain) NSDictionary *rowTextHighlightAttributes;
-@property (retain) NSDictionary *sectionHeaderTextAttributes;
-@property BOOL swapIconAndHighlightIcon;
+
+- (void) setBackgroundColor:(NSColor *)inColor
+{
+    if (self.view && [self.view respondsToSelector:@selector(setBackgroundColor:)])
+    {
+        [self.view setBackgroundColor:inColor];
+    }
+    [self invalidateFormat];
+}
+
+
+- (void)dealloc
+{
+    IMBRelease(_keyWindowHighlightGradient);
+    IMBRelease(_nonKeyWindowHighlightGradient);
+    IMBRelease(_rowTextAttributes);
+    IMBRelease(_rowTextHighlightAttributes);
+    IMBRelease(_sectionHeaderTextAttributes);
+    
+    [super dealloc];
+}
+
 
 @end

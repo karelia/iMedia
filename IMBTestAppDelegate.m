@@ -64,6 +64,7 @@
 #import "IMBTestFaceBrowserCell.h"
 #import "IMBTestFacesBackgroundLayer.h"
 #import "IMBAccessRightsController.h"
+#import "IMBTableViewAppearance.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +75,7 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-#define CUSTOM_USER_INTERFACE 0
+#define CUSTOM_USER_INTERFACE 1
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,31 +172,31 @@
     
     IMBOutlineView* outlineView = self.nodeViewController.nodeOutlineView;
     
-    IMBTableViewFormat* tableViewFormat = [[[IMBTableViewFormat alloc] init] autorelease];
+    IMBTableViewAppearance* tableViewAppearance = [[[IMBTableViewAppearance alloc] init] autorelease];
     
-    outlineView.format = tableViewFormat;
+    outlineView.imb_Appearance = tableViewAppearance;
     
-    tableViewFormat.keyWindowHighlightGradient =
+    tableViewAppearance.keyWindowHighlightGradient =
     [[[NSGradient alloc] initWithColorsAndLocations:
      [NSColor colorWithDeviceWhite:(float)200/255 alpha:1.0], 0.0,
      [NSColor colorWithDeviceWhite:(float)230/255 alpha:1.0], 1.0, nil] autorelease];
     
-    tableViewFormat.nonKeyWindowHighlightGradient =
+    tableViewAppearance.nonKeyWindowHighlightGradient =
     [[[NSGradient alloc] initWithColorsAndLocations:
       [NSColor colorWithDeviceWhite:(float)180/255 alpha:1.0], 0.0,
       [NSColor colorWithDeviceWhite:(float)210/255 alpha:1.0], 1.0, nil] autorelease];
     
-    tableViewFormat.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+    tableViewAppearance.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                           [NSColor colorWithDeviceWhite:(float)210/255 alpha:1.0], NSForegroundColorAttributeName,
                                           [NSFont fontWithName:@"Lucida Grande" size:12], NSFontAttributeName,
                                           nil];
     
-    tableViewFormat.rowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+    tableViewAppearance.rowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                                   [NSColor colorWithDeviceWhite:(float)60/255 alpha:1.0], NSForegroundColorAttributeName,
                                                   [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
                                                   nil];
     
-    tableViewFormat.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+    tableViewAppearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                                    [NSColor colorWithDeviceWhite:(float)150/255 alpha:1.0], NSForegroundColorAttributeName,
                                                    [NSFont fontWithName:@"Lucida Grande Bold" size:11], NSFontAttributeName,
                                                    nil];
@@ -204,7 +205,7 @@
     
     // Tell view to use highlight icons as normal icons and vice versa
     
-    tableViewFormat.swapIconAndHighlightIcon = YES;
+    tableViewAppearance.swapIconAndHighlightIcon = YES;
     
     // Change background color of node view
     

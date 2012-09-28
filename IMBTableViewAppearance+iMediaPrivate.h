@@ -49,10 +49,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import "IMBTableViewFormat.h"
+#import "IMBTableViewAppearance.h"
 
-@interface IMBTableViewFormat ()
+@interface IMBTableViewAppearance ()
 
-@property (assign, readwrite) NSTableView *tableView;
+@property (assign, readwrite) NSView *view;
 
 @end

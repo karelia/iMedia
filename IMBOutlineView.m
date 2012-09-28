@@ -59,7 +59,7 @@
 #import "NSCell+iMedia.h"
 #import "IMBNodeCell.h"
 #import "IMBTextFieldCell.h"
-#import "IMBTableViewFormat+iMediaPrivate.h"
+#import "IMBTableViewAppearance+iMediaPrivate.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,20 +71,20 @@
 
 @synthesize draggingPrompt = _draggingPrompt;
 @synthesize textCell = _textCell;
-@synthesize format = _appearance;
+@synthesize imb_Appearance = _appearance;
 
 
-- (void)setAppearance:(IMBTableViewFormat *)inFormat
+- (void)setImb_Appearance:(IMBTableViewAppearance *)inFormat
 {
     if (_appearance) {
-        _appearance.tableView = nil;
+        _appearance.view = nil;
     }
     [_appearance release];
     _appearance = inFormat;
     [_appearance retain];
     
     if (_appearance) {
-        _appearance.tableView = self;
+        _appearance.view = self;
     }
 }
 
@@ -97,7 +97,7 @@
 	if (self = [super initWithFrame:inFrame])
 	{
 		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
-        self.format = [self defaultAppearance];
+        self.imb_Appearance = [self defaultAppearance];
 	}
 	
 	return self;
@@ -109,7 +109,7 @@
 	if (self = [super initWithCoder:inCoder])
 	{
 		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
-        self.format = [self defaultAppearance];
+        self.imb_Appearance = [self defaultAppearance];
 	}
 	
 	return self;
@@ -126,7 +126,7 @@
     
     if (_appearance)
     {
-        _appearance.tableView = nil;
+        _appearance.view = nil;
         IMBRelease(_appearance);
     }
  
@@ -215,12 +215,12 @@
 
 - (void)highlightSelectionInClipRect:(NSRect)theClipRect
 {
-    if (!self.format || !self.format.keyWindowHighlightGradient || !self.format.nonKeyWindowHighlightGradient)
+    if (!self.imb_Appearance || !self.imb_Appearance.keyWindowHighlightGradient || !self.imb_Appearance.nonKeyWindowHighlightGradient)
     {
         [super highlightSelectionInClipRect:theClipRect];
         return;
     }
-    IMBTableViewFormat *tableViewFormat = self.format;
+    IMBTableViewAppearance *tableViewFormat = self.imb_Appearance;
     
     NSRange         aVisibleRowIndexes = [self rowsInRect:theClipRect];
     NSIndexSet *    aSelectedRowIndexes = [self selectedRowIndexes];
@@ -443,9 +443,9 @@
 #pragma mark
 #pragma mark Appearance
 
-- (IMBTableViewFormat*) defaultAppearance
+- (IMBTableViewAppearance*) defaultAppearance
 {
-    IMBTableViewFormat* appearance = [[[IMBTableViewFormat alloc] init] autorelease];
+    IMBTableViewAppearance* appearance = [[[IMBTableViewAppearance alloc] init] autorelease];
     
     appearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                               [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
@@ -467,16 +467,16 @@
 
 - (id) appearanceProperty:(SEL)propertyAccessor
 {
-    if (self.format) {
-        return [self.format performSelector:propertyAccessor];
+    if (self.imb_Appearance) {
+        return [self.imb_Appearance performSelector:propertyAccessor];
     }
     return nil;
 }
 
 - (BOOL) appearanceBooleanProperty:(SEL)propertyAccessor
 {
-    if (self.format) {
-        return (BOOL)[self.format performSelector:propertyAccessor];
+    if (self.imb_Appearance) {
+        return (BOOL)[self.imb_Appearance performSelector:propertyAccessor];
     }
     return NO;
 }

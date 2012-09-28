@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 @class IMBTextFieldCell;
 @class IMBNode;
-@class IMBTableViewFormat;
+@class IMBTableViewAppearance;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,12 +61,12 @@
 	NSMutableDictionary* _subviewsInVisibleRows;
 	NSString* _draggingPrompt;
 	IMBTextFieldCell* _textCell;
-    IMBTableViewFormat *_appearance;
+    IMBTableViewAppearance *_appearance;
 }
 
 @property (retain) NSString* draggingPrompt;
 @property (retain) IMBTextFieldCell* textCell;
-@property (retain) IMBTableViewFormat *format;
+@property (retain) IMBTableViewAppearance *imb_Appearance; // Note that there is already -appearance on NSView (private)
 
 - (IMBNode*) nodeAtRow:(NSInteger)inRow;
 - (NSRect) badgeRectForRow:(NSInteger)inRow;

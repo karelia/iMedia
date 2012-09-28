@@ -49,48 +49,25 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import "IMBTableViewFormat+iMediaPrivate.h"
+#import <Foundation/Foundation.h>
 
-@implementation IMBTableViewFormat
-
-@synthesize tableView = _tableView;
-@synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
-@synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
-@synthesize rowTextAttributes = _rowTextAttributes;
-@synthesize rowTextHighlightAttributes = _rowTextHighlightAttributes;
-@synthesize sectionHeaderTextAttributes = _sectionHeaderTextAttributes;
-@synthesize swapIconAndHighlightIcon = _swapIconAndHighlightIcon;
-
-
-- (void) invalidateFormat
+@interface IMBTableViewAppearance : NSObject
 {
-    if (self.tableView)
-    {
-        [self.tableView setNeedsDisplay];
-    }
+    NSView *_view;
+    NSGradient *_keyWindowHighlightGradient;
+    NSGradient *_nonKeyWindowHighlightGradient;
+    NSDictionary *_rowTextAttributes;
+    NSDictionary *_rowTextHighlightAttributes;
+    NSDictionary *_sectionHeaderTextAttributes;
+    BOOL _swapIconAndHighlightIcon;
 }
 
-
-- (void) setBackgroundColor:(NSColor *)inColor
-{
-    if (self.tableView)
-    {
-        [self.tableView setBackgroundColor:inColor];
-    }
-    [self invalidateFormat];
-}
-
-
-- (void)dealloc
-{
-    IMBRelease(_keyWindowHighlightGradient);
-    IMBRelease(_nonKeyWindowHighlightGradient);
-    IMBRelease(_rowTextAttributes);
-    IMBRelease(_rowTextHighlightAttributes);
-    IMBRelease(_sectionHeaderTextAttributes);
-    
-    [super dealloc];
-}
-
+@property (assign, readonly) NSView *view;
+@property (retain) NSGradient *keyWindowHighlightGradient;
+@property (retain) NSGradient *nonKeyWindowHighlightGradient;
+@property (retain) NSDictionary *rowTextAttributes;
+@property (retain) NSDictionary *rowTextHighlightAttributes;
+@property (retain) NSDictionary *sectionHeaderTextAttributes;
+@property BOOL swapIconAndHighlightIcon;
 
 @end
