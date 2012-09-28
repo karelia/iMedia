@@ -48,9 +48,9 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
-#import "IMBTableViewFormat+iMediaPrivate.h"
 @class IMBTextFieldCell;
 @class IMBNode;
+@class IMBTableViewFormat;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@
 	NSMutableDictionary* _subviewsInVisibleRows;
 	NSString* _draggingPrompt;
 	IMBTextFieldCell* _textCell;
-    IMBTableViewFormat *_format;
+    IMBTableViewFormat *_appearance;
 }
 
 @property (retain) NSString* draggingPrompt;

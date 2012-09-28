@@ -59,6 +59,7 @@
 #import "NSCell+iMedia.h"
 #import "IMBNodeCell.h"
 #import "IMBTextFieldCell.h"
+#import "IMBTableViewFormat+iMediaPrivate.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,20 +71,20 @@
 
 @synthesize draggingPrompt = _draggingPrompt;
 @synthesize textCell = _textCell;
-@synthesize format = _format;
+@synthesize format = _appearance;
 
 
-- (void)setFormat:(IMBTableViewFormat *)inFormat
+- (void)setAppearance:(IMBTableViewFormat *)inFormat
 {
-    if (_format) {
-        _format.tableView = nil;
+    if (_appearance) {
+        _appearance.tableView = nil;
     }
-    [_format release];
-    _format = inFormat;
-    [_format retain];
+    [_appearance release];
+    _appearance = inFormat;
+    [_appearance retain];
     
-    if (_format) {
-        _format.tableView = self;
+    if (_appearance) {
+        _appearance.tableView = self;
     }
 }
 
@@ -123,10 +124,10 @@
 	IMBRelease(_draggingPrompt);
 	IMBRelease(_textCell);
     
-    if (_format)
+    if (_appearance)
     {
-        _format.tableView = nil;
-        IMBRelease(_format);
+        _appearance.tableView = nil;
+        IMBRelease(_appearance);
     }
  
 	[super dealloc];
