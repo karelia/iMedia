@@ -322,10 +322,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) iconForAlbumType:(NSString*)inAlbumType
+- (NSImage*) iconForAlbumType:(NSString*)inAlbumType highlight:(BOOL)inHighlight
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
+        // Icon Type                Application Icon Name            Fallback Icon Name
+        
 		// iPhoto 7
 		{@"Book",					@"sl-icon-small_book",				@"folder",	nil,				nil},
 		{@"Calendar",				@"sl-icon-small_calendar",			@"folder",	nil,				nil},
@@ -354,12 +356,18 @@
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
+        @"-sel",
 		{@"Regular",				@"sl-icon-small_album",			@"folder",	nil,				nil}	// fallback image
 	};
 	
+    
+    
 	NSString* type = inAlbumType;
 	if (type == nil) type = @"Photos";
-	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.iPhoto" withMappingTable:&kIconTypeMapping];
+	return [[IMBIconCache sharedIconCache] iconForType:type
+                                          fromBundleID:@"com.apple.iPhoto"
+                                      withMappingTable:&kIconTypeMapping
+                                             highlight:inHighlight];
 }
 
 
@@ -439,7 +447,8 @@
 			IMBNode* albumNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
-			albumNode.icon = [self iconForAlbumType:albumType];
+			albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
+			albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
 			albumNode.name = albumName;
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
@@ -640,7 +649,8 @@
 			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
-			subnode.icon = [self iconForAlbumType:subNodeType];
+			subnode.icon = [self iconForAlbumType:subNodeType highlight:NO];
+			subnode.highlightIcon = [self iconForAlbumType:subNodeType highlight:YES];
 			subnode.name = subnodeName;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 

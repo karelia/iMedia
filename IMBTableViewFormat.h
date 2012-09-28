@@ -53,17 +53,21 @@
 
 @interface IMBTableViewFormat : NSObject
 {
+    NSTableView *_tableView;
     NSGradient *_keyWindowHighlightGradient;
     NSGradient *_nonKeyWindowHighlightGradient;
-    NSColor *_dataCellTextColor;
-    NSColor *_dataCellTextHighlightColor;
-    NSColor *_groupCellTextColor;
+    NSDictionary *_rowTextAttributes;
+    NSDictionary *_rowTextHighlightAttributes;
+    NSDictionary *_sectionHeaderTextAttributes;
+    BOOL _swapIconAndHighlightIcon;
 }
 
+@property (assign, readonly) NSTableView *tableView;
 @property (retain) NSGradient *keyWindowHighlightGradient;
 @property (retain) NSGradient *nonKeyWindowHighlightGradient;
-@property (retain) NSColor *dataCellTextColor;
-@property (retain) NSColor *dataCellTextHighlightColor;
-@property (retain) NSColor *groupCellTextColor;
+@property (retain) NSDictionary *rowTextAttributes;
+@property (retain) NSDictionary *rowTextHighlightAttributes;
+@property (retain) NSDictionary *sectionHeaderTextAttributes;
+@property BOOL swapIconAndHighlightIcon;
 
 @end

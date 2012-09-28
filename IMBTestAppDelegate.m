@@ -44,7 +44,7 @@
  */
 
 
-// Author: Peter Baumgartner, Dan Wood, Christoph Priebe
+// Author: Peter Baumgartner, Dan Wood, Christoph Priebe, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -173,25 +173,42 @@
     
     IMBTableViewFormat* tableViewFormat = [[[IMBTableViewFormat alloc] init] autorelease];
     
+    outlineView.format = tableViewFormat;
+    
     tableViewFormat.keyWindowHighlightGradient =
     [[[NSGradient alloc] initWithColorsAndLocations:
-     [NSColor colorWithDeviceRed:(float)62/255 green:(float)133/255 blue:(float)197/255 alpha:1.0], 0.0,
-     [NSColor colorWithDeviceRed:(float)48/255 green:(float)95/255 blue:(float)152/255 alpha:1.0], 1.0, nil] autorelease];
+     [NSColor colorWithDeviceWhite:(float)200/255 alpha:1.0], 0.0,
+     [NSColor colorWithDeviceWhite:(float)230/255 alpha:1.0], 1.0, nil] autorelease];
     
     tableViewFormat.nonKeyWindowHighlightGradient =
     [[[NSGradient alloc] initWithColorsAndLocations:
-     [NSColor colorWithDeviceRed:(float)190/255 green:(float)190/255 blue:(float)190/255 alpha:1.0], 0.0,
-     [NSColor colorWithDeviceRed:(float)150/255 green:(float)150/255 blue:(float)150/255 alpha:1.0], 1.0, nil] autorelease];
+      [NSColor colorWithDeviceWhite:(float)180/255 alpha:1.0], 0.0,
+      [NSColor colorWithDeviceWhite:(float)210/255 alpha:1.0], 1.0, nil] autorelease];
     
-    tableViewFormat.dataCellTextColor = [NSColor lightGrayColor];
-    tableViewFormat.dataCellTextHighlightColor = [NSColor yellowColor];
-    tableViewFormat.groupCellTextColor = [NSColor lightGrayColor];
+    tableViewFormat.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          [NSColor colorWithDeviceWhite:(float)210/255 alpha:1.0], NSForegroundColorAttributeName,
+                                          [NSFont fontWithName:@"Lucida Grande" size:12], NSFontAttributeName,
+                                          nil];
     
-    outlineView.format = tableViewFormat;
+    tableViewFormat.rowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                  [NSColor colorWithDeviceWhite:(float)60/255 alpha:1.0], NSForegroundColorAttributeName,
+                                                  [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
+                                                  nil];
+    
+    tableViewFormat.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                   [NSColor colorWithDeviceWhite:(float)150/255 alpha:1.0], NSForegroundColorAttributeName,
+                                                   [NSFont fontWithName:@"Lucida Grande Bold" size:11], NSFontAttributeName,
+                                                   nil];
+    
+    
+    
+    // Tell view to use highlight icons as normal icons and vice versa
+    
+    tableViewFormat.swapIconAndHighlightIcon = YES;
     
     // Change background color of node view
     
-    [outlineView setBackgroundColor:[NSColor darkGrayColor]];
+    [outlineView setBackgroundColor:[NSColor colorWithDeviceWhite:(float)90/255 alpha:1.0]];
     
     [outlineView setNeedsDisplay:YES];
     

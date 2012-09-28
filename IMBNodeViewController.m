@@ -829,8 +829,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 	cell.isGroupCell = node.isGroupNode;
 	cell.node = node;
-	cell.icon = node.icon;
-	cell.title = node.name;
+    cell.title = node.name;
 	cell.badgeType = node.badgeTypeNormal;
 	
 	if (node.accessibility == kIMBResourceDoesNotExist)

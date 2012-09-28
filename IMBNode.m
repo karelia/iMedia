@@ -89,6 +89,7 @@
 // Primary properties...
 
 @synthesize icon = _icon;
+@synthesize highlightIcon = _highlightIcon;
 @synthesize name = _name;
 @synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
@@ -145,6 +146,8 @@
 {
 	if (self = [super init])
 	{
+        self.icon = nil;
+        self.highlightIcon = nil;
 		self.subnodes = nil;
 		self.objects = nil;
 
@@ -198,6 +201,7 @@
     [self setSubnodes:nil];		// Sub-nodes have a weak reference to self, so break that
 	
 	IMBRelease(_icon);
+	IMBRelease(_highlightIcon);
 	IMBRelease(_name);
 	IMBRelease(_identifier);
 	IMBRelease(_mediaType);
@@ -223,6 +227,7 @@
 	IMBNode* copy = [[[self class] allocWithZone:inZone] init];
 
 	copy.icon = self.icon;
+	copy.highlightIcon = self.highlightIcon;
 	copy.name = self.name;
 	copy.identifier = self.identifier;
 	copy.mediaType = self.mediaType;
@@ -337,6 +342,15 @@
 			NSLog(@"%s Caught exception trying to decode icon for node %@: %@",__FUNCTION__,self.name,exception);
 			self.icon = [NSImage imb_sharedGenericFolderIcon];
 		}
+		@try
+		{
+			self.highlightIcon = [inCoder decodeObjectForKey:@"highlightIcon"];
+		}
+		@catch (NSException *exception)
+		{
+			NSLog(@"%s Caught exception trying to decode highlight icon for node %@: %@",__FUNCTION__,self.name,exception);
+			self.highlightIcon = self.icon;
+		}
 	}
 	
 	return self;
@@ -377,30 +391,36 @@
 	// but the NSImage contains multiple high resolution representations. Instead of encoding them all, we'll
 	// simply encode the small ones...
 	
-	NSImage* originalIcon = self.icon;
-	NSArray* originalReps = [originalIcon representations];
-	NSImage* strippedIcon = [[NSImage alloc] initWithSize:NSMakeSize(16.0,16.0)];
-	
-	for (NSImageRep* iconRep in originalReps)
-	{
-		NSSize size = iconRep.size;
-		
-		if (size.width <= 32.0)
-		{
-//			if ([rep isKindOfClass:[NSBitmapImageRep class]])
-			if (YES)
-			{
-//				NSLog(@"%s %@ %@",__FUNCTION__,NSStringFromClass([rep class]),NSStringFromSize(size));
-				[strippedIcon addRepresentation:iconRep];
-			}
-			else
-			{
-				// TODO: convert other reps to NSBitmapImageRep
-			}
-		}
-	}
-	
-	[inCoder encodeObject:strippedIcon forKey:@"icon"];
+    NSImage*(^iconWithSmallRepresentations)(NSImage*) = ^NSImage*(NSImage* inImage)
+    {
+        if (inImage)
+        {
+            NSImage* strippedIcon = [[[NSImage alloc] initWithSize:NSMakeSize(16.0,16.0)]autorelease];
+            for (NSImageRep* iconRep in inImage.representations)
+            {
+                NSSize size = iconRep.size;
+                
+                if (size.width <= 32.0)
+                {
+                    //			if ([rep isKindOfClass:[NSBitmapImageRep class]])
+                    if (YES)
+                    {
+                        //				NSLog(@"%s %@ %@",__FUNCTION__,NSStringFromClass([rep class]),NSStringFromSize(size));
+                        [strippedIcon addRepresentation:iconRep];
+                    }
+                    else
+                    {
+                        // TODO: convert other reps to NSBitmapImageRep
+                    }
+                }
+            }
+            return strippedIcon;
+        }
+        return nil;
+    };
+
+    [inCoder encodeObject:iconWithSmallRepresentations(self.icon) forKey:@"icon"];
+    [inCoder encodeObject:iconWithSmallRepresentations(self.highlightIcon) forKey:@"highlightIcon"];
 }
 
 

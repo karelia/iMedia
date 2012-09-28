@@ -49,48 +49,13 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import "IMBTableViewFormat+iMediaPrivate.h"
 
-@implementation IMBTableViewFormat
+#pragma mark HEADERS
 
-@synthesize tableView = _tableView;
-@synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
-@synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
-@synthesize rowTextAttributes = _rowTextAttributes;
-@synthesize rowTextHighlightAttributes = _rowTextHighlightAttributes;
-@synthesize sectionHeaderTextAttributes = _sectionHeaderTextAttributes;
-@synthesize swapIconAndHighlightIcon = _swapIconAndHighlightIcon;
+@interface NSCell (iMedia)
 
+// Set string value attributes conformant to NSAttributedString
 
-- (void) invalidateFormat
-{
-    if (self.tableView)
-    {
-        [self.tableView setNeedsDisplay];
-    }
-}
-
-
-- (void) setBackgroundColor:(NSColor *)inColor
-{
-    if (self.tableView)
-    {
-        [self.tableView setBackgroundColor:inColor];
-    }
-    [self invalidateFormat];
-}
-
-
-- (void)dealloc
-{
-    IMBRelease(_keyWindowHighlightGradient);
-    IMBRelease(_nonKeyWindowHighlightGradient);
-    IMBRelease(_rowTextAttributes);
-    IMBRelease(_rowTextHighlightAttributes);
-    IMBRelease(_sectionHeaderTextAttributes);
-    
-    [super dealloc];
-}
-
+- (void) imb_setStringValueAttributes:(NSDictionary*)inAttributes;
 
 @end

@@ -49,48 +49,10 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#import "IMBTableViewFormat+iMediaPrivate.h"
+#import "IMBTableViewFormat.h"
 
-@implementation IMBTableViewFormat
+@interface IMBTableViewFormat ()
 
-@synthesize tableView = _tableView;
-@synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
-@synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
-@synthesize rowTextAttributes = _rowTextAttributes;
-@synthesize rowTextHighlightAttributes = _rowTextHighlightAttributes;
-@synthesize sectionHeaderTextAttributes = _sectionHeaderTextAttributes;
-@synthesize swapIconAndHighlightIcon = _swapIconAndHighlightIcon;
-
-
-- (void) invalidateFormat
-{
-    if (self.tableView)
-    {
-        [self.tableView setNeedsDisplay];
-    }
-}
-
-
-- (void) setBackgroundColor:(NSColor *)inColor
-{
-    if (self.tableView)
-    {
-        [self.tableView setBackgroundColor:inColor];
-    }
-    [self invalidateFormat];
-}
-
-
-- (void)dealloc
-{
-    IMBRelease(_keyWindowHighlightGradient);
-    IMBRelease(_nonKeyWindowHighlightGradient);
-    IMBRelease(_rowTextAttributes);
-    IMBRelease(_rowTextHighlightAttributes);
-    IMBRelease(_sectionHeaderTextAttributes);
-    
-    [super dealloc];
-}
-
+@property (assign, readwrite) NSTableView *tableView;
 
 @end

@@ -76,7 +76,7 @@
 - (NSString*) rootNodeIdentifier;
 - (BOOL) shouldUseAlbumType:(NSString*)inAlbumType;
 - (BOOL) isLeafAlbumType:(NSString*)inType;
-- (NSImage*) iconForAlbumType:(NSString*)inType;
+- (NSImage*) iconForAlbumType:(NSString*)inType highlight:(BOOL)inHighlight;
 - (NSArray*) keylistForAlbum:(NSDictionary*)inAlbumDict;
 - (BOOL) shouldUseObject:(NSString*)inObjectType;
 - (void) addSubNodesToNode:(IMBNode*)inParentNode albums:(NSArray*)inAlbums images:(NSDictionary*)inImages;
@@ -439,7 +439,7 @@
 
 // Icons for older Aperture versions...
 
-- (NSImage*) iconForAlbumType2:(NSString*)inType
+- (NSImage*) iconForAlbumType2:(NSString*)inType highlight:(BOOL)inHighlight
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
@@ -465,6 +465,7 @@
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
+        @"_S",
 		{@"v2-1",	@"Project_I_Album",			@"folder",	nil,	nil}	// fallback image
 	};
 
@@ -472,18 +473,21 @@
 	// to the album type so that we can store different icons (for each version) in the icon cache...
 
 	NSString* type = [@"v2-" stringByAppendingString:inType];
-	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+	return [[IMBIconCache sharedIconCache] iconForType:type
+                                          fromBundleID:@"com.apple.Aperture"
+                                      withMappingTable:&kIconTypeMapping
+                                             highlight:inHighlight];
 }
 
 
 // New icons for Aperture 3...
 
-- (NSImage*) iconForAlbumType3:(NSString*)inType
+- (NSImage*) iconForAlbumType3:(NSString*)inType highlight:(BOOL)inHighlight
 {
 	static const IMBIconTypeMappingEntry kIconTypeMappingEntries[] =
 	{
-		{@"v3-Photo Stream",@"SL-stream",          @"folder",	nil,	nil},   // photo stream
-		{@"v3-Faces",@"SL-faces",                  @"folder",	nil,	nil},   // faces
+		{@"v3-Photo Stream",@"SL-stream",           @"folder",	nil,	nil},   // photo stream
+		{@"v3-Faces",@"SL-faces",                   @"folder",	nil,	nil},   // faces
 		{@"v3-1",	@"SL-album",					@"folder",	nil,	nil},	// album
 		{@"v3-2",	@"SL-smartAlbum",				@"folder",	nil,	nil},	// smart album
 		{@"v3-3",	@"SL-smartAlbum",				@"folder",	nil,	nil},	// library **** ... 200X
@@ -491,7 +495,7 @@
 		{@"v3-5",	@"SL-allProjects",				@"folder",	nil,	nil},	// library (top level)
 		{@"v3-6",	@"SL-folder",					@"folder",	nil,	nil},	// folder
 		{@"v3-7",	@"SL-folder",					@"folder",	nil,	nil},	// sub-folder of project
-		{@"v3-8",	@"SL-book",					@"folder",	nil,	nil},	// book
+		{@"v3-8",	@"SL-book",                     @"folder",	nil,	nil},	// book
 		{@"v3-9",	@"SL-webpage",					@"folder",	nil,	nil},	// web gallery
 		{@"v3-9",	@"Project_I_WebGallery",		@"folder",	nil,	nil},	// web gallery (alternate image)
 		{@"v3-10",	@"SL-webJournal",				@"folder",	nil,	nil},	// web journal
@@ -500,9 +504,9 @@
 		{@"v3-19",	@"SL-slideshow",				@"folder",	nil,	nil},	// slideshow
 		{@"v3-94",	@"SL-photos",					@"folder",	nil,	nil},	// photos
 		{@"v3-95",	@"SL-flag",						@"folder",	nil,	nil},	// flagged
-		{@"v3-96",	@"SL-smartLibrary",			@"folder",	nil,	nil},	// library albums
+		{@"v3-96",	@"SL-smartLibrary",             @"folder",	nil,	nil},	// library albums
 		{@"v3-97",	@"SL-allProjects",				@"folder",	nil,	nil},	// library
-		{@"v3-98",	@"AppIcon.icns",					@"folder",	nil,	nil},	// library
+		{@"v3-98",	@"AppIcon.icns",				@"folder",	nil,	nil},	// library
 		{@"v3-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
 	};
 
@@ -510,6 +514,7 @@
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
+        @"_S",
 		{@"1",	@"SL-album",					@"folder",	nil,	nil}	// fallback image
 	};
 
@@ -517,19 +522,22 @@
 	// to the album type so that we can store different icons (for each version) in the icon cache...
 
 	NSString* type = [@"v3-" stringByAppendingString:inType];
-	return [[IMBIconCache sharedIconCache] iconForType:type fromBundleID:@"com.apple.Aperture" withMappingTable:&kIconTypeMapping];
+	return [[IMBIconCache sharedIconCache] iconForType:type
+                                          fromBundleID:@"com.apple.Aperture"
+                                      withMappingTable:&kIconTypeMapping
+                                             highlight:inHighlight];
 }
 
 
-- (NSImage*) iconForAlbumType:(NSString*)inType
+- (NSImage*) iconForAlbumType:(NSString*)inType highlight:(BOOL)inHighlight
 {
 	if (self.version < 3)
 	{
-		return [self iconForAlbumType2:inType];
+		return [self iconForAlbumType2:inType highlight:inHighlight];
 	}
 	else
 	{
-		return [self iconForAlbumType3:inType];
+		return [self iconForAlbumType3:inType highlight:inHighlight];
 	}
 }
 
@@ -634,7 +642,8 @@
 			IMBNode* albumNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
-			albumNode.icon = [self iconForAlbumType:albumType];
+			albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
+			albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
 			albumNode.name = albumName;
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:

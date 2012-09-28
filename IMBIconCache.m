@@ -109,7 +109,7 @@ static IMBIconCache* sSharedIconCache;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) __loadIconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const IMBIconTypeMapping*)mappingTable
+- (NSImage*) __loadIconForType:(NSString*)name fromBundleID:(NSString*)bundleID withMappingTable:(const IMBIconTypeMapping*)mappingTable highlight:(BOOL)inHighlight
 {
 	if ((name != nil) && (bundleID != nil) && (mappingTable != NULL))
 	{
@@ -123,13 +123,32 @@ static IMBIconCache* sSharedIconCache;
 			// check for a match with the current entry's icon type
 			if ([name isEqualToString:entry->fIconType])
 			{
+                // Highlight icon name is derivable
+                
+                NSString* effectiveIconName = entry->fApplicationIconName;
+                NSString* effectiveFallbackIconName = entry->fFallbackIconName;
+                if (inHighlight && mappingTable->fHighlightPostfix)
+                {
+                    effectiveIconName = [entry->fApplicationIconName stringByAppendingString:mappingTable->fHighlightPostfix];
+                    
+                    if (entry->fFallbackIconName) {
+                        effectiveFallbackIconName = [entry->fFallbackIconName stringByAppendingString:mappingTable->fHighlightPostfix];
+                    }
+                }
+                
 				// first try to find the specified image in the application bundle associated with the parser
-				NSImage* image = [NSImage imb_imageForResource:entry->fApplicationIconName
+				NSImage* image = [NSImage imb_imageForResource:effectiveIconName
 											 fromAppWithBundleIdentifier:bundleID
-												  fallbackName:entry->fFallbackIconName];
+												  fallbackName:effectiveFallbackIconName];
+                
+                if (image) {
+                    NSLog(@"Loaded image %@", effectiveIconName);
+                } else {
+                    NSLog(@"Could not load image %@", effectiveIconName);
+                }
 
-				// if the image doesn't exist, try using another image at a specific location
-				if ((image == nil) && (entry->fAlternateBundlePath != nil))
+				// if the image doesn't exist, try using another image at a specific location (but not for highlight icon)
+				if ((image == nil) && (entry->fAlternateBundlePath != nil) && !inHighlight)
 				{
 					NSBundle* bundle = [NSBundle bundleWithPath:entry->fAlternateBundlePath];
 					NSString* path = [bundle pathForResource:entry->fAlternateIconName ofType:nil];
@@ -143,10 +162,13 @@ static IMBIconCache* sSharedIconCache;
 			}
 		}
 
-		// if no type-specific image was found, use the fallback image
-		return [NSImage imb_imageForResource:mappingTable->fUnknownTypeEntry.fApplicationIconName
-						   fromAppWithBundleIdentifier:bundleID
-								fallbackName:mappingTable->fUnknownTypeEntry.fFallbackIconName];
+		// if no type-specific image was found, use the fallback image (but not for highlight icon)
+        if (!inHighlight)
+        {
+            return [NSImage imb_imageForResource:mappingTable->fUnknownTypeEntry.fApplicationIconName
+                     fromAppWithBundleIdentifier:bundleID
+                                    fallbackName:mappingTable->fUnknownTypeEntry.fFallbackIconName];
+        }
 	}
 
 	return nil;
@@ -156,7 +178,7 @@ static IMBIconCache* sSharedIconCache;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable
+- (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable highlight:(BOOL)inHighlight
 {
 	NSImage* image = nil;
 
@@ -164,6 +186,12 @@ static IMBIconCache* sSharedIconCache;
 	{
 		@synchronized(self)
 		{
+            NSString* typeKey = inType;
+            if (inHighlight && inMappingTable->fHighlightPostfix)
+            {
+                typeKey = [inType stringByAppendingString:inMappingTable->fHighlightPostfix];
+            }
+            
 			NSMutableDictionary* bundleCache = [_iconCache objectForKey:inBundleID];
 			
 			if (bundleCache == nil)
@@ -172,13 +200,17 @@ static IMBIconCache* sSharedIconCache;
 				[_iconCache setObject:bundleCache forKey:inBundleID];
 			}
 
-			image = [bundleCache objectForKey:inType];
+			image = [bundleCache objectForKey:typeKey];
 			
 			if (image == nil)
 			{
-				image = [self __loadIconForType:inType fromBundleID:inBundleID withMappingTable:inMappingTable];
-				if (image) [bundleCache setObject:image forKey:inType];
-				else image = [NSImage imb_sharedGenericFolderIcon];
+				image = [self __loadIconForType:inType
+                                   fromBundleID:inBundleID
+                               withMappingTable:inMappingTable
+                                      highlight:inHighlight];
+                
+				if (image) [bundleCache setObject:image forKey:typeKey];
+				else if(!inHighlight) image = [NSImage imb_sharedGenericFolderIcon];
 			}
 		}
 	}

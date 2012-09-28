@@ -56,6 +56,7 @@
 #import "IMBNodeViewController.h"
 #import "IMBLibraryController.h"
 #import "IMBNode.h"
+#import "NSCell+iMedia.h"
 #import "IMBNodeCell.h"
 #import "IMBTextFieldCell.h"
 
@@ -72,6 +73,21 @@
 @synthesize format = _format;
 
 
+- (void)setFormat:(IMBTableViewFormat *)inFormat
+{
+    if (_format) {
+        _format.tableView = nil;
+    }
+    [_format release];
+    _format = inFormat;
+    [_format retain];
+    
+    if (_format) {
+        _format.tableView = self;
+    }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -80,6 +96,7 @@
 	if (self = [super initWithFrame:inFrame])
 	{
 		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
+        self.format = [self defaultAppearance];
 	}
 	
 	return self;
@@ -91,6 +108,7 @@
 	if (self = [super initWithCoder:inCoder])
 	{
 		_subviewsInVisibleRows = [[NSMutableDictionary alloc] init];
+        self.format = [self defaultAppearance];
 	}
 	
 	return self;
@@ -104,7 +122,12 @@
 	IMBRelease(_subviewsInVisibleRows);
 	IMBRelease(_draggingPrompt);
 	IMBRelease(_textCell);
-	IMBRelease(_format);
+    
+    if (_format)
+    {
+        _format.tableView = nil;
+        IMBRelease(_format);
+    }
  
 	[super dealloc];
 }
@@ -240,42 +263,41 @@
 {
 	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
     
-    IMBTableViewFormat *tableViewFormat = self.format;
-    
 	if ([cell isKindOfClass:[IMBNodeCell class]])
 	{
         IMBNodeCell *nodeCell = (IMBNodeCell *) cell;
+        nodeCell.icon = nodeCell.node.icon;
+        
         if ([nodeCell isGroupCell])
         {
-            if (tableViewFormat && tableViewFormat.groupCellTextColor)
-            {
-                nodeCell.textColor = tableViewFormat.groupCellTextColor;
-            } else {
-                nodeCell.textColor = [NSColor disabledControlTextColor];
+            if (self.sectionHeaderTextAttributes) {
+                [nodeCell imb_setStringValueAttributes:self.sectionHeaderTextAttributes];
             }
-            nodeCell.font = [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]];
         }
         else
         {
+            nodeCell.textColor = [NSColor controlTextColor];
             if ([cell isHighlighted])
             {
-                if (tableViewFormat && tableViewFormat.dataCellTextHighlightColor)
-                {
-                    nodeCell.textColor = tableViewFormat.dataCellTextHighlightColor;
-                } else {
-                    nodeCell.textColor = [NSColor controlTextColor];
+                if (nodeCell.node.highlightIcon) {
+                    nodeCell.icon = nodeCell.node.highlightIcon;
+                }
+                if (self.swapIconAndHighlightIcon) {
+                    nodeCell.icon = nodeCell.node.icon;
+                }
+                if (self.rowTextHighlightAttributes) {
+                    [nodeCell imb_setStringValueAttributes:self.rowTextHighlightAttributes];
                 }
             }
-            else
+            else    // Non-highlighted cell
             {
-                if (tableViewFormat && tableViewFormat.dataCellTextColor)
-                {
-                    nodeCell.textColor = tableViewFormat.dataCellTextColor;
-                } else {
-                    nodeCell.textColor = [NSColor controlTextColor];
+                if (nodeCell.node.highlightIcon && self.swapIconAndHighlightIcon) {
+                    nodeCell.icon = nodeCell.node.highlightIcon;
+                }
+                if (self.rowTextAttributes) {
+                    [nodeCell imb_setStringValueAttributes:self.rowTextAttributes];
                 }
             }
-            nodeCell.font = [NSFont systemFontOfSize:[NSFont systemFontSize]];
         }
 	}
 	return cell;
@@ -415,6 +437,80 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Appearance
+
+- (IMBTableViewFormat*) defaultAppearance
+{
+    IMBTableViewFormat* appearance = [[[IMBTableViewFormat alloc] init] autorelease];
+    
+    appearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                              [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
+                                              [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName,
+                                              nil];
+    
+    appearance.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [NSFont systemFontOfSize:[NSFont systemFontSize]], NSFontAttributeName,
+                                    nil];
+    
+    appearance.rowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [NSFont systemFontOfSize:[NSFont systemFontSize]], NSFontAttributeName,
+                                             nil];
+    
+    return appearance;
+}
+
+// Helper
+
+- (id) appearanceProperty:(SEL)propertyAccessor
+{
+    if (self.format) {
+        return [self.format performSelector:propertyAccessor];
+    }
+    return nil;
+}
+
+- (BOOL) appearanceBooleanProperty:(SEL)propertyAccessor
+{
+    if (self.format) {
+        return (BOOL)[self.format performSelector:propertyAccessor];
+    }
+    return NO;
+}
+
+// Convenience
+
+- (NSDictionary*) rowTextAttributes
+{
+    return (NSDictionary*) [self appearanceProperty:_cmd];
+}
+
+
+// Convenience
+
+- (NSDictionary*) rowTextHighlightAttributes
+{
+    return (NSDictionary*) [self appearanceProperty:_cmd];
+}
+
+
+// Convenience
+
+- (NSDictionary*) sectionHeaderTextAttributes
+{
+    return (NSDictionary*) [self appearanceProperty:_cmd];
+}
+
+
+// Convenience
+
+- (BOOL) swapIconAndHighlightIcon
+{
+    return [self appearanceBooleanProperty:_cmd];
+}
+
 
 
 @end

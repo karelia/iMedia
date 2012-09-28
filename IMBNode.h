@@ -78,6 +78,7 @@
 	// Primary properties...
 
 	NSImage* _icon;
+	NSImage* _highlightIcon;        // Optional. To be used when node is highlighted.
 	NSString* _name;
 	NSString* _identifier;
 	NSString* _mediaType;
@@ -132,6 +133,7 @@
 // Primary properties for a node:
 
 @property (retain) NSImage* icon;					// 16x16 icon for user interface
+@property (retain) NSImage* highlightIcon;			// Optional. To be used when node is highlighted.
 @property (copy) NSString* name;					// Display name for user interface
 @property (copy) NSString* identifier;				// Unique identifier of form parserClassName://path/to/node
 @property (retain) NSString* mediaType;				// See IMBCommon.h

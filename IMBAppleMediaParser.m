@@ -597,7 +597,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 // Returns an icon for an album of this type. Must be subclassed.
 
-- (NSImage*) iconForAlbumType:(NSString*)inType
+- (NSImage*) iconForAlbumType:(NSString*)inType highlight:(BOOL)inHighlight
 {
 	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
@@ -913,7 +913,8 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			
 			subnode.isLeafNode = [self isLeafAlbumType:subNodeType];
-			subnode.icon = [self iconForAlbumType:subNodeType];
+			subnode.icon = [self iconForAlbumType:subNodeType highlight:NO];
+			subnode.highlightIcon = [self iconForAlbumType:subNodeType highlight:YES];
 			subnode.name = subnodeName;
 			subnode.isIncludedInPopup = NO;
 			subnode.watchedPath = inNode.watchedPath;	// These two lines are important to make file watching work for nested 

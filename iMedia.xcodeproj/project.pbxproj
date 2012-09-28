@@ -22,6 +22,9 @@
 
 /* Begin PBXBuildFile section */
 		274DF618114EF0B200AC8C03 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3000ADEC1612F6DA00EDC78E /* IMBTableViewFormat+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADEA1612F6DA00EDC78E /* IMBTableViewFormat+iMediaPrivate.h */; };
+		3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADF716159C2300EDC78E /* NSCell+iMedia.h */; };
+		3000ADFA16159C2300EDC78E /* NSCell+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000ADF816159C2300EDC78E /* NSCell+iMedia.m */; };
 		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		30203EDC153C546900CFE91B /* IMBTestiPhotoEventBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */; };
@@ -541,6 +544,9 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		274DF616114EF0B200AC8C03 /* IMBImageItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBImageItem.h; sourceTree = "<group>"; };
 		274DF617114EF0B200AC8C03 /* IMBImageItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBImageItem.m; sourceTree = "<group>"; };
+		3000ADEA1612F6DA00EDC78E /* IMBTableViewFormat+iMediaPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMBTableViewFormat+iMediaPrivate.h"; sourceTree = "<group>"; };
+		3000ADF716159C2300EDC78E /* NSCell+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCell+iMedia.h"; sourceTree = "<group>"; };
+		3000ADF816159C2300EDC78E /* NSCell+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCell+iMedia.m"; sourceTree = "<group>"; };
 		3016783413B1F435000E57D2 /* IMBTestTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestTextView.h; sourceTree = "<group>"; };
 		3016783513B1F435000E57D2 /* IMBTestTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestTextView.m; sourceTree = "<group>"; };
 		3016792813B225B9000E57D2 /* badge_checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_checkbox.png; sourceTree = "<group>"; };
@@ -1610,6 +1616,7 @@
 			children = (
 				F331802411E6D25D00BDABC2 /* IMBPanel.h */,
 				F331802511E6D25D00BDABC2 /* IMBPanel.m */,
+				3000ADEA1612F6DA00EDC78E /* IMBTableViewFormat+iMediaPrivate.h */,
 				308DEF131609C6CE00F889C8 /* IMBTableViewFormat.h */,
 				308DEF141609C6CE00F889C8 /* IMBTableViewFormat.m */,
 				D099392F101236AB00C527B7 /* IMBOutlineView.h */,
@@ -1696,6 +1703,8 @@
 		D099323410111A1600C527B7 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				30F61B68155D4A4D0092A99C /* NSObject+iMedia.h */,
+				30F61B69155D4A4D0092A99C /* NSObject+iMedia.m */,
 				30FD64641546AF6E0036BDE2 /* NSPasteboard+iMedia.h */,
 				30FD64651546AF6E0036BDE2 /* NSPasteboard+iMedia.m */,
 				D099324310111A2900C527B7 /* NSFileManager+iMedia.h */,
@@ -1710,12 +1719,12 @@
 				D049F0091034993E003CC49C /* NSImage+iMedia.m */,
 				D0363E7A11D3787800E0579F /* NSView+iMedia.h */,
 				D0363E7B11D3787800E0579F /* NSView+iMedia.m */,
+				3000ADF716159C2300EDC78E /* NSCell+iMedia.h */,
+				3000ADF816159C2300EDC78E /* NSCell+iMedia.m */,
 				CE3EC9A0124AAC0700D8435B /* NSURL+iMedia.h */,
 				CE3EC9A1124AAC0700D8435B /* NSURL+iMedia.m */,
 				D0E69CD3151C5989002FE181 /* NSKeyedArchiver+iMedia.h */,
 				D0E69CD4151C5989002FE181 /* NSKeyedArchiver+iMedia.m */,
-				30F61B68155D4A4D0092A99C /* NSObject+iMedia.h */,
-				30F61B69155D4A4D0092A99C /* NSObject+iMedia.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -2079,6 +2088,8 @@
 				3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */,
 				D0DC63F515ECAB9400DAD84E /* IMBAccessRightsController.h in Headers */,
 				D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */,
+				3000ADEC1612F6DA00EDC78E /* IMBTableViewFormat+iMediaPrivate.h in Headers */,
+				3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2734,6 +2745,7 @@
 				D0DC63F815ECC10600DAD84E /* IMBAccessRightsController.m in Sources */,
 				D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */,
 				308DEF161609C6CE00F889C8 /* IMBTableViewFormat.m in Sources */,
+				3000ADFA16159C2300EDC78E /* NSCell+iMedia.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
