@@ -55,4 +55,18 @@
 
 @property (assign, readwrite) NSView *view;
 
+// Customizes appearance of cell according to this object's appearance properties
+
+- (void) prepareCell:(NSCell *)inCell atColumn:(NSInteger)inColumn row:(NSInteger)inRow;
+
+// Draws selected rows with a highlight bar according to -keyWindowHighlightGradient and -nonKeyWindowHighlightGradient.
+// Returns NO if no gradients are set (thus not drawing anything). Returns YES otherwise.
+
+- (BOOL)highlightSelectionInClipRect:(NSRect)theClipRect;
+
+// Draws background colors for rows according to -backgroundColors (re-iterating colors).
+// Returns NO if no background colors are set (thus not drawing anything). Returns YES otherwise.
+
+- (BOOL) drawBackgroundInClipRect:(NSRect)inClipRect;
+
 @end

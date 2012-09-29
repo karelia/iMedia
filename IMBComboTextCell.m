@@ -79,10 +79,8 @@
 
 @synthesize imageRepresentation = _imageRepresentation;
 @synthesize imageRepresentationType = _imageRepresentationType;
-@synthesize title = _title;
 @synthesize subtitle = _subtitle;
 @synthesize badge = _badge;
-@synthesize titleTextAttributes = _titleTextAttributes;
 @synthesize subtitleTextAttributes = _subtitleTextAttributes;
 @synthesize isDisabledFromDragging = _isDisabledFromDragging;
 
@@ -90,75 +88,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Set default text style for title and subtitle...
-
-- (void) initTextAttributes
-{
-	NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
-	[paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
-	
-	NSColor* titleColor = [self textColor];
-	NSColor* metadataColor = [[self textColor] colorWithAlphaComponent:0.4];
-	
-	self.titleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-								 titleColor,NSForegroundColorAttributeName,
-								 [NSFont systemFontOfSize:13.0],NSFontAttributeName,
-								 paragraphStyle,NSParagraphStyleAttributeName,
-								 nil] autorelease];
-	
-	self.subtitleTextAttributes = [[[NSMutableDictionary alloc] initWithObjectsAndKeys:
-									metadataColor,NSForegroundColorAttributeName,
-									[NSFont systemFontOfSize:11.0],NSFontAttributeName,
-									paragraphStyle,NSParagraphStyleAttributeName,
-									nil] autorelease];
-}
-
-
 //----------------------------------------------------------------------------------------------------------------------
-
-
-- (id) initTextCell:(NSString*)inString
-{
-	if (self = [super initTextCell:inString])
-	{
-		[self initTextAttributes];
-	}
-	
-	return self;
-}
-
-
-- (id) initImageCell:(NSImage*)inImage
-{
-	if (self = [super initImageCell:inImage])
-	{
-		[self initTextAttributes];
-	}
-	
-	return self;
-}
-
-
-- (id) initWithCoder:(NSCoder*)inCoder
-{
-	if (self = [super initWithCoder:inCoder])
-	{
-		[self initTextAttributes];
-	}
-	
-	return self;
-}
 
 
 - (void) dealloc
 {
 	IMBRelease(_imageRepresentation);
 	IMBRelease(_imageRepresentationType);
-	IMBRelease(_title);
 	IMBRelease(_subtitle);
-	IMBRelease(_badge);
-	IMBRelease(_titleTextAttributes);
 	IMBRelease(_subtitleTextAttributes);
+	IMBRelease(_badge);
 	
     [super dealloc];
 }
@@ -177,16 +116,13 @@
 	// This is appropriate because NSCopyObject, if called, has blithely copied the bits over without retaining...
 	
 	result->_imageRepresentation = nil;
-	result->_title = nil;
 	result->_subtitle = nil;
-	result->_titleTextAttributes = nil;
 	result->_subtitleTextAttributes = nil;
 	
 	result.imageRepresentation = self.imageRepresentation;
  	result.imageRepresentationType = self.imageRepresentationType;
-	result.title = self.title;
+	result.attributedStringValue = self.attributedStringValue;
 	result.subtitle = self.subtitle;
-	result.titleTextAttributes = self.titleTextAttributes;
 	result.subtitleTextAttributes = self.subtitleTextAttributes;
 	
 	result.isDisabledFromDragging = self.isDisabledFromDragging;
@@ -390,11 +326,9 @@
 	
 	// Draw the title and subtitle...
 	
-	[self initTextAttributes];
-	
-	if (_title)
+	if (self.attributedStringValue)
 	{
-		[_title drawInRect:titleRect withAttributes:_titleTextAttributes];
+		[self.attributedStringValue drawInRect:titleRect];
 	}
 	
 	if (_subtitle)

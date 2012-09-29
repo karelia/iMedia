@@ -54,6 +54,7 @@
 @interface IMBTableViewAppearance : NSObject
 {
     NSView *_view;
+    NSArray *_backgroundColors;
     NSGradient *_keyWindowHighlightGradient;
     NSGradient *_nonKeyWindowHighlightGradient;
     NSDictionary *_rowTextAttributes;
@@ -63,6 +64,7 @@
 }
 
 @property (assign, readonly) NSView *view;
+@property (retain) NSArray *backgroundColors;
 @property (retain) NSGradient *keyWindowHighlightGradient;
 @property (retain) NSGradient *nonKeyWindowHighlightGradient;
 @property (retain) NSDictionary *rowTextAttributes;
@@ -70,4 +72,6 @@
 @property (retain) NSDictionary *sectionHeaderTextAttributes;
 @property BOOL swapIconAndHighlightIcon;
 
+- (NSColor *)backgroundColor;
+- (void) setBackgroundColor:(NSColor *)inColor;
 @end

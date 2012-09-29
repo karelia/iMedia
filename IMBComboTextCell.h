@@ -57,20 +57,15 @@
 {
 	id _imageRepresentation;								
 	NSString* _imageRepresentationType;		
-	NSString* _title;
-	NSString* _subtitle;
 	NSImage* _badge;				// An optional badge probably provided by host application
 	BOOL _isDisabledFromDragging;
 	
-	NSDictionary* _titleTextAttributes;
+	NSString* _subtitle;
 	NSDictionary* _subtitleTextAttributes;
 }
 
 @property (retain) id imageRepresentation;	
 @property (retain) NSString* imageRepresentationType;
-
-@property (retain) NSString* title;
-@property (copy) NSDictionary* titleTextAttributes;
 
 @property (retain) NSString* subtitle;
 @property (copy) NSDictionary* subtitleTextAttributes;

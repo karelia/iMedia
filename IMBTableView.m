@@ -59,6 +59,7 @@
 #import "IMBObjectViewController.h"
 #import "IMBButtonObject.h"
 #import "IMBQLPreviewPanel.h"
+#import "IMBTableViewAppearance+iMediaPrivate.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,14 +77,6 @@ enum IMBMouseOperation
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface NSTableView (NotPublicSoThisMightBeAProblemForTheMAS)
-- (NSColor*) _highlightColorForCell:(NSCell*)inCell;
-@end
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 #pragma mark
 
 @implementation IMBTableView
@@ -92,10 +85,22 @@ enum IMBMouseOperation
 @synthesize clickedObjectIndex = _clickedObjectIndex;
 @synthesize clickedObject = _clickedObject;
 
-@synthesize customBackgroundColors = _customBackgroundColors;
-@synthesize customHighlightColor = _customHighlightColor;
-@synthesize customTextColor = _customTextColor;
-@synthesize customHighlightedTextColor = _customHighlightedTextColor;
+@synthesize imb_Appearance = _appearance;
+
+
+- (void)setImb_Appearance:(IMBTableViewAppearance *)inFormat
+{
+    if (_appearance) {
+        _appearance.view = nil;
+    }
+    [_appearance release];
+    _appearance = inFormat;
+    [_appearance retain];
+    
+    if (_appearance) {
+        _appearance.view = self;
+    }
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -108,6 +113,7 @@ enum IMBMouseOperation
 		_mouseOperation = kMouseOperationNone;
 		_clickedObjectIndex = -1;
 		_clickedObject = nil;
+        self.imb_Appearance = [self defaultAppearance];
 	}
 	
 	return self;
@@ -121,6 +127,7 @@ enum IMBMouseOperation
 		_mouseOperation = kMouseOperationNone;
 		_clickedObjectIndex = -1;
 		_clickedObject = nil;
+        self.imb_Appearance = [self defaultAppearance];
 	}
 	
 	return self;
@@ -131,10 +138,13 @@ enum IMBMouseOperation
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	IMBRelease(_clickedObject);
-	IMBRelease(_customBackgroundColors);
-	IMBRelease(_customHighlightColor);
-	IMBRelease(_customTextColor);
-	IMBRelease(_customHighlightedTextColor);
+
+    if (_appearance)
+    {
+        _appearance.view = nil;
+        IMBRelease(_appearance);
+    }
+    
 	[super dealloc];
 }
 
@@ -143,68 +153,29 @@ enum IMBMouseOperation
 
 
 #pragma mark
-#pragma mark Drawing
+#pragma mark Appearance
 
-#ifndef MAS
-
-// This is a private internal method. If it no longer going to be called, there's no harm in proving an override...
-// It might be possible to actually define this (but not call superclass) if we want to force a custom color.
-
-- (NSColor*) _highlightColorForCell:(NSCell*)inCell
-{
-	NSColor* color = nil;
-	
-	if ([self respondsToSelector:@selector(_highlightColorForCell:)])
-	{
-		color = [super _highlightColorForCell:inCell];
-	}
-
-	if (_customHighlightColor != nil) 
-	{
-		color = self.customHighlightColor; 
-	}
-	
-	return color;
-}
-
-#endif
-
-
-// If we have custom background colors, then draw the alternating row background ourself, otherwise let the 
-// superclass draw Apple's default white & light blue rows...
+// This method is asking us to draw the backgrounds for all rows that are visible inside theClipRect.
+// If possible delegate task to appearance object
 
 - (void) drawBackgroundInClipRect:(NSRect)inClipRect
 {
-	if (_customBackgroundColors != nil)
-	{
-		NSUInteger n = [_customBackgroundColors count];
-		NSUInteger i = 0;
-
-		CGFloat height = self.rowHeight + self.intercellSpacing.height;
-		NSRect clipRect = [self bounds];
-		NSRect drawRect = clipRect;
-		drawRect.origin = NSZeroPoint;
-		drawRect.size.height = height;
-		
-		[[self backgroundColor] set];
-		NSRectFillUsingOperation(inClipRect,NSCompositeSourceOver);
-		
-		while ((NSMinY(drawRect) <= NSHeight(clipRect)))
-		{
-			if (NSIntersectsRect(drawRect,clipRect))
-			{
-				[(NSColor*)[_customBackgroundColors objectAtIndex:i%n] set];
-				NSRectFillUsingOperation(drawRect,NSCompositeSourceOver);
-			}
-			
-			drawRect.origin.y += height;
-			i++;
-		}
-	} 
-	else
-	{
+    if (!self.imb_Appearance || ![self.imb_Appearance drawBackgroundInClipRect:inClipRect])
+    {
 		[super drawBackgroundInClipRect:inClipRect];
-	}
+    }
+}
+
+
+// This method is asking us to draw the hightlights for all of the selected rows that are visible inside theClipRect.
+// If possible delegate task to appearance object
+
+- (void)highlightSelectionInClipRect:(NSRect)inClipRect
+{
+    if (!self.imb_Appearance || ![self.imb_Appearance highlightSelectionInClipRect:inClipRect])
+    {
+        [super highlightSelectionInClipRect:inClipRect];
+    }
 }
 
 
@@ -215,25 +186,17 @@ enum IMBMouseOperation
 {
 	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
 	
-	if ([cell isKindOfClass:[NSTextFieldCell class]])
-	{
-		if ([cell isHighlighted])
-		{
-			if (_customHighlightedTextColor != nil)
-			{
-				[(NSTextFieldCell*)cell setTextColor:_customHighlightedTextColor];
-			}
-		}
-		else
-		{
-			if (_customTextColor != nil)
-			{
-				[(NSTextFieldCell*)cell setTextColor:_customTextColor];
-			}
-		}
-	}
+    if (self.imb_Appearance) {
+        [self.imb_Appearance prepareCell:cell atColumn:inColumn row:inRow];
+    }
 	
 	return cell;
+}
+
+
+- (IMBTableViewAppearance*) defaultAppearance
+{
+    return nil;
 }
 
 

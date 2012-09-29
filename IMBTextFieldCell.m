@@ -62,8 +62,8 @@
 #pragma mark 
 
 @interface IMBTextFieldCell ()
-- (void) drawVerticallyCenteredWithFrame:(NSRect)inFrame inView:(NSView*)inView;
-- (void) drawAtBottomOfCellWithFrame:(NSRect)inFrame inView:(NSView*)inView;
+//- (void) drawVerticallyCenteredWithFrame:(NSRect)inFrame inView:(NSView*)inView;
+//- (void) drawAtBottomOfCellWithFrame:(NSRect)inFrame inView:(NSView*)inView;
 @end
 
 
@@ -154,16 +154,11 @@
 }
 
 
+// Must return nil so that sub-cells do not exercise their own highlighting
+
 - (NSColor*) highlightColorWithFrame:(NSRect)inFrame inView:(NSView*)inView
 {
-	NSColor* color = [super highlightColorWithFrame:inFrame inView:inView];
-	
-	if ([inView respondsToSelector:@selector(customHighlightColor)])
-	{
-		color = [(IMBTableView*)inView customHighlightColor];
-	}
-	
-	return color;
+    return nil;
 }
 
 

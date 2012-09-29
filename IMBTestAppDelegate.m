@@ -59,12 +59,14 @@
 #import <iMedia/IMBiPhotoEventObjectViewController.h>
 #import <iMedia/IMBFaceObjectViewController.h>
 #import <iMedia/IMBOutlineView.h>
+#import <iMedia/IMBTableView.h>
 #import <iMedia/NSImage+iMedia.h>
 #import "IMBTestiPhotoEventBrowserCell.h"
 #import "IMBTestFaceBrowserCell.h"
 #import "IMBTestFacesBackgroundLayer.h"
 #import "IMBAccessRightsController.h"
 #import "IMBTableViewAppearance.h"
+#import "IMBComboTableViewAppearance.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,7 +77,7 @@
 #define LOG_PARSERS 0
 #define LOG_CREATE_NODE 0
 #define LOG_POPULATE_NODE 0
-#define CUSTOM_USER_INTERFACE 1
+#define CUSTOM_USER_INTERFACE 0
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -537,6 +539,77 @@
 		
 		[iconView setValue:[IMBTestFaceBrowserCell titleAttributes] forKey:IKImageBrowserCellsTitleAttributesKey];
 	}
+    
+#if CUSTOM_USER_INTERFACE
+    
+    IMBObjectViewController* ovc = inController;
+    
+    // Setup custom appearance on object views
+    
+    NSGradient* keyWindowHighlightGradient =
+    [[[NSGradient alloc] initWithColorsAndLocations:
+      [NSColor colorWithDeviceWhite:(float)200/255 alpha:1.0], 0.0,
+      [NSColor colorWithDeviceWhite:(float)230/255 alpha:1.0], 1.0, nil] autorelease];
+    
+    NSGradient* nonKeyWindowHighlightGradient =
+    [[[NSGradient alloc] initWithColorsAndLocations:
+      [NSColor colorWithDeviceWhite:(float)180/255 alpha:1.0], 0.0,
+      [NSColor colorWithDeviceWhite:(float)210/255 alpha:1.0], 1.0, nil] autorelease];
+    
+    NSDictionary* rowTextAttributes =
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     [NSColor colorWithDeviceWhite:(float)240/255 alpha:1.0], NSForegroundColorAttributeName,
+     [NSFont fontWithName:@"Lucida Grande" size:12], NSFontAttributeName,
+     nil];
+    
+    NSDictionary* rowTextHighlightAttributes =
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     [NSColor colorWithDeviceWhite:(float)60/255 alpha:1.0], NSForegroundColorAttributeName,
+     [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
+     nil];
+    
+    NSDictionary* subRowTextAttributes =
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     [NSColor colorWithDeviceWhite:(float)240/255 alpha:0.4], NSForegroundColorAttributeName,
+     [NSFont fontWithName:@"Lucida Grande" size:12], NSFontAttributeName,
+     nil];
+    
+    NSDictionary* subRowTextHighlightAttributes =
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     [NSColor colorWithDeviceWhite:(float)60/255 alpha:0.4], NSForegroundColorAttributeName,
+     [NSFont fontWithName:@"Lucida Grande" size:11], NSFontAttributeName,
+     nil];
+    
+    NSArray* backgroundColors =
+    [NSArray arrayWithObjects:
+     [NSColor colorWithDeviceWhite:(float)140/255 alpha:1.0],
+     [NSColor colorWithDeviceWhite:(float)135/255 alpha:1.0], nil];
+    
+    void(^setAppearance)(NSView*, Class) = ^(NSView* inView, Class inAppearanceClass) {
+        if ([inView isKindOfClass:[IMBTableView class]])
+        {
+            IMBTableView *tableView = (IMBTableView *)inView;
+            
+            IMBTableViewAppearance* appearance = [[[inAppearanceClass alloc] init] autorelease];
+            tableView.imb_Appearance = appearance;
+            
+            appearance.keyWindowHighlightGradient = keyWindowHighlightGradient;
+            appearance.nonKeyWindowHighlightGradient = nonKeyWindowHighlightGradient;
+            appearance.rowTextAttributes = rowTextAttributes;
+            appearance.rowTextHighlightAttributes = rowTextHighlightAttributes;
+            appearance.backgroundColors = backgroundColors;
+            
+            if ([appearance isKindOfClass:[IMBComboTableViewAppearance class]]) {
+                ((IMBComboTableViewAppearance*)appearance).subRowTextAttributes = subRowTextAttributes;
+                ((IMBComboTableViewAppearance*)appearance).subRowTextHighlightAttributes = subRowTextHighlightAttributes;
+            }
+        }
+    };
+    setAppearance(ovc.listView, [IMBTableViewAppearance class]);
+    setAppearance(ovc.comboView, [IMBComboTableViewAppearance class]);
+    
+#endif
+    
 }
 
 

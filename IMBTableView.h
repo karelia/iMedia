@@ -53,6 +53,7 @@
 #pragma mark CLASSES
 
 @class IMBObject;
+@class IMBTableViewAppearance;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,21 +65,14 @@
 	NSInteger _clickedObjectIndex;
 	IMBObject* _clickedObject;
 	
-	NSArray* _customBackgroundColors;
-	NSColor* _customHighlightColor;
-	NSColor* _customTextColor;
-	NSColor* _customHighlightedTextColor;
-}	
-
+    IMBTableViewAppearance *_appearance;
+}
 
 @property (assign) NSInteger mouseOperation;
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
 
-@property (retain) NSArray* customBackgroundColors;
-@property (retain) NSColor* customHighlightColor;
-@property (retain) NSColor* customTextColor;
-@property (retain) NSColor* customHighlightedTextColor;
+@property (retain) IMBTableViewAppearance *imb_Appearance; // Note that there is already -appearance on NSView (private)
 
 @end
 

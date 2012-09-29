@@ -54,6 +54,7 @@
 */
 
 #import "IMBComboTableView.h"
+#import "IMBComboTableViewAppearance.h"
 #import "IMBComboTextCell.h"
 
 
@@ -74,74 +75,110 @@
 // If we are using custom background and highlight colors, we may have to adjust the text colors accordingly,
 // to make sure that text is always clearly readable...
 
-- (NSCell*) preparedCellAtColumn:(NSInteger)inColumn row:(NSInteger)inRow
-{
-	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
-	IMBComboTextCell* comboCell = (IMBComboTextCell*)cell;
-	NSMutableDictionary* attributes;
-	NSMutableParagraphStyle* style;
-	
-	if ([cell isKindOfClass:[IMBComboTextCell class]])
-	{
-		if ([comboCell isHighlighted])
-		{
-			if (_customHighlightedTextColor != nil)
-			{
-				style = [[NSMutableParagraphStyle alloc] init];
-				[style setLineBreakMode:NSLineBreakByTruncatingTail];
-
-				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-					_customHighlightedTextColor,NSForegroundColorAttributeName,
-					[NSFont systemFontOfSize:13.0],NSFontAttributeName,
-					style,NSParagraphStyleAttributeName,
-					nil];
-				comboCell.titleTextAttributes = attributes;
-				[attributes release];
-				
-				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-					[_customHighlightedTextColor colorWithAlphaComponent:0.5],NSForegroundColorAttributeName,
-					[NSFont systemFontOfSize:11.0],NSFontAttributeName,
-					style,NSParagraphStyleAttributeName,
-					nil];
-				comboCell.subtitleTextAttributes = attributes;
-				[attributes release];
-					
-				[style release];	
-			}
-		}
-		else
-		{
-			if (_customTextColor != nil)
-			{
-				style = [[NSMutableParagraphStyle alloc] init];
-				[style setLineBreakMode:NSLineBreakByTruncatingTail];
-
-				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-					_customTextColor,NSForegroundColorAttributeName,
-					[NSFont systemFontOfSize:13.0],NSFontAttributeName,
-					style,NSParagraphStyleAttributeName,
-					nil];
-				comboCell.titleTextAttributes = attributes;
-				[attributes release];
-
-				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-					[_customTextColor colorWithAlphaComponent:0.5],NSForegroundColorAttributeName,
-					[NSFont systemFontOfSize:11.0],NSFontAttributeName,
-					style,NSParagraphStyleAttributeName,
-					nil];
-				comboCell.subtitleTextAttributes = attributes;
-				[attributes release];
-					
-				[style release];	
-			}
-		}
-	}
-	
-	return cell;
-}
+//- (NSCell*) preparedCellAtColumn:(NSInteger)inColumn row:(NSInteger)inRow
+//{
+//	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
+//	IMBComboTextCell* comboCell = (IMBComboTextCell*)cell;
+//	NSMutableDictionary* attributes;
+//	NSMutableParagraphStyle* style;
+//	
+//	if ([cell isKindOfClass:[IMBComboTextCell class]])
+//	{
+//		if ([comboCell isHighlighted])
+//		{
+//			if (_customHighlightedTextColor != nil)
+//			{
+//				style = [[NSMutableParagraphStyle alloc] init];
+//				[style setLineBreakMode:NSLineBreakByTruncatingTail];
+//
+//				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+//					_customHighlightedTextColor,NSForegroundColorAttributeName,
+//					[NSFont systemFontOfSize:13.0],NSFontAttributeName,
+//					style,NSParagraphStyleAttributeName,
+//					nil];
+//				comboCell.titleTextAttributes = attributes;
+//				[attributes release];
+//				
+//				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+//					[_customHighlightedTextColor colorWithAlphaComponent:0.5],NSForegroundColorAttributeName,
+//					[NSFont systemFontOfSize:11.0],NSFontAttributeName,
+//					style,NSParagraphStyleAttributeName,
+//					nil];
+//				comboCell.subtitleTextAttributes = attributes;
+//				[attributes release];
+//					
+//				[style release];	
+//			}
+//		}
+//		else
+//		{
+//			if (_customTextColor != nil)
+//			{
+//				style = [[NSMutableParagraphStyle alloc] init];
+//				[style setLineBreakMode:NSLineBreakByTruncatingTail];
+//
+//				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+//					_customTextColor,NSForegroundColorAttributeName,
+//					[NSFont systemFontOfSize:13.0],NSFontAttributeName,
+//					style,NSParagraphStyleAttributeName,
+//					nil];
+//				comboCell.titleTextAttributes = attributes;
+//				[attributes release];
+//
+//				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+//					[_customTextColor colorWithAlphaComponent:0.5],NSForegroundColorAttributeName,
+//					[NSFont systemFontOfSize:11.0],NSFontAttributeName,
+//					style,NSParagraphStyleAttributeName,
+//					nil];
+//				comboCell.subtitleTextAttributes = attributes;
+//				[attributes release];
+//					
+//				[style release];	
+//			}
+//		}
+//	}
+//	
+//	return cell;
+//}
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark
+#pragma mark Appearance
+
+- (IMBTableViewAppearance*) defaultAppearance
+{
+    IMBComboTableViewAppearance* appearance = [[[IMBComboTableViewAppearance alloc] init] autorelease];
+    
+    NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+    [paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
+    
+    appearance.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [NSFont systemFontOfSize:13.0],NSFontAttributeName,
+                                    paragraphStyle,NSParagraphStyleAttributeName,
+                                    nil];
+    
+    appearance.rowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [NSFont systemFontOfSize:13.0],NSFontAttributeName,
+                                             [NSColor selectedMenuItemTextColor], NSForegroundColorAttributeName,
+                                             paragraphStyle,NSParagraphStyleAttributeName,
+                                             nil];
+    
+    appearance.subRowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [NSFont systemFontOfSize:11.0],NSFontAttributeName,
+                                       [[NSColor textColor] colorWithAlphaComponent:0.4], NSForegroundColorAttributeName,
+                                       paragraphStyle,NSParagraphStyleAttributeName,
+                                    nil];
+    
+    appearance.subRowTextHighlightAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                [NSFont systemFontOfSize:11.0],NSFontAttributeName,
+                                                [[NSColor selectedMenuItemTextColor] colorWithAlphaComponent:0.4], NSForegroundColorAttributeName,
+                                                paragraphStyle,NSParagraphStyleAttributeName,
+                                             nil];
+    
+   return appearance;
+}
 
 
 @end

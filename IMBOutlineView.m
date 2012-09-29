@@ -205,54 +205,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method is asking us to draw the hightlights for
-// all of the selected rows that are visible inside theClipRect
+// This method is asking us to draw the backgrounds for all rows that are visible inside theClipRect.
+// If possible delegate task to appearance object
 
-// 1. get the range of row indexes that are currently visible
-// 2. get a list of selected rows
-// 3. iterate over the visible rows and if their index is selected
-// 4. draw our custom highlight in the rect of that row.
-
-- (void)highlightSelectionInClipRect:(NSRect)theClipRect
+- (void) drawBackgroundInClipRect:(NSRect)inClipRect
 {
-    if (!self.imb_Appearance || !self.imb_Appearance.keyWindowHighlightGradient || !self.imb_Appearance.nonKeyWindowHighlightGradient)
+    if (!self.imb_Appearance || ![self.imb_Appearance drawBackgroundInClipRect:inClipRect])
     {
-        [super highlightSelectionInClipRect:theClipRect];
-        return;
+		[super drawBackgroundInClipRect:inClipRect];
     }
-    IMBTableViewAppearance *tableViewFormat = self.imb_Appearance;
-    
-    NSRange         aVisibleRowIndexes = [self rowsInRect:theClipRect];
-    NSIndexSet *    aSelectedRowIndexes = [self selectedRowIndexes];
-    int             aRow = aVisibleRowIndexes.location;
-    int             anEndRow = aRow + aVisibleRowIndexes.length;
-    NSGradient *    gradient;
-    NSColor *       pathColor;
-    
-    // if the view is focused, use highlight color, otherwise use the out-of-focus highlight color
-    if (self == [[self window] firstResponder] && [[self window] isMainWindow] && [[self window] isKeyWindow])
+}
+
+
+// This method is asking us to draw the hightlights for all of the selected rows that are visible inside theClipRect.
+// If possible delegate task to appearance object
+
+- (void)highlightSelectionInClipRect:(NSRect)inClipRect
+{
+    if (!self.imb_Appearance || ![self.imb_Appearance highlightSelectionInClipRect:inClipRect])
     {
-        gradient = tableViewFormat.keyWindowHighlightGradient;
-    }
-    else
-    {
-        gradient = tableViewFormat.nonKeyWindowHighlightGradient;
-    }
-    pathColor = [gradient interpolatedColorAtLocation:1.0];
-    
-    // draw highlight for the visible, selected rows
-    for (; aRow < anEndRow; aRow++)
-    {
-        if([aSelectedRowIndexes containsIndex:aRow])
-        {
-            NSRect aRowRect = NSInsetRect([self rectOfRow:aRow], 0, 1); //first is horizontal, second is vertical
-            NSBezierPath * path = [NSBezierPath bezierPathWithRoundedRect:aRowRect xRadius:0.0 yRadius:0.0]; //6.0
-            [path setLineWidth: 2];
-            [pathColor set];
-            [path stroke];
-            
-            [gradient drawInBezierPath:path angle:90];
-        }
+        [super highlightSelectionInClipRect:inClipRect];
     }
 }
 
@@ -263,44 +235,11 @@
 - (NSCell*) preparedCellAtColumn:(NSInteger)inColumn row:(NSInteger)inRow
 {
 	NSCell* cell = [super preparedCellAtColumn:inColumn row:inRow];
-    
-	if ([cell isKindOfClass:[IMBNodeCell class]])
-	{
-        IMBNodeCell *nodeCell = (IMBNodeCell *) cell;
-        nodeCell.icon = nodeCell.node.icon;
-        
-        if ([nodeCell isGroupCell])
-        {
-            if (self.sectionHeaderTextAttributes) {
-                [nodeCell imb_setStringValueAttributes:self.sectionHeaderTextAttributes];
-            }
-        }
-        else
-        {
-            nodeCell.textColor = [NSColor controlTextColor];
-            if ([cell isHighlighted])
-            {
-                if (nodeCell.node.highlightIcon) {
-                    nodeCell.icon = nodeCell.node.highlightIcon;
-                }
-                if (self.swapIconAndHighlightIcon) {
-                    nodeCell.icon = nodeCell.node.icon;
-                }
-                if (self.rowTextHighlightAttributes) {
-                    [nodeCell imb_setStringValueAttributes:self.rowTextHighlightAttributes];
-                }
-            }
-            else    // Non-highlighted cell
-            {
-                if (nodeCell.node.highlightIcon && self.swapIconAndHighlightIcon) {
-                    nodeCell.icon = nodeCell.node.highlightIcon;
-                }
-                if (self.rowTextAttributes) {
-                    [nodeCell imb_setStringValueAttributes:self.rowTextAttributes];
-                }
-            }
-        }
-	}
+	
+    if (self.imb_Appearance) {
+        [self.imb_Appearance prepareCell:cell atColumn:inColumn row:inRow];
+    }
+	
 	return cell;
 }
 
@@ -462,56 +401,6 @@
     
     return appearance;
 }
-
-// Helper
-
-- (id) appearanceProperty:(SEL)propertyAccessor
-{
-    if (self.imb_Appearance) {
-        return [self.imb_Appearance performSelector:propertyAccessor];
-    }
-    return nil;
-}
-
-- (BOOL) appearanceBooleanProperty:(SEL)propertyAccessor
-{
-    if (self.imb_Appearance) {
-        return (BOOL)[self.imb_Appearance performSelector:propertyAccessor];
-    }
-    return NO;
-}
-
-// Convenience
-
-- (NSDictionary*) rowTextAttributes
-{
-    return (NSDictionary*) [self appearanceProperty:_cmd];
-}
-
-
-// Convenience
-
-- (NSDictionary*) rowTextHighlightAttributes
-{
-    return (NSDictionary*) [self appearanceProperty:_cmd];
-}
-
-
-// Convenience
-
-- (NSDictionary*) sectionHeaderTextAttributes
-{
-    return (NSDictionary*) [self appearanceProperty:_cmd];
-}
-
-
-// Convenience
-
-- (BOOL) swapIconAndHighlightIcon
-{
-    return [self appearanceBooleanProperty:_cmd];
-}
-
 
 
 @end

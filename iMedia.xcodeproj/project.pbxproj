@@ -25,6 +25,8 @@
 		3000ADEC1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADEA1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h */; };
 		3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADF716159C2300EDC78E /* NSCell+iMedia.h */; };
 		3000ADFA16159C2300EDC78E /* NSCell+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000ADF816159C2300EDC78E /* NSCell+iMedia.m */; };
+		3000AE011617288200EDC78E /* IMBComboTableViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADFF1617288000EDC78E /* IMBComboTableViewAppearance.h */; };
+		3000AE021617288200EDC78E /* IMBComboTableViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000AE001617288100EDC78E /* IMBComboTableViewAppearance.m */; };
 		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		30203EDC153C546900CFE91B /* IMBTestiPhotoEventBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */; };
@@ -547,6 +549,8 @@
 		3000ADEA1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMBTableViewAppearance+iMediaPrivate.h"; sourceTree = "<group>"; };
 		3000ADF716159C2300EDC78E /* NSCell+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSCell+iMedia.h"; sourceTree = "<group>"; };
 		3000ADF816159C2300EDC78E /* NSCell+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSCell+iMedia.m"; sourceTree = "<group>"; };
+		3000ADFF1617288000EDC78E /* IMBComboTableViewAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBComboTableViewAppearance.h; sourceTree = "<group>"; };
+		3000AE001617288100EDC78E /* IMBComboTableViewAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBComboTableViewAppearance.m; sourceTree = "<group>"; };
 		3016783413B1F435000E57D2 /* IMBTestTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestTextView.h; sourceTree = "<group>"; };
 		3016783513B1F435000E57D2 /* IMBTestTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestTextView.m; sourceTree = "<group>"; };
 		3016792813B225B9000E57D2 /* badge_checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_checkbox.png; sourceTree = "<group>"; };
@@ -1619,6 +1623,8 @@
 				3000ADEA1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h */,
 				308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */,
 				308DEF141609C6CE00F889C8 /* IMBTableViewAppearance.m */,
+				3000ADFF1617288000EDC78E /* IMBComboTableViewAppearance.h */,
+				3000AE001617288100EDC78E /* IMBComboTableViewAppearance.m */,
 				D099392F101236AB00C527B7 /* IMBOutlineView.h */,
 				D0993930101236AB00C527B7 /* IMBOutlineView.m */,
 				D049EF5310346C1C003CC49C /* IMBNodeCell.h */,
@@ -2090,6 +2096,7 @@
 				D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */,
 				3000ADEC1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h in Headers */,
 				3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */,
+				3000AE011617288200EDC78E /* IMBComboTableViewAppearance.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2746,6 +2753,7 @@
 				D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */,
 				308DEF161609C6CE00F889C8 /* IMBTableViewAppearance.m in Sources */,
 				3000ADFA16159C2300EDC78E /* NSCell+iMedia.m in Sources */,
+				3000AE021617288200EDC78E /* IMBComboTableViewAppearance.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
