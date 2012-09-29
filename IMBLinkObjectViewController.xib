@@ -279,7 +279,7 @@
 															</object>
 															<string key="NSFrameSize">{406, 472}</string>
 															<reference key="NSSuperview" ref="666718852"/>
-															<reference key="NSNextKeyView" ref="541187350"/>
+															<reference key="NSNextKeyView" ref="454630173"/>
 															<bool key="NSViewWantsBestResolutionOpenGLSurface">YES</bool>
 															<bool key="constrainsToOriginalSize">YES</bool>
 															<bool key="cellsHaveSubtitle">NO</bool>
@@ -338,7 +338,7 @@
 											</object>
 											<string key="NSFrame">{{-1, 0}, {409, 474}}</string>
 											<reference key="NSSuperview" ref="842547720"/>
-											<reference key="NSNextKeyView" ref="454630173"/>
+											<reference key="NSNextKeyView" ref="666718852"/>
 											<int key="NSsFlags">133138</int>
 											<reference key="NSVScroller" ref="541187350"/>
 											<reference key="NSHScroller" ref="454630173"/>
@@ -517,7 +517,7 @@
 													<string key="NSFrame">{{392, 1}, {16, 472}}</string>
 													<reference key="NSSuperview" ref="1016361311"/>
 													<reference key="NSWindow"/>
-													<reference key="NSNextKeyView" ref="565099908"/>
+													<reference key="NSNextKeyView"/>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<reference key="NSTarget" ref="1016361311"/>
 													<string key="NSAction">_doScroller:</string>
@@ -651,7 +651,6 @@
 													<int key="NSvFlags">256</int>
 													<string key="NSFrame">{{391, 1}, {16, 472}}</string>
 													<reference key="NSSuperview" ref="522911762"/>
-													<reference key="NSNextKeyView" ref="74501851"/>
 													<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 													<reference key="NSTarget" ref="522911762"/>
 													<string key="NSAction">_doScroller:</string>
@@ -766,6 +765,7 @@
 						<string key="NSFrame">{{278, 8}, {118, 19}}</string>
 						<reference key="NSSuperview" ref="818174058"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSearchFieldCell" key="NSCell" id="928480503">
 							<int key="NSCellFlags">342884416</int>
@@ -1550,6 +1550,7 @@
 					<string>699.IBPluginDependency</string>
 					<string>700.IBPluginDependency</string>
 					<string>701.IBPluginDependency</string>
+					<string>702.CustomClassName</string>
 					<string>702.IBPluginDependency</string>
 					<string>703.IBPluginDependency</string>
 					<string>704.IBPluginDependency</string>
@@ -1595,6 +1596,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>IMBTextFieldCell</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1625,52 +1627,6 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">IKImageBrowserView</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_dataSource</string>
-							<string>_delegate</string>
-							<string>_dragDestinationDelegate</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>_dataSource</string>
-							<string>_delegate</string>
-							<string>_dragDestinationDelegate</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_dataSource</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_delegate</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">_dragDestinationDelegate</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/IKImageBrowserView.h</string>
-					</object>
-				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">IMBComboTableView</string>
 					<string key="superclassName">IMBDynamicTableView</string>
@@ -1706,17 +1662,6 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">IMBLinkObjectViewController</string>
 					<string key="superclassName">IMBObjectViewController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">quicklook:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">quicklook:</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">quicklook:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/IMBLinkObjectViewController.h</string>
@@ -1907,6 +1852,14 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">./Classes/IMBTableView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">IMBTextFieldCell</string>
+					<string key="superclassName">NSTextFieldCell</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBProjectSource</string>
+						<string key="minorKey">./Classes/IMBTextFieldCell.h</string>
 					</object>
 				</object>
 			</object>
