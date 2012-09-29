@@ -116,6 +116,7 @@
 	// This is appropriate because NSCopyObject, if called, has blithely copied the bits over without retaining...
 	
 	result->_imageRepresentation = nil;
+	result->_imageRepresentationType = nil;
 	result->_subtitle = nil;
 	result->_subtitleTextAttributes = nil;
 	
