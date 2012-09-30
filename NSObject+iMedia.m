@@ -53,6 +53,13 @@
 
 @implementation NSObject (iMedia)
 
+
+- (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason
+{
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:inReason userInfo:nil] raise];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // Throws a "must subclass" exception.
 // Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.

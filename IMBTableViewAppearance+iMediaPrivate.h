@@ -53,8 +53,6 @@
 
 @interface IMBTableViewAppearance ()
 
-@property (assign, readwrite) NSView *view;
-
 // Customizes appearance of cell according to this object's appearance properties
 
 - (void) prepareCell:(NSCell *)inCell atColumn:(NSInteger)inColumn row:(NSInteger)inRow;

@@ -88,18 +88,17 @@ enum IMBMouseOperation
 @synthesize imb_Appearance = _appearance;
 
 
-- (void)setImb_Appearance:(IMBTableViewAppearance *)inFormat
+- (void)setImb_Appearance:(IMBTableViewAppearance *)inAppearance
 {
+    if (_appearance == inAppearance) {
+        return;
+    }
     if (_appearance) {
-        _appearance.view = nil;
+        [_appearance unsetView];
     }
     [_appearance release];
-    _appearance = inFormat;
+    _appearance = inAppearance;
     [_appearance retain];
-    
-    if (_appearance) {
-        _appearance.view = self;
-    }
 }
 
 
@@ -141,7 +140,7 @@ enum IMBMouseOperation
 
     if (_appearance)
     {
-        _appearance.view = nil;
+        [_appearance unsetView];
         IMBRelease(_appearance);
     }
     

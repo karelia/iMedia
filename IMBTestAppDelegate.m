@@ -174,9 +174,8 @@
     
     IMBOutlineView* outlineView = self.nodeViewController.nodeOutlineView;
     
-    IMBTableViewAppearance* tableViewAppearance = [[[IMBTableViewAppearance alloc] init] autorelease];
-    
-    outlineView.imb_Appearance = tableViewAppearance;
+    IMBTableViewAppearance* tableViewAppearance =
+    [[[IMBTableViewAppearance alloc] initWithView:outlineView] autorelease];
     
     tableViewAppearance.keyWindowHighlightGradient =
     [[[NSGradient alloc] initWithColorsAndLocations:
@@ -590,8 +589,8 @@
         {
             IMBTableView *tableView = (IMBTableView *)inView;
             
-            IMBTableViewAppearance* appearance = [[[inAppearanceClass alloc] init] autorelease];
-            tableView.imb_Appearance = appearance;
+            IMBTableViewAppearance* appearance =
+            [[[inAppearanceClass alloc] initWithView:tableView] autorelease];
             
             appearance.keyWindowHighlightGradient = keyWindowHighlightGradient;
             appearance.nonKeyWindowHighlightGradient = nonKeyWindowHighlightGradient;

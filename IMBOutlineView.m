@@ -73,19 +73,17 @@
 @synthesize textCell = _textCell;
 @synthesize imb_Appearance = _appearance;
 
-
-- (void)setImb_Appearance:(IMBTableViewAppearance *)inFormat
+- (void)setImb_Appearance:(IMBTableViewAppearance *)inAppearance
 {
+    if (_appearance == inAppearance) {
+        return;
+    }
     if (_appearance) {
-        _appearance.view = nil;
+        [_appearance unsetView];
     }
     [_appearance release];
-    _appearance = inFormat;
+    _appearance = inAppearance;
     [_appearance retain];
-    
-    if (_appearance) {
-        _appearance.view = self;
-    }
 }
 
 
@@ -126,7 +124,7 @@
     
     if (_appearance)
     {
-        _appearance.view = nil;
+        [_appearance unsetView];
         IMBRelease(_appearance);
     }
  
@@ -384,7 +382,7 @@
 
 - (IMBTableViewAppearance*) defaultAppearance
 {
-    IMBTableViewAppearance* appearance = [[[IMBTableViewAppearance alloc] init] autorelease];
+    IMBTableViewAppearance* appearance = [[[IMBTableViewAppearance alloc] initWithView:self] autorelease];
     
     appearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                               [NSColor disabledControlTextColor], NSForegroundColorAttributeName,

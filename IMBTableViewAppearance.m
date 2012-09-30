@@ -57,7 +57,6 @@
 
 @implementation IMBTableViewAppearance
 
-@synthesize view = _view;
 @synthesize backgroundColors = _backgroundColors;
 @synthesize keyWindowHighlightGradient = _keyWindowHighlightGradient;
 @synthesize nonKeyWindowHighlightGradient = _nonKeyWindowHighlightGradient;
@@ -77,40 +76,6 @@
     IMBRelease(_sectionHeaderTextAttributes);
     
     [super dealloc];
-}
-
-
-- (void) invalidateFormat
-{
-    if (self.view)
-    {
-        [self.view setNeedsDisplay:YES];
-    }
-}
-
-
-- (NSColor *)backgroundColor
-{
-    if (self.view && [self.view respondsToSelector:@selector(setBackgroundColor:)])
-    {
-        NSTableView *tableView = (NSTableView *)self.view;
-        return [tableView backgroundColor];
-    }
-return nil;
-}
-
-
-- (void) setBackgroundColor:(NSColor *)inColor
-{
-    if (self.view && [self.view respondsToSelector:@selector(setBackgroundColor:)])
-    {
-        NSTableView *tableView = (NSTableView *)self.view;
-        [tableView setBackgroundColor:inColor];
-        if (inColor) {
-            tableView.usesAlternatingRowBackgroundColors = NO;
-        }
-    }
-    [self invalidateFormat];
 }
 
 

@@ -149,7 +149,7 @@
 
 - (IMBTableViewAppearance*) defaultAppearance
 {
-    IMBComboTableViewAppearance* appearance = [[[IMBComboTableViewAppearance alloc] init] autorelease];
+    IMBComboTableViewAppearance* appearance = [[[IMBComboTableViewAppearance alloc] initWithView:self] autorelease];
     
     NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
     [paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];

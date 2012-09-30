@@ -50,10 +50,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #import <Foundation/Foundation.h>
+#import "IMBViewAppearance+iMediaPrivate.h"
 
-@interface IMBTableViewAppearance : NSObject
+@interface IMBTableViewAppearance : IMBViewAppearance
 {
-    NSView *_view;
     NSArray *_backgroundColors;
     NSGradient *_keyWindowHighlightGradient;
     NSGradient *_nonKeyWindowHighlightGradient;
@@ -63,7 +63,6 @@
     BOOL _swapIconAndHighlightIcon;
 }
 
-@property (assign, readonly) NSView *view;
 @property (retain) NSArray *backgroundColors;
 @property (retain) NSGradient *keyWindowHighlightGradient;
 @property (retain) NSGradient *nonKeyWindowHighlightGradient;
@@ -72,6 +71,4 @@
 @property (retain) NSDictionary *sectionHeaderTextAttributes;
 @property BOOL swapIconAndHighlightIcon;
 
-- (NSColor *)backgroundColor;
-- (void) setBackgroundColor:(NSColor *)inColor;
 @end

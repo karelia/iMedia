@@ -66,7 +66,7 @@
 
 @property (retain) NSString* draggingPrompt;
 @property (retain) IMBTextFieldCell* textCell;
-@property (retain) IMBTableViewAppearance *imb_Appearance; // Note that there is already -appearance on NSView (private)
+@property (readonly) IMBTableViewAppearance *imb_Appearance;
 
 - (IMBNode*) nodeAtRow:(NSInteger)inRow;
 - (NSRect) badgeRectForRow:(NSInteger)inRow;
