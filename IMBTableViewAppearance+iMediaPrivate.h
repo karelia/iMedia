@@ -49,6 +49,7 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#import "IMBViewAppearance+iMediaPrivate.h"
 #import "IMBTableViewAppearance.h"
 
 @interface IMBTableViewAppearance ()

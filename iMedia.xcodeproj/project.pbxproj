@@ -27,7 +27,7 @@
 		3000ADFA16159C2300EDC78E /* NSCell+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000ADF816159C2300EDC78E /* NSCell+iMedia.m */; };
 		3000AE011617288200EDC78E /* IMBComboTableViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000ADFF1617288000EDC78E /* IMBComboTableViewAppearance.h */; };
 		3000AE021617288200EDC78E /* IMBComboTableViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000AE001617288100EDC78E /* IMBComboTableViewAppearance.m */; };
-		3000AE1F1617AE2200EDC78E /* IMBViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE1D1617AE1F00EDC78E /* IMBViewAppearance.h */; };
+		3000AE1F1617AE2200EDC78E /* IMBViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE1D1617AE1F00EDC78E /* IMBViewAppearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3000AE201617AE2200EDC78E /* IMBViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000AE1E1617AE2000EDC78E /* IMBViewAppearance.m */; };
 		3000AE231618150D00EDC78E /* IMBViewAppearance+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE211618150A00EDC78E /* IMBViewAppearance+iMediaPrivate.h */; };
 		3000AE26161816CD00EDC78E /* IMBOutlineView+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE25161816CC00EDC78E /* IMBOutlineView+iMediaPrivate.h */; };
@@ -2073,6 +2073,7 @@
 				D054AFEA152984C300EBFA1C /* IMBGarageBandParserMessenger.h in Headers */,
 				D0904DA8152CA51F003FDD08 /* IMBFileSystemObserver.h in Headers */,
 				303FFD6A152CBC3B0026B8CF /* IMBSkimmableObject.h in Headers */,
+				3000AE1F1617AE2200EDC78E /* IMBViewAppearance.h in Headers */,
 				303FFD76152CBD000026B8CF /* IMBFaceNodeObject.h in Headers */,
 				D0904DF6152D7478003FDD08 /* IMBSafariParserMessenger.h in Headers */,
 				D0904E07152D936C003FDD08 /* IMBLinkObject.h in Headers */,
@@ -2109,7 +2110,6 @@
 				3000ADEC1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h in Headers */,
 				3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */,
 				3000AE011617288200EDC78E /* IMBComboTableViewAppearance.h in Headers */,
-				3000AE1F1617AE2200EDC78E /* IMBViewAppearance.h in Headers */,
 				3000AE231618150D00EDC78E /* IMBViewAppearance+iMediaPrivate.h in Headers */,
 				3000AE26161816CD00EDC78E /* IMBOutlineView+iMediaPrivate.h in Headers */,
 			);
