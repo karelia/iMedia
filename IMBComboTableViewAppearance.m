@@ -6,6 +6,7 @@
 //
 //
 
+#import "IMBTableViewAppearance+iMediaPrivate.h"
 #import "IMBComboTableViewAppearance.h"
 #import "NSCell+iMedia.h"
 #import "IMBComboTextCell.h"

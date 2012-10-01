@@ -6,7 +6,7 @@
 //
 //
 
-#import "IMBTableViewAppearance+iMediaPrivate.h"
+#import "IMBTableViewAppearance.h"
 
 @interface IMBComboTableViewAppearance : IMBTableViewAppearance
 {
