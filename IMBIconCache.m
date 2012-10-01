@@ -142,7 +142,7 @@ static IMBIconCache* sSharedIconCache;
 												  fallbackName:effectiveFallbackIconName];
                 
                 if (image) {
-                    NSLog(@"Loaded image %@", effectiveIconName);
+//                    NSLog(@"Loaded image %@", effectiveIconName);
                 } else {
                     NSLog(@"Could not load image %@", effectiveIconName);
                 }
