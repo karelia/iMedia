@@ -65,7 +65,11 @@
 // Returns the longest common sub path of self with inPath
 // Paths must be absolute paths.
 
-- (NSString *) imb_commonSubPathWithPath:(NSString *)inPath;
+- (NSString *)imb_commonSubPathWithPath:(NSString *)inPath;
+
+// Returns whether inPath is a path prefix of self. Both strings must be absolute paths.
+
+- (BOOL)hasPathPrefix:(NSString *)inPath;
 
 - (NSString *)imb_pathForURLString;
 - (NSString *)imb_path;

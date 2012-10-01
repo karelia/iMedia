@@ -157,7 +157,7 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
 	{
 		NSURL* url = [[self class] _urlForBookmark:bookmark];
 
-		if (url && [path hasPrefix:[url path]])
+		if (url && [path hasPathPrefix:[url path]])
 		{
 			return YES;
 		}
@@ -220,6 +220,8 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
         //       will be reclaimed when the process ends.
         
 		[url startAccessingSecurityScopedResource];
+        
+//        NSLog(@"Entitlements: Loaded from preferences security scoped URL %@", url);
 	}
 }
 

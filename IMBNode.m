@@ -182,6 +182,8 @@
                 // accessibility = kIMBResourceIsAccessible if media source is not a file URL (e.g. Flickr node)
 
                 self.accessibility = [self.mediaSource imb_accessibility];
+                
+//                NSLog(@"Entitlements: %@ is accessible? %@", self.mediaSource, self.accessibility == kIMBResourceIsAccessible ? @"YES" :@"NO");
             }
         }
 	}
