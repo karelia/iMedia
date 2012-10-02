@@ -68,6 +68,7 @@
 #import "IMBAlertPopover.h"
 #import "NSImage+iMedia.h"
 #import "NSURL+iMedia.h"
+#import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
 
 
@@ -77,6 +78,16 @@
 #pragma mark TYPES
 
 typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
+@interface IMBAccessRightsViewController ()
+- (void) _reloadTopLevelNodesWithoutAccessRightsWithURL:(NSURL*)inURL bookmark:(NSData*)inBookmark;
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,11 +248,8 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 // bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
 // to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
 
-- (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler
+- (void) grantAccessRightsForNode:(IMBNode*)inNode
 {
-	void(^completionHandler)(void) = [inCompletionHandler copy];
-	__block NSInteger completionCount = 0;
-	
 	// Calculate the best possible folder to select...
 	
 	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
@@ -262,60 +270,41 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			
 			// Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
 			
-			for (IMBNode* node in nodes)
-			{
-				node.badgeTypeNormal = kIMBBadgeTypeLoading;
-				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
-				
-				IMBParserMessenger* messenger = node.parserMessenger;
-				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+			[self _reloadTopLevelNodesWithoutAccessRightsWithURL:inGrantedURL bookmark:bookmark];
 			
-					^(NSURL* inReceivedURL,NSError* inError)
-					{
-						if (inError == nil)
-						{
-							[libraryController reloadNodeTree:node];
-							
-							completionCount++;
-							
-							if (completionCount == nodes.count)
-							{
-								completionHandler();
-								[completionHandler release];
-							}
-						}
-					});
-			}
+//			for (IMBNode* node in nodes)
+//			{
+//				node.badgeTypeNormal = kIMBBadgeTypeLoading;
+//				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+//				
+//				IMBParserMessenger* messenger = node.parserMessenger;
+//				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+//			
+//					^(NSURL* inReceivedURL,NSError* inError)
+//					{
+//						if (inError == nil)
+//						{
+//							[libraryController reloadNodeTree:node];
+//						}
+//					});
+//			}
 			
 			// Also send it to the FSEvents service, so that it can do its job...
 			
 			[[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
 		}
-		else
-		{
-			[completionHandler release];
-		}
 	}];
-}
-
-
-// Convenience method with emtpy completion handler...
-
-- (void) grantAccessRightsForNode:(IMBNode*)inNode
-{
-	[self grantAccessRightsForNode:inNode completionHandler:^{}];
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler
+- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode
 {
 	if (inNode.objects.count > 0)
 	{
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
-		void(^completionHandler)(void) = [inCompletionHandler copy];
 
 		// Get ancestor folder that encloses all objects for this node (usually the selected node)...
 		
@@ -347,23 +336,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 						if (inError == nil)
 						{
 							[libraryController reloadNodeTree:inNode];
-							completionHandler();
-							[completionHandler release];
 						}
 					});
 			}
-			else
-			{
-				[completionHandler release];
-			}
 		}];
 	}
-}
-
-
-- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode
-{
-	[self grantAccessRightsForObjectsOfNode:inNode completionHandler:^{}];
 }
 
 
@@ -660,6 +637,49 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			if (button == NSOKButton)
 			{
 				[[IMBLibraryController sharedLibraryControllerWithMediaType:inObject.mediaType] reload];
+			}
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark Helpers
+
+
+// Try to reload any top-level nodes that do not have access rights and which might benefit from the newly
+// granted URL...
+
+- (void) _reloadTopLevelNodesWithoutAccessRightsWithURL:(NSURL*)inURL bookmark:(NSData*)inBookmark
+{
+	NSArray* mediaTypes = [IMBLibraryController knownMediaTypes];
+	NSString* path = [inURL path];
+	
+	for (NSString* mediaType in mediaTypes)
+	{
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
+		NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+		
+		for (IMBNode* node in nodes)
+		{
+			if ([node.libraryRootURL.path hasPathPrefix:path])
+			{
+				node.badgeTypeNormal = kIMBBadgeTypeLoading;
+				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+				
+				IMBParserMessenger* messenger = node.parserMessenger;
+				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),inBookmark,
+			
+					^(NSURL* inReceivedURL,NSError* inError)
+					{
+						if (inError == nil)
+						{
+							[libraryController reloadNodeTree:node];
+						}
+					});
 			}
 		}
 	}

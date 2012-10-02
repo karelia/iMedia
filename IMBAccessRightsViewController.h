@@ -80,18 +80,16 @@
 	IBOutlet NSTextField* _warningMessage;
 }
 
++ (IMBAccessRightsViewController*) sharedViewController;
+
 // User inteface to grant access to part of the file system. Returns a url for the folder that the user
 // actually selected or nil in case of Cancel...
 
-+ (IMBAccessRightsViewController*) sharedViewController;
-
-- (void) grantAccessRightsForNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
 - (void) grantAccessRightsForNode:(IMBNode*)inNode;
-
-- (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode completionHandler:(void(^)(void))inCompletionHandler;
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
-
 + (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler;
+
+// User interface to alert user to missing media files...
 
 + (void) showMissingResourceAlertForNode:(IMBNode*)inNode view:(NSView*)inView relativeToRect:(NSRect)inRect;
 + (void) showMissingResourceAlertForObject:(IMBObject*)inObject view:(NSView*)inView relativeToRect:(NSRect)inRect;
