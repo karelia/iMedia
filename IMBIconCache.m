@@ -121,7 +121,7 @@ static IMBIconCache* sSharedIconCache;
 			const IMBIconTypeMappingEntry* entry = &mappingTable->fEntries[iconIndex];
 
 			// check for a match with the current entry's icon type
-			if ([name isEqualToString:entry->fIconType])
+			if ([name isEqualToString:entry->fIconType] || [@"Wildcard" isEqualToString:entry->fIconType])
 			{
                 // Highlight icon name is derivable
                 
@@ -161,14 +161,6 @@ static IMBIconCache* sSharedIconCache;
 					return image;
 			}
 		}
-
-		// if no type-specific image was found, use the fallback image (but not for highlight icon)
-        if (!inHighlight)
-        {
-            return [NSImage imb_imageForResource:mappingTable->fUnknownTypeEntry.fApplicationIconName
-                     fromAppWithBundleIdentifier:bundleID
-                                    fallbackName:mappingTable->fUnknownTypeEntry.fFallbackIconName];
-        }
 	}
 
 	return nil;

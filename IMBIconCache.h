@@ -73,7 +73,6 @@ typedef struct _IMBIconTypeMapping
 	unsigned int fCount;
 	const IMBIconTypeMappingEntry* fEntries;
 	__unsafe_unretained NSString* fHighlightPostfix; // Postfix to be added to fIconType to denote highlighted icon type
-	const IMBIconTypeMappingEntry fUnknownTypeEntry;
 } 
 IMBIconTypeMapping;
 

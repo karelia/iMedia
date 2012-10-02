@@ -360,14 +360,14 @@
 		{@"Special Month",			@"sl-icon-small_cal",				@"folder",	nil,				nil},
 		{@"Last Import",			@"sl-icon_lastImport",				@"folder",	nil,				nil},
 		{@"Subscribed",				@"sl-icon-small_subscribedAlbum",	@"folder",	nil,				nil},
+		{@"Wildcard",				@"sl-icon-small_album",             @"folder",	nil,				nil}	// fallback image
 	};
 	
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-        @"-sel",
-		{@"Regular",				@"sl-icon-small_album",			@"folder",	nil,				nil}	// fallback image
+        @"-sel"
 	};
 	
     

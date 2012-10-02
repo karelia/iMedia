@@ -460,14 +460,14 @@
 		{@"v2-97",	@"Project_I_Projects",			@"folder",	nil,	nil},	// library
 		{@"v2-98",	@"AppIcon.icns",                @"folder",	nil,	nil},	// library
 		{@"v2-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
+		{@"Wildcard",	@"Project_I_Album",			@"folder",	nil,	nil}	// fallback image
 	};
 
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-        @"_S",
-		{@"v2-1",	@"Project_I_Album",			@"folder",	nil,	nil}	// fallback image
+        @"_S"
 	};
 
 	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
@@ -510,14 +510,14 @@
 		{@"v3-98",	@"AppIcon.icns",				@"folder",	nil,	nil},	// library
 		{@"v3-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
 		{@"v3-Last Import",	@"SL-LastImport",       @"folder",	nil,	nil},	// last import
+		{@"Wildcard",@"SL-album",                   @"folder",	nil,	nil}	// fallback image
 	};
 
 	static const IMBIconTypeMapping kIconTypeMapping =
 	{
 		sizeof(kIconTypeMappingEntries) / sizeof(kIconTypeMappingEntries[0]),
 		kIconTypeMappingEntries,
-        @"_S",
-		{@"1",	@"SL-album",					@"folder",	nil,	nil}	// fallback image
+        @"_S"
 	};
 
 	// Since icons are different for different versions of Aperture, we are adding the prefix v2- or v3- 
