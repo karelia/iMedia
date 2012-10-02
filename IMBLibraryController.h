@@ -146,6 +146,9 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 
 - (NSMenu*) menuWithSelector:(SEL)inSelector target:(id)inTarget addSeparators:(BOOL)inAddSeparator;
 
+// Helpers...
+
++ (NSArray*) knownMediaTypes;
 
 @end
 

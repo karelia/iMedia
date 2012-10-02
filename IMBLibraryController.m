@@ -1357,6 +1357,19 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 
 #pragma mark 
+#pragma mark Helpers
+
+
++ (NSArray*) knownMediaTypes
+{
+	return [NSArray arrayWithObjects:kIMBMediaTypeImage,kIMBMediaTypeMovie,kIMBMediaTypeAudio,kIMBMediaTypeLink,nil];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
 #pragma mark Debugging
 
 
