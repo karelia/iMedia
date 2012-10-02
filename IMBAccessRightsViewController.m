@@ -302,7 +302,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode
 {
-	if (inNode.objects.count > 0)
+	if (inNode.objects.count > 0 && inNode.badgeTypeNormal != kIMBBadgeTypeLoading)
 	{
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 
@@ -328,6 +328,8 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			{
 				NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
 				
+                inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+                inNode.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
 				IMBParserMessenger* messenger = inNode.parserMessenger;
 				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
 				
