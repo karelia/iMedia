@@ -51,7 +51,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBAppleMediaParser.h"
+#import "IMBAppleMediaParser+iMediaPrivate.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import "IMBNode.h"
@@ -1125,8 +1125,28 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#pragma mark -
-#pragma mark Consistency
+#pragma mark - Library version specifics
+
+// Get album type
+
+- (NSString*) typeForAlbum:(NSDictionary*)album
+{
+    NSString* albumType = [album valueForKey:@"Album Type"];
+    
+    // Last import
+    
+    if ([[album valueForKey:@"uuid"] isEqualToString:@"lastImportAlbum"] ||                 // Aperture 3.4, iPhoto 9.4
+        [albumType isEqualToString:@"Special Roll"])                                        // iPhoto 8.1.2
+    {
+        return @"Last Import";
+    }
+    return albumType;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark - Library consistency
 
 // Checks inKey whether it is a valid key in resource list and returns it if valid.
 // If not checks all other candidates for validity and returns the first that is valid.

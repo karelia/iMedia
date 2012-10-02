@@ -53,6 +53,7 @@
 #pragma mark HEADERS
 
 #import "IMBApertureParser.h"
+#import "IMBAppleMediaParser+iMediaPrivate.h"
 
 #import "IMBApertureHeaderViewController.h"
 #import "IMBParserController.h"
@@ -508,6 +509,7 @@
 		{@"v3-97",	@"SL-allProjects",				@"folder",	nil,	nil},	// library
 		{@"v3-98",	@"AppIcon.icns",				@"folder",	nil,	nil},	// library
 		{@"v3-99",	@"List_Icons_Library",			@"folder",	nil,	nil},	// library (knot holding all images)
+		{@"v3-Last Import",	@"SL-LastImport",       @"folder",	nil,	nil},	// last import
 	};
 
 	static const IMBIconTypeMapping kIconTypeMapping =
@@ -625,7 +627,7 @@
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		NSString* albumType = [self typeForAlbum:albumDict];
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
 		

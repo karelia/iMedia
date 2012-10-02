@@ -52,6 +52,7 @@
 
 #pragma mark HEADERS
 
+#import "IMBAppleMediaParser+iMediaPrivate.h"
 #import "IMBiPhotoParser.h"
 #import "IMBNode.h"
 #import "IMBiPhotoEventNodeObject.h"
@@ -64,7 +65,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
+
+@interface IMBiPhotoParser ()
+
+- (NSString*) typeForAlbum:(NSDictionary*)album;
+
+@end
+
+
+#pragma mark
 
 @implementation IMBiPhotoParser
 
@@ -348,7 +358,7 @@
 		{@"Slideshow",				@"sl-icon-small_slideshow",         @"folder",	nil,				nil},
 		{@"Smart",					@"sl-icon-small_smartAlbum",		@"folder",	nil,				nil},
 		{@"Special Month",			@"sl-icon-small_cal",				@"folder",	nil,				nil},
-		{@"Special Roll",			@"sl-icon_lastImport",				@"folder",	nil,				nil},
+		{@"Last Import",			@"sl-icon_lastImport",				@"folder",	nil,				nil},
 		{@"Subscribed",				@"sl-icon-small_subscribedAlbum",	@"folder",	nil,				nil},
 	};
 	
@@ -428,7 +438,7 @@
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 		
-		NSString* albumType = [albumDict objectForKey:@"Album Type"];
+		NSString* albumType = [self typeForAlbum:albumDict];
 		NSString* albumName = [albumDict objectForKey:@"AlbumName"];
 		NSNumber* parentId = [albumDict objectForKey:@"Parent"];
         
@@ -890,5 +900,29 @@
     [objects release];
 
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+#pragma mark - Library version specifics
+
+
+// Get album type
+
+- (NSString*) typeForAlbum:(NSDictionary*)album
+{
+    NSString* albumType = [album valueForKey:@"Album Type"];
+    
+    // Photos
+    
+    if ([albumType isEqualToString:@"99"] ||                                                        // Vers. 9.4
+        (albumType == nil && [[album valueForKey:@"GUID"] isEqualToString:@"allPhotosAlbum"]) ||    // Vers. 9.3
+        (albumType == nil && [[album valueForKey:@"AlbumId"] unsignedIntegerValue] == 2))           // Vers. 8.1.2
+    {
+        return @"Photos";
+    }
+    return [super typeForAlbum:album];
+}
+
 
 @end

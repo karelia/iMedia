@@ -31,6 +31,7 @@
 		3000AE201617AE2200EDC78E /* IMBViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 3000AE1E1617AE2000EDC78E /* IMBViewAppearance.m */; };
 		3000AE231618150D00EDC78E /* IMBViewAppearance+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE211618150A00EDC78E /* IMBViewAppearance+iMediaPrivate.h */; };
 		3000AE26161816CD00EDC78E /* IMBOutlineView+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE25161816CC00EDC78E /* IMBOutlineView+iMediaPrivate.h */; };
+		3000AE2B161A996000EDC78E /* IMBAppleMediaParser+iMediaPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 3000AE29161A995F00EDC78E /* IMBAppleMediaParser+iMediaPrivate.h */; };
 		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		30203EDC153C546900CFE91B /* IMBTestiPhotoEventBrowserCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30439223130D173C00DD1D34 /* IMBTestiPhotoEventBrowserCell.m */; };
@@ -559,6 +560,7 @@
 		3000AE1E1617AE2000EDC78E /* IMBViewAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBViewAppearance.m; sourceTree = "<group>"; };
 		3000AE211618150A00EDC78E /* IMBViewAppearance+iMediaPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMBViewAppearance+iMediaPrivate.h"; sourceTree = "<group>"; };
 		3000AE25161816CC00EDC78E /* IMBOutlineView+iMediaPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMBOutlineView+iMediaPrivate.h"; sourceTree = "<group>"; };
+		3000AE29161A995F00EDC78E /* IMBAppleMediaParser+iMediaPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IMBAppleMediaParser+iMediaPrivate.h"; sourceTree = "<group>"; };
 		3016783413B1F435000E57D2 /* IMBTestTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTestTextView.h; sourceTree = "<group>"; };
 		3016783513B1F435000E57D2 /* IMBTestTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTestTextView.m; sourceTree = "<group>"; };
 		3016792813B225B9000E57D2 /* badge_checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_checkbox.png; sourceTree = "<group>"; };
@@ -1255,6 +1257,7 @@
 			children = (
 				303FFD6D152CBC690026B8CF /* IMBAppleMediaParserMessenger.h */,
 				303FFD6E152CBC690026B8CF /* IMBAppleMediaParserMessenger.m */,
+				3000AE29161A995F00EDC78E /* IMBAppleMediaParser+iMediaPrivate.h */,
 				D0E96C2915122F86004F3EE7 /* IMBAppleMediaParser.h */,
 				D0E96C2A15122F86004F3EE7 /* IMBAppleMediaParser.m */,
 				8FCA063F12368367009072AE /* Aperture */,
@@ -2112,6 +2115,7 @@
 				3000ADF916159C2300EDC78E /* NSCell+iMedia.h in Headers */,
 				3000AE231618150D00EDC78E /* IMBViewAppearance+iMediaPrivate.h in Headers */,
 				3000AE26161816CD00EDC78E /* IMBOutlineView+iMediaPrivate.h in Headers */,
+				3000AE2B161A996000EDC78E /* IMBAppleMediaParser+iMediaPrivate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
