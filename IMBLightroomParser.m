@@ -920,7 +920,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSString* orientation = [results stringForColumn:@"orientation"];
 			NSString* caption = [results stringForColumn:@"caption"];
 			NSString* pyramidPath = ([results hasColumnWithName:@"pyramidPath"] ? [results stringForColumn:@"pyramidPath"] : nil);
-			NSString* name = caption!= nil ? caption : filename;
+			NSString* name = filename;
 			NSString* path = [folderPath stringByAppendingPathComponent:filename];
 			
 			if (pyramidPath == nil) {
@@ -944,6 +944,10 @@ static NSArray* sSupportedUTIs = nil;
 				if (captureTime) {
 					[metadata setObject:captureTime forKey:@"dateTime"];
 				}
+                
+                if (caption) {
+					[metadata setObject:caption forKey:@"comment"];
+                }
 				
 				IMBObject* object = [self objectWithPath:path
 												 idLocal:idLocal
