@@ -424,15 +424,17 @@
 		@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
 		@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
 		@" WHERE ids.image = ?"
-		@" ORDER BY alf.id_global ASC"
-		@" LIMIT 1";
+		@" ORDER BY alf.id_global ASC";
 		
 		FMResultSet* results = [database executeQuery:query, idLocal];
 		
-		if ([results next]) {				
+        // JJ/2012-10-02: For some reason we may get multiple rows with some of them not properly filled. Try best we can.
+        
+        while ([results next] && (uuid == nil || digest == nil || [uuid isEqualToString:@""] || [digest isEqualToString:@""]))
+        {
 			uuid = [results stringForColumn:@"uuid"];
 			digest = [results stringForColumn:@"digest"];
-		}
+        }
 		
 		[results close];
 	}
