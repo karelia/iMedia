@@ -629,6 +629,7 @@
 	if ([inTrackDict objectForKey:@"Name"] == nil) return NO;
 	if ([[inTrackDict objectForKey:@"Location"] length] == 0) return NO;
 	if ([[inTrackDict objectForKey:@"Has Video"] boolValue] == 1) return NO;
+	if (![[inTrackDict objectForKey:@"Location"] hasPrefix:@"file:"]) return NO;
 	
 	return YES;
 }
