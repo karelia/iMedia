@@ -273,6 +273,15 @@
 		[path setLineWidth:2.0];
 		[path setLineDash:dashes count:2 phase:0.0];
 		[path stroke];
+
+		if (_badge) 
+		{
+			CGContextRef context = (CGContextRef) [[NSGraphicsContext currentContext] graphicsPort];
+			[self willDrawImageInRect:imageRect context:context];
+			NSRect badgeRect = [self badgeRectForImageRect:imageRect];
+			[_badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+            CGContextRestoreGState(context);
+		}
 	}
 	
 	else
