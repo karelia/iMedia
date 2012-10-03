@@ -409,9 +409,9 @@
 	NSString* nodePath = nil;
 	if (inIdSpace)
 	{
-		nodePath = [NSString stringWithFormat:@"/%i/%@/%@/%@",[path hash],libraryName,inIdSpace,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@/%@",[path hash],libraryName,inIdSpace,inId];
 	} else {
-		nodePath = [NSString stringWithFormat:@"/%i/%@/%@",[path hash],libraryName,inId];
+		nodePath = [NSString stringWithFormat:@"/%lu/%@/%@",[path hash],libraryName,inId];
 	}
 	
 	return [self identifierForPath:nodePath];

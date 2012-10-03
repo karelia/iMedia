@@ -156,7 +156,7 @@ typedef enum {
 
 - (NSDictionary*) argumentsForFlickrCall;
 + (NSString *)base58EncodedValue:(long long)num;
-+ (NSString *)descriptionOfLicense:(int)aLicenseNumber;
++ (NSString *)descriptionOfLicense:(NSInteger)aLicenseNumber;
 + (NSString*) identifierWithQueryParams: (NSDictionary*) inQueryParams;
 - (void) readPropertiesFromDictionary: (NSDictionary*) dictionary;
 

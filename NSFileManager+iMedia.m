@@ -300,7 +300,7 @@
 				{
 					if (!exists)
 					{
-						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %i",volName,i] stringByAppendingPathComponent:relPath];
+						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %ld",volName,i] stringByAppendingPathComponent:relPath];
 						exists = [self fileExistsAtPath:newPath];
 						if (exists) break;
 					}
@@ -326,7 +326,7 @@
     NSString *result = [path stringByAppendingPathComponent:filename];
     NSInteger i = 1;
     while ([self fileExistsAtPath:result]) {
-        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, (long)i, extension];
+        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, i, extension];
         result = [path stringByAppendingPathComponent:filename];
         i++;
     }    
