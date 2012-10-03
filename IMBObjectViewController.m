@@ -1833,7 +1833,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 							}
 							
 							[thisItem setDataProvider:self forTypes:whichTypes];
-							[thisItem setString:[NSString stringWithFormat:@"%d", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
+							[thisItem setString:[NSString stringWithFormat:@"%ld", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
 							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
 							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
 							[thisItem setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];

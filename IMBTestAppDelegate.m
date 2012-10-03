@@ -489,7 +489,7 @@
 			// Make sure the object view controller's preferences reflect the view type we want to show
 			// (preferences will later be loaded into object)
 			
-			NSMutableDictionary* preferences = [IMBConfig prefsForClass:inController.class];
+			NSMutableDictionary* preferences = [[[IMBConfig prefsForClass:inController.class] mutableCopy] autorelease];
 			[preferences setObject:[NSNumber numberWithUnsignedInteger:0] forKey:@"viewType"];
 			[IMBConfig setPrefs:preferences forClass:inController.class];
 			
@@ -633,7 +633,7 @@
 	if ([self count] > 20)
 	{
 		NSArray *subArray = [self subarrayWithRange:NSMakeRange(0,20)];
-		return [NSString stringWithFormat:@"%@ [... %d items]", [subArray description], [self count]];
+		return [NSString stringWithFormat:@"%@ [... %ld items]", [subArray description], [self count]];
 	}
 	else
 	{
