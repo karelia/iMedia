@@ -1032,7 +1032,6 @@
                 }
                 else
                 {
-                    #warning @Jörg This is a preliminary "fix" for the Events bug with iPhoto 9.4
                     NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
                     [objects removeObjectIdenticalTo:object];
                     [subNodes removeObjectIdenticalTo:subNode];

@@ -54,7 +54,7 @@
 {
     NSUInteger selfLength = [self length];
     if (searchRange.location > selfLength || NSMaxRange(searchRange) > selfLength)
-        [NSException raise:NSRangeException format:@"Range {%u,%u} exceeds length %u", searchRange.location, searchRange.length, selfLength];
+        [NSException raise:NSRangeException format:@"Range {%lu,%lu} exceeds length %lu", searchRange.location, searchRange.length, selfLength];
     
     unsigned const char *selfBufferStart, *selfPtr, *selfPtrEnd, *selfPtrMax;
     unsigned const char firstPatternByte = *(const char *)patternBytes;

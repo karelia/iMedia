@@ -73,6 +73,11 @@ static NSString* sIMBFlickrDownloadSizeKey = @"flickrDownloadSize";
 
 static BOOL sUseGlobalViewType = NO;
 
+@interface IMBConfig ()
+
++ (void) registerDefaultValues;
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
