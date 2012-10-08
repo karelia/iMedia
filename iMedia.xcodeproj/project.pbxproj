@@ -1814,7 +1814,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# shell script goes here\n\nrm -fv ./en.lproj/Localizable.strings\n\ngenstrings *.c -u -a -o ./en.lproj/ \ngenstrings *.cp -u -a -o ./en.lproj/\ngenstrings *.m -u -a -o ./en.lproj/\ngenstrings *.mm -u -a -o ./en.lproj/\n\nexit 0";
+			shellScript = "# shell script goes here\n\nrm -fv ./en.lproj/Localizable.strings\n\ngenstrings *.c -u -a -o ./en.lproj/ \ngenstrings *.cp -u -a -o ./en.lproj/\ngenstrings *.m -u -a -o ./en.lproj/\ngenstrings *.mm -u -a -o ./en.lproj/\n\n# Convert UTF-16 into UTF-8 with BOM\necho -ne '\\xEF\\xBB\\xBF' > ./en.lproj/Localizable.strings.utf8\niconv -f UTF-16 -t UTF-8 ./en.lproj/Localizable.strings >> ./en.lproj/Localizable.strings.utf8\n\nexit 0";
 		};
 /* End PBXShellScriptBuildPhase section */
 
