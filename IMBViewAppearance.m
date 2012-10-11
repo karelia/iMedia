@@ -64,7 +64,7 @@
 
 - (NSColor *)backgroundColor
 {
-    SEL getter = @selector(backgroundColor:);
+    SEL getter = @selector(backgroundColor);
     if (self.view && [self.view respondsToSelector:getter])
     {
         return [self.view performSelector:getter];
