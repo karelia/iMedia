@@ -867,7 +867,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	else 
 	{
 		NSLog(@"%s ERROR trying to insert node at illegal index!",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to insert node at illegal index" userInfo:nil] raise];
 	}
 }
 
@@ -881,7 +880,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	else 
 	{
 		NSLog(@"%s ERROR trying to remove node at illegal index!",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to remove node at illegal index" userInfo:nil] raise];
 	}
 }
 
@@ -895,7 +893,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	else 
 	{
 		NSLog(@"%s ERROR trying to replace node at illegal index!",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: trying to replace node at illegal index" userInfo:nil] raise];
 	}
 }
 
