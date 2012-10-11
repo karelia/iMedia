@@ -85,7 +85,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 @interface IMBImageBrowserCell()
 
-- (CALayer *)imb_layerWithBadge:(NSImage*)inBadge inRect:(NSRect)inRect;
+- (CALayer *) badgeLayerInRect:(NSRect)inRect;
 
 @end
 //----------------------------------------------------------------------------------------------------------------------
@@ -281,9 +281,17 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 		[placeHolderLayer setBorderWidth:2.0];
 		[placeHolderLayer setCornerRadius:10];
 		CFRelease(colorSpace);
+        
+        [layer addSublayer:placeHolderLayer];
 		
-		[layer addSublayer:placeHolderLayer];
-		
+        // Display a warning or error badge if resource that thumbnail is representing is not accessible.
+		// Display any kind of badge if host app wants us to (should not exceed 16x16 points)...
+        
+        CALayer *badgeLayer = [self badgeLayerInRect:relativeImageFrame];
+        if (badgeLayer) {
+            [layer addSublayer:badgeLayer];
+        }
+        
 		return layer;
 	}
 	
@@ -299,34 +307,13 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 		CALayer *layer = [CALayer layer];
 		layer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
 		
-		IMBObject* item = (IMBObject*) [self representedItem];
-
         // Display a warning or error badge if resource that thumbnail is representing is not accessible.
 		// Display any kind of badge if host app wants us to (should not exceed 16x16 points)...
 
-        NSImage* badge = NULL;
-		
-		if (item.accessibility == kIMBResourceDoesNotExist)
-		{
-			badge = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
-			[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
-		}
-		else if (item.accessibility == kIMBResourceNoPermission)
-		{
-			badge = [NSImage imb_imageNamed:@"warning.tiff"];
-			[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
-		}
-		else if (item.accessibility == kIMBResourceIsAccessible)
-		{
-			IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
-			id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
-			
-			if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
-			{
-				badge = [delegate objectViewController:objectViewController badgeForObject:item];
-				[layer addSublayer:[self imb_layerWithBadge:badge inRect:relativeImageFrame]];
-			}
-		}
+        CALayer *badgeLayer = [self badgeLayerInRect:relativeImageFrame];
+        if (badgeLayer) {
+            [layer addSublayer:badgeLayer];
+        }
         
 		return layer;
 	}
@@ -413,7 +400,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 
 // Returns a layer that displays inBadge in the lower right corner relative to inRect
 
-- (CALayer *)imb_layerWithBadge:(NSImage*)inBadge inRect:(NSRect)inRect
+- (CALayer *)layerWithBadge:(NSImage*)inBadge inRect:(NSRect)inRect
 {
     CALayer *badgeLayer = nil;
 	
@@ -432,6 +419,41 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
     }
 	
     return badgeLayer;
+}
+
+
+// Returns badge layer containing badge regarding the item's access status or badge provided by host app.
+// Returns nil if no badge is to be displayed.
+
+- (CALayer *)badgeLayerInRect:(NSRect)inRect
+{
+    IMBObject* item = (IMBObject*) [self representedItem];
+    NSImage* badge = nil;
+    
+    switch (item.accessibility) {
+        case kIMBResourceDoesNotExist:
+            badge = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+            break;
+        case kIMBResourceNoPermission:
+            badge = [NSImage imb_imageNamed:@"warning.tiff"];
+            break;
+        case kIMBResourceIsAccessible:
+        {
+            IMBObjectViewController* objectViewController = (IMBObjectViewController*) [[self imageBrowserView] delegate];
+            id <IMBObjectViewControllerDelegate> delegate = [objectViewController delegate];
+            
+            if ([delegate respondsToSelector:@selector(objectViewController:badgeForObject:)])
+            {
+                badge = [delegate objectViewController:objectViewController badgeForObject:item];
+            }
+            break;
+        }
+            
+        default:
+            break;
+    }
+    if (badge) return [self layerWithBadge:badge inRect:inRect];
+    else return nil;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
