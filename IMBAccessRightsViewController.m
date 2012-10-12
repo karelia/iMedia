@@ -70,6 +70,7 @@
 #import "NSURL+iMedia.h"
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSObject+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -149,6 +150,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 - (void) dealloc
 {
+	[self imb_cancelAllCoalescedSelectors];
 	[super dealloc];
 }
 

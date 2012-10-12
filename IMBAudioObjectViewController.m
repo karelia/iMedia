@@ -66,6 +66,7 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBFolderParser.h"
+#import "NSObject+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSFileManager+iMedia.h"
 #import <QTKit/QTKit.h>
@@ -249,7 +250,9 @@
 					break;
 					
                     case kIMBResourceNoPermission:
-					[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+					[[IMBAccessRightsViewController sharedViewController]
+						imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+						withObject:self.currentNode];
 					break;
 					
                     case kIMBResourceIsAccessible:
@@ -284,7 +287,9 @@
 			break;
 			
             case kIMBResourceNoPermission:
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			[[IMBAccessRightsViewController sharedViewController]
+				imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+				withObject:self.currentNode];
 			break;
 			
             case kIMBResourceIsAccessible:
@@ -340,7 +345,9 @@
 				}
 				else if (object.accessibility == kIMBResourceNoPermission)
 				{
-					[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+					[[IMBAccessRightsViewController sharedViewController]
+						imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+						withObject:self.currentNode];
 				}
 				else
 				{

@@ -70,6 +70,7 @@
 #import "NSPasteboard+iMedia.h"
 #import "NSView+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSObject+iMedia.h"
 #import "IMBDynamicTableView.h"
 #import "IMBOperationQueue.h"
 #import "IMBObjectThumbnailLoadOperation.h"
@@ -1007,7 +1008,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			}
 			else if (object.accessibility == kIMBResourceNoPermission)
 			{
-				[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+				[[IMBAccessRightsViewController sharedViewController]
+					imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+					withObject:self.currentNode];
 			}
 		}
 	}
@@ -1369,7 +1372,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 		else if (object.accessibility == kIMBResourceNoPermission)
 		{
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			[[IMBAccessRightsViewController sharedViewController]
+				imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+				withObject:self.currentNode];
 		}
 		else 
 		{
@@ -1428,7 +1433,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		}
 		else if (object.accessibility == kIMBResourceNoPermission)
 		{
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForObjectsOfNode:self.currentNode];
+			[[IMBAccessRightsViewController sharedViewController]
+				imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+				withObject:self.currentNode];
 		}
 	}
 }
