@@ -103,6 +103,7 @@
 
 + (NSImage*) imb_imageNamed:(NSString*)inName
 {
+	NSImage* image = nil;
 	static NSMutableDictionary* sImageCache = nil;
 	static dispatch_once_t sOnceToken;
 	
@@ -111,14 +112,17 @@
 		sImageCache = [[NSMutableDictionary alloc] init];
 	});
 	
-	NSImage* image = (NSImage*)[sImageCache objectForKey:inName];
-	
-	if (image == nil)
+	@synchronized(sImageCache)
 	{
-		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
-		NSString* path = [bundle pathForResource:inName ofType:nil];
-		image = [[NSImage alloc] initWithContentsOfFile:path];
-		[sImageCache setObject:image forKey:inName];
+		image = (NSImage*)[sImageCache objectForKey:inName];
+		
+		if (image == nil)
+		{
+			NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+			NSString* path = [bundle pathForResource:inName ofType:nil];
+			image = [[NSImage alloc] initWithContentsOfFile:path];
+			[sImageCache setObject:image forKey:inName];
+		}
 	}
 	
 	return image;
@@ -129,6 +133,7 @@
 
 + (CGImageRef) imb_CGImageNamed:(NSString*)inName
 {
+	CGImageRef image = NULL;
 	static NSMutableDictionary* sImageCache = nil;
 	static dispatch_once_t sOnceToken;
 	
@@ -137,27 +142,30 @@
 		sImageCache = [[NSMutableDictionary alloc] init];
 	});
 
-	CGImageRef image = (CGImageRef)[sImageCache objectForKey:inName];
-
-	if (image == nil)
+	@synchronized(sImageCache)
 	{
-		NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
-		NSString* path = [bundle pathForResource:inName ofType:nil];
-		
-		if (path)
+		image = (CGImageRef)[sImageCache objectForKey:inName];
+
+		if (image == nil)
 		{
-			CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
-        
-			if (imageSource)
+			NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
+			NSString* path = [bundle pathForResource:inName ofType:nil];
+			
+			if (path)
 			{
-				image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
-				[sImageCache setObject:(id)image forKey:inName];
-				CGImageRelease(image);
-				CFRelease(imageSource);
+				CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+			
+				if (imageSource)
+				{
+					image = CGImageSourceCreateImageAtIndex(imageSource,0,NULL);
+					[sImageCache setObject:(id)image forKey:inName];
+					CGImageRelease(image);
+					CFRelease(imageSource);
+				}
 			}
 		}
 	}
-
+	
 	return image;
 }
 
@@ -329,16 +337,19 @@
 {
 	static NSImage *sGenericFolderIcon = nil;
 	
-	if (sGenericFolderIcon == nil)
+	@synchronized(sGenericFolderIcon)
 	{
-		sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
-		[sGenericFolderIcon setScalesWhenResized:YES];
-		[sGenericFolderIcon setSize:NSMakeSize(16,16)];
-	}
-	
-	if (sGenericFolderIcon == nil)
-	{
-		sGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
+		if (sGenericFolderIcon == nil)
+		{
+			sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+			[sGenericFolderIcon setScalesWhenResized:YES];
+			[sGenericFolderIcon setSize:NSMakeSize(16,16)];
+		}
+		
+		if (sGenericFolderIcon == nil)
+		{
+			sGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
+		}
 	}
 	
 	return sGenericFolderIcon;
@@ -348,16 +359,19 @@
 {
 	static NSImage *sLargeGenericFolderIcon = nil;
 	
-	if (sLargeGenericFolderIcon == nil)
+	@synchronized(sLargeGenericFolderIcon)
 	{
-		sLargeGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
-		[sLargeGenericFolderIcon setScalesWhenResized:YES];
-		[sLargeGenericFolderIcon setSize:NSMakeSize(128,128)];
-	}
-	
-	if (sLargeGenericFolderIcon == nil)
-	{
-		sLargeGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
+		if (sLargeGenericFolderIcon == nil)
+		{
+			sLargeGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+			[sLargeGenericFolderIcon setScalesWhenResized:YES];
+			[sLargeGenericFolderIcon setSize:NSMakeSize(128,128)];
+		}
+		
+		if (sLargeGenericFolderIcon == nil)
+		{
+			sLargeGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
+		}
 	}
 	
 	return sLargeGenericFolderIcon;
@@ -367,13 +381,16 @@
 {
 	static NSImage *sGenericFileIcon = nil;
 	
-	if (sGenericFileIcon == nil)
+	@synchronized(sGenericFileIcon)
 	{
-		sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
-		[sGenericFileIcon setScalesWhenResized:YES];
-		[sGenericFileIcon setSize:NSMakeSize(16,16)];
+		if (sGenericFileIcon == nil)
+		{
+			sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
+			[sGenericFileIcon setScalesWhenResized:YES];
+			[sGenericFileIcon setSize:NSMakeSize(16,16)];
+		}
 	}
-
+	
 	return sGenericFileIcon;
 }
 
