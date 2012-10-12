@@ -44,23 +44,40 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
 #import <Foundation/Foundation.h>
-
-@interface NSObject (iMedia)
-
-
-- (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason;
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+@interface NSObject (iMedia)
+
+- (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason;
+
 // Throws a "must subclass" exception.
 // Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
 
 - (void) imb_throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
+// Convenience methods for coalesced delayed perfoming...
+
+- (void) imb_performCoalescedSelector:(SEL)inSelector;
+- (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
+- (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay;
+- (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
+- (void) imb_cancelAllCoalescedSelectors;
+
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+

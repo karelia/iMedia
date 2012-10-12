@@ -44,14 +44,29 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
+
+#pragma mark HEADERS
+
 #import "NSObject+iMedia.h"
 
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+
 @implementation NSObject (iMedia)
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 - (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason
@@ -61,6 +76,8 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
 // Throws a "must subclass" exception.
 // Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
 
@@ -69,6 +86,43 @@
 	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (void) imb_performCoalescedSelector:(SEL)inSelector
+{
+	[self imb_performCoalescedSelector:inSelector withObject:nil];
+}
+
+
+- (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject
+{
+	[self imb_performCoalescedSelector:inSelector withObject:inObject afterDelay:0.0];
+}
+
+
+- (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay
+{
+	[self imb_cancelCoalescedSelector:inSelector withObject:inObject];
+	[self performSelector:inSelector withObject:inObject afterDelay:inDelay];
+}
+
+
+- (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:inSelector object:inObject];
+}
+
+
+- (void) imb_cancelAllCoalescedSelectors
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @end
