@@ -348,8 +348,7 @@
 		
 		if (sGenericFolderIcon == nil)
 		{
-			sGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
-		}
+			sGenericFolderIcon = [NSImage imageNamed:NSImageNameFolder];		}
 	}
 	
 	return sGenericFolderIcon;
