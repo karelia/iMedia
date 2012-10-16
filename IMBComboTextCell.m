@@ -119,12 +119,14 @@
 	result->_imageRepresentationType = nil;
 	result->_subtitle = nil;
 	result->_subtitleTextAttributes = nil;
+	result->_badge = nil;
 	
 	result.imageRepresentation = self.imageRepresentation;
  	result.imageRepresentationType = self.imageRepresentationType;
 	result.attributedStringValue = self.attributedStringValue;
 	result.subtitle = self.subtitle;
 	result.subtitleTextAttributes = self.subtitleTextAttributes;
+	result.badge = self.badge;
 	
 	result.isDisabledFromDragging = self.isDisabledFromDragging;
 	
