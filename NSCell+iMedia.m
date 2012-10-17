@@ -58,11 +58,23 @@
 
 // Set string value attributes conformant to NSAttributedString
 
-- (void) imb_setStringValueAttributes:(NSDictionary*)inAttributes;
+- (void) imb_setStringValueAttributes:(NSDictionary *)inAttributes
 {
     NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithString:[self stringValue]
                                                                    attributes:inAttributes] autorelease];
     [self setAttributedStringValue:attrStr];
+}
+
+
+// Merge additional string attributes into the attributed string of the cell
+
+- (void) imb_addStringValueAttributes:(NSDictionary *)inAttributes
+{
+    NSDictionary *currentAttributes = [[self attributedStringValue] attributesAtIndex:0 effectiveRange:NULL];
+    NSMutableDictionary *effectiveAttributes = [NSMutableDictionary dictionaryWithDictionary:currentAttributes];
+    [effectiveAttributes addEntriesFromDictionary:inAttributes];
+    
+    [self imb_setStringValueAttributes:effectiveAttributes];
 }
 
 @end

@@ -92,11 +92,11 @@
             if ([theCell isHighlighted])
             {
                 if (self.rowTextHighlightAttributes) {
-                    [theCell imb_setStringValueAttributes:self.rowTextHighlightAttributes];
+                    [theCell imb_addStringValueAttributes:self.rowTextHighlightAttributes];
                 }
             } else {    // Non-highlighted cell
                 if (self.rowTextAttributes) {
-                    [theCell imb_setStringValueAttributes:self.rowTextAttributes];
+                    [theCell imb_addStringValueAttributes:self.rowTextAttributes];
                 }
             }
         }
@@ -109,7 +109,7 @@
         if ([theCell isGroupCell])
         {
             if (self.sectionHeaderTextAttributes) {
-                [theCell imb_setStringValueAttributes:self.sectionHeaderTextAttributes];
+                [theCell imb_addStringValueAttributes:self.sectionHeaderTextAttributes];
             }
         }
         if ([theCell isHighlighted])

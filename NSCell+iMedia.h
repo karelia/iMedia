@@ -58,4 +58,8 @@
 
 - (void) imb_setStringValueAttributes:(NSDictionary*)inAttributes;
 
+// Merge additional string attributes into the attributed string of the cell
+
+- (void) imb_addStringValueAttributes:(NSDictionary *)inAttributes;
+
 @end
