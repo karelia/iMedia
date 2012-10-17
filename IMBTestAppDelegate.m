@@ -567,14 +567,19 @@
      [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
      nil];
     
+    NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    [paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
+    
     NSDictionary* subRowTextAttributes =
     [NSDictionary dictionaryWithObjectsAndKeys:
+     paragraphStyle, NSParagraphStyleAttributeName,
      [NSColor colorWithDeviceWhite:(float)240/255 alpha:0.4], NSForegroundColorAttributeName,
      [NSFont fontWithName:@"Lucida Grande" size:12], NSFontAttributeName,
      nil];
     
     NSDictionary* subRowTextHighlightAttributes =
     [NSDictionary dictionaryWithObjectsAndKeys:
+     paragraphStyle, NSParagraphStyleAttributeName,
      [NSColor colorWithDeviceWhite:(float)60/255 alpha:0.4], NSForegroundColorAttributeName,
      [NSFont fontWithName:@"Lucida Grande" size:11], NSFontAttributeName,
      nil];
