@@ -330,8 +330,19 @@
 			CGFloat alpha = (float)fadeHeight / FADE_AREA;
 			
 			NSTextFieldCell* textCell = self.textCell;
-			[textCell setTextColor:[NSColor colorWithCalibratedWhite:0.66667 alpha:alpha]];
-			[textCell setStringValue:self.draggingPrompt];
+            [textCell setStringValue:self.draggingPrompt];
+            NSColor* draggingPromptColor = nil;
+            
+            // If header has a customized color then use it but with 0.6 of its alpha value
+            
+            NSColor* appearanceTextColor = [self.imb_Appearance.sectionHeaderTextAttributes objectForKey:NSForegroundColorAttributeName];
+            if (appearanceTextColor) {
+                CGFloat appearanceAlpha = [appearanceTextColor alphaComponent];
+                draggingPromptColor = [appearanceTextColor colorWithAlphaComponent:appearanceAlpha * 0.6 * alpha];
+            } else {
+                draggingPromptColor = [NSColor colorWithCalibratedWhite:0.66667 alpha:alpha];
+            }
+            [textCell setTextColor:draggingPromptColor];
 			
 			NSRect textRect = NSInsetRect([self visibleRect],12.0,8.0);
 			[textCell drawWithFrame:textRect inView:self];
