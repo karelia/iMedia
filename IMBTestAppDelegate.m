@@ -197,9 +197,13 @@
                                                   [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
                                                   nil];
     
+    NSShadow* shadow = [[[NSShadow alloc] init] autorelease];
+    [shadow setShadowOffset:NSMakeSize(0.0, 0.0)];
+    
     tableViewAppearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                                    [NSColor colorWithDeviceWhite:(float)150/255 alpha:1.0], NSForegroundColorAttributeName,
                                                    [NSFont fontWithName:@"Lucida Grande Bold" size:11], NSFontAttributeName,
+                                                   shadow, NSShadowAttributeName,
                                                    nil];
     
     

@@ -395,9 +395,14 @@
 {
     IMBTableViewAppearance* appearance = [[[IMBTableViewAppearance alloc] initWithView:self] autorelease];
     
+    NSShadow* shadow = [[[NSShadow alloc] init] autorelease];
+    [shadow setShadowColor:[NSColor whiteColor]];
+    [shadow setShadowOffset:NSMakeSize(0.0, -1.0)];
+    
     appearance.sectionHeaderTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                               [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
                                               [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName,
+                                              shadow, NSShadowAttributeName,
                                               nil];
     
     appearance.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:

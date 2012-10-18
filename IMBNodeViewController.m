@@ -69,6 +69,8 @@
 #import "NSView+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSCell+iMedia.h"
+#import "IMBTableViewAppearance+iMediaPrivate.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -894,6 +896,35 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	IMBNode* node = (IMBNode*)inItem; 
 	return node.isGroupNode;
+}
+
+
+// Change text attributes of outline cell so that Hide/Show buttons' appearance can be customized
+// based on section header appearance
+
+-(void)outlineView:(NSOutlineView *)inOutlineView willDisplayOutlineCell:(id)inCell forTableColumn:(NSTableColumn *)tableColumn item:(id)inItem
+{    
+    if ([inCell isKindOfClass:[NSButtonCell class]] &&
+        [inOutlineView isKindOfClass:[IMBOutlineView class]])
+    {
+        // If header has a customized color then use it for Hide/Show buttons on right hand side of group row
+        
+        NSDictionary* textAttributes = ((IMBOutlineView*)inOutlineView).imb_Appearance.sectionHeaderTextAttributes;
+        if (textAttributes)
+        {
+            NSMutableDictionary* effectiveTextAttributes = [NSMutableDictionary dictionaryWithDictionary:textAttributes];
+            NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+            [paragraphStyle setAlignment:NSRightTextAlignment];
+            [effectiveTextAttributes setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+            
+            
+            [inCell setBackgroundStyle:0];      // Remove shadows from disclosure triangles
+            NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithString:[inCell title]
+                                                                           attributes:effectiveTextAttributes] autorelease];
+            [inCell setAttributedTitle:attrStr];
+        }
+    }
+    
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector;
