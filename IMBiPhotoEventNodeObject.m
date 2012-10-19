@@ -223,6 +223,7 @@
 	CGContextDrawImage(bitmapContext, imageBounds, inImage);
 	
 	CGImageRef image = CGBitmapContextCreateImage(bitmapContext);
+    if (image) CFMakeCollectable(image);        // NO-OP if garbage collector is OFF (but appeases static analyzer)
     [(id)image autorelease];
 	
 	CGContextRelease(bitmapContext);
