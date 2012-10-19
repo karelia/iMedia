@@ -608,8 +608,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	
 	else if (inContext == (void*)kImageRepresentationKeyPath)
 	{
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_reloadIconView) object:nil];
-		[self performSelector:@selector(_reloadIconView) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+		[self imb_performCoalescedSelector:@selector(_reloadIconView) withObject:nil afterDelay:[[self class] iconViewReloadDelay]];
+        [self imb_performCoalescedSelector:@selector(_reloadComboView) withObject:nil afterDelay:0.1];
 	}
 	
 	// The globally set view type in preferences was changed - adjust our own view type accordingly. Please note 
@@ -910,9 +910,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		// if the system attempts to communicate with the tooltip's owner which is being removed from the view...
 		
 		[ibIconView removeAllToolTips];
-
-		[NSObject cancelPreviousPerformRequestsWithTarget:ibIconView selector:@selector(reloadData) object:nil];
-		[ibIconView performSelector:@selector(reloadData) withObject:nil afterDelay:[[self class] iconViewReloadDelay] inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+        [ibIconView reloadData];
 
 		// Items loading into the view will cause a change in the scroller's clip view, which will cause the tooltips
 		// to be revised to suit only the current visible items...
@@ -924,8 +922,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	if ([ibListView.window isVisible])
 	{
-		[NSObject cancelPreviousPerformRequestsWithTarget:ibListView selector:@selector(reloadData) object:nil];
-		[ibListView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+        [ibListView reloadData];
 	}
 }
 
@@ -934,8 +931,7 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	if ([ibComboView.window isVisible])
 	{
-		[NSObject cancelPreviousPerformRequestsWithTarget:ibComboView selector:@selector(reloadData) object:nil];
-		[ibComboView performSelector:@selector(reloadData) withObject:nil afterDelay:0.05 inModes:[NSArray arrayWithObject:NSRunLoopCommonModes]];
+        [ibComboView reloadData];
 	}
 }
 
