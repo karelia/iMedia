@@ -826,6 +826,7 @@
             [metadata setObject:imageKey forKey:@"iPhotoKey"];   // so pasteboard-writing code can retrieve it later
             [assetIds addObject:photoStreamAssetId];
             [photoStreamObjectDictionaries addObject:metadata];
+            [metadata release];
         }
     }
     // After collecting all Photo Stream object dictionaries sort them by date
