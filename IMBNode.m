@@ -341,7 +341,7 @@
 		}
 		@catch (NSException *exception)
 		{
-			NSLog(@"%s Caught exception trying to decode icon for node %@: %@",__FUNCTION__,self.name,exception);
+//			NSLog(@"%s Caught exception trying to decode icon for node %@: %@",__FUNCTION__,self.name,exception);
 			self.icon = [NSImage imb_sharedGenericFolderIcon];
 		}
 		@try
@@ -350,7 +350,7 @@
 		}
 		@catch (NSException *exception)
 		{
-			NSLog(@"%s Caught exception trying to decode highlight icon for node %@: %@",__FUNCTION__,self.name,exception);
+//			NSLog(@"%s Caught exception trying to decode highlight icon for node %@: %@",__FUNCTION__,self.name,exception);
 			self.highlightIcon = self.icon;
 		}
 	}
