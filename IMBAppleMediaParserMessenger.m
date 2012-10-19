@@ -155,11 +155,6 @@
     Class messengerClass = [self class];
     IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[super newParser];
     
-    // All parsers are kept in static list
-    
-    [[messengerClass parsers] addObject:parser];
-    [parser release];
-    
     if (inMediaSource)
     {
         NSString* path = [inMediaSource path];
@@ -215,6 +210,12 @@
 				NSFileManager *fileManager = [[NSFileManager alloc] init];
 
 				IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
+                
+                // All parsers are kept in static list
+                
+                [[messengerClass parsers] addObject:parser];
+                [parser release];
+                
 				parser.shouldDisplayLibraryName = [libraries count] > 1;
 				  
 				//NSLog(@"%@ uses library: %@", [parser class], path);
