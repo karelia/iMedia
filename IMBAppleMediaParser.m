@@ -414,15 +414,6 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 //
 
-- (void) reloadNode:(IMBNode*)inNode error:(NSError**)outError
-{
-    
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//
-
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	if (outError) *outError = nil;
