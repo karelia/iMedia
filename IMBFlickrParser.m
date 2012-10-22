@@ -183,7 +183,7 @@
                               nil];
         
         NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];        
-        if (*outError) *outError = error;
+        if (outError) *outError = error;
 
         return nil;
     }
@@ -206,7 +206,7 @@
                               nil];
         
         NSError* error = [NSError errorWithDomain:kIMBErrorDomain code:paramErr userInfo:info];        
-        if (*outError) *outError = error;
+        if (outError) *outError = error;
     }
     return (id) image;
 
