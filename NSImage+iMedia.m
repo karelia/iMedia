@@ -104,7 +104,7 @@
 + (NSImage*) imb_imageNamed:(NSString*)inName
 {
 	NSImage* image = nil;
-	static NSMutableDictionary* sImageCache = nil;
+	static NSMutableDictionary* sImageCache;
 	static dispatch_once_t sOnceToken;
 	
 	dispatch_once(&sOnceToken,^()
@@ -122,6 +122,7 @@
 			NSString* path = [bundle pathForResource:inName ofType:nil];
 			image = [[NSImage alloc] initWithContentsOfFile:path];
 			[sImageCache setObject:image forKey:inName];
+            [image release];
 		}
 	}
 	
@@ -134,7 +135,7 @@
 + (CGImageRef) imb_CGImageNamed:(NSString*)inName
 {
 	CGImageRef image = NULL;
-	static NSMutableDictionary* sImageCache = nil;
+	static NSMutableDictionary* sImageCache;
 	static dispatch_once_t sOnceToken;
 	
 	dispatch_once(&sOnceToken,^()
@@ -335,60 +336,55 @@
 
 + (NSImage *) imb_sharedGenericFolderIcon
 {
-	static NSImage *sGenericFolderIcon = nil;
+	static NSImage *sGenericFolderIcon;	
+	static dispatch_once_t sOnceToken;
 	
-	@synchronized(sGenericFolderIcon)
-	{
-		if (sGenericFolderIcon == nil)
-		{
-			sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
-			[sGenericFolderIcon setScalesWhenResized:YES];
-			[sGenericFolderIcon setSize:NSMakeSize(16,16)];
-		}
-		
-		if (sGenericFolderIcon == nil)
-		{
-			sGenericFolderIcon = [NSImage imageNamed:NSImageNameFolder];		}
-	}
+	dispatch_once(&sOnceToken,^()
+                  {
+                      sGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+                      [sGenericFolderIcon setScalesWhenResized:YES];
+                      [sGenericFolderIcon setSize:NSMakeSize(16,16)];
+                      
+                      if (sGenericFolderIcon == nil)
+                      {
+                          sGenericFolderIcon = [NSImage imageNamed:NSImageNameFolder];
+                      }
+                  });
 	
 	return sGenericFolderIcon;
 }
 
 + (NSImage *) imb_sharedLargeGenericFolderIcon
 {
-	static NSImage *sLargeGenericFolderIcon = nil;
+	static NSImage *sLargeGenericFolderIcon;
+	static dispatch_once_t sOnceToken;
 	
-	@synchronized(sLargeGenericFolderIcon)
-	{
-		if (sLargeGenericFolderIcon == nil)
-		{
-			sLargeGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
-			[sLargeGenericFolderIcon setScalesWhenResized:YES];
-			[sLargeGenericFolderIcon setSize:NSMakeSize(128,128)];
-		}
-		
-		if (sLargeGenericFolderIcon == nil)
-		{
-			sLargeGenericFolderIcon = [NSImage imageNamed:@"folder"];	// NSImageNameFolder in 10.6 and up... does it work in 10.5 ?
-		}
-	}
+	dispatch_once(&sOnceToken,^()
+                  {
+                      sLargeGenericFolderIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericFolderIcon)] retain];
+                      [sLargeGenericFolderIcon setScalesWhenResized:YES];
+                      [sLargeGenericFolderIcon setSize:NSMakeSize(128,128)];
+                      
+                      if (sLargeGenericFolderIcon == nil)
+                      {
+                          sLargeGenericFolderIcon = [NSImage imageNamed:NSImageNameFolder];
+                      }
+                  });
 	
 	return sLargeGenericFolderIcon;
 }
 
 + (NSImage *) imb_sharedGenericFileIcon
 {
-	static NSImage *sGenericFileIcon = nil;
+	static NSImage *sGenericFileIcon;
+	static dispatch_once_t sOnceToken;
 	
-	@synchronized(sGenericFileIcon)
-	{
-		if (sGenericFileIcon == nil)
-		{
-			sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
-			[sGenericFileIcon setScalesWhenResized:YES];
-			[sGenericFileIcon setSize:NSMakeSize(16,16)];
-		}
-	}
+	dispatch_once(&sOnceToken,^()
+                  {
+                      sGenericFileIcon = [[[NSWorkspace imb_threadSafeWorkspace] iconForFileType: NSFileTypeForHFSTypeCode(kGenericDocumentIcon)] retain];
+                      [sGenericFileIcon setScalesWhenResized:YES];
+                      [sGenericFileIcon setSize:NSMakeSize(16,16)];
+                  });
 	
 	return sGenericFileIcon;
 }
