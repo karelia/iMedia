@@ -179,7 +179,7 @@
 }
 
 
-+ (NSString*) xpcSerivceIdentifier
++ (NSString*) xpcServiceIdentifier
 {
 	return [self identifier];
 }
@@ -191,7 +191,7 @@
 {
 	if (_connection == nil && SBIsSandboxed())
 	{
-		NSString* identifier = [[self class] xpcSerivceIdentifier];
+		NSString* identifier = [[self class] xpcServiceIdentifier];
 		_connection = [[NSClassFromString(@"XPCConnection") alloc] initWithServiceName:identifier];
 	}
 	

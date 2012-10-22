@@ -274,7 +274,7 @@ return kIMBMediaTypeImage;
 //----------------------------------------------------------------------------------------------------------------------
 // Both image and movie use the same xpc service, so override this method...
 
-+ (NSString*) xpcSerivceIdentifier
++ (NSString*) xpcServiceIdentifier
 {
 	return @"com.karelia.imedia.Aperture";
 }

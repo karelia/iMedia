@@ -86,7 +86,7 @@
 }
 
 
-+ (NSString*) xpcSerivceIdentifier
++ (NSString*) xpcServiceIdentifier
 {
 	return @"com.karelia.imedia.Folder";
 }

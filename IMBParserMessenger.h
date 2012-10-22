@@ -93,7 +93,7 @@
 
 // For communicating with the XPC service...
 
-+ (NSString*) xpcSerivceIdentifier;							// For connecting to correct XPC service
++ (NSString*) xpcServiceIdentifier;							// For connecting to correct XPC service
 @property (retain,readonly) id connection;                  // Used internally (XPCConnection)
 
 @end

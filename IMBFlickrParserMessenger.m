@@ -140,7 +140,7 @@
 }
 
 
-+ (NSString*) xpcSerivceIdentifier {
++ (NSString*) xpcServiceIdentifier {
 	return @"com.karelia.imedia.Flickr";
 }
 
