@@ -67,7 +67,9 @@ BOOL SBIsSandboxed()
 						sIsSandboxed = YES;
 					};
 				}
+                CFRelease(reqRef);
 			}
+            CFRelease(codeRef);
 		}
     });
 	
