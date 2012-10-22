@@ -114,7 +114,7 @@
 	
     // Check if the folder exists. If not then do not return a node...
 
-	NSFileManager* fileManager = [[NSFileManager alloc] init];
+	NSFileManager* fileManager = [[[NSFileManager alloc] init] autorelease];
     BOOL directory;
     BOOL exists = [fileManager fileExistsAtPath:path isDirectory:&directory];
     if (!exists || !directory) return nil;
@@ -126,7 +126,6 @@
 	
 	NSString* name = [fileManager displayNameAtPath:[path stringByDeletingPathExtension]];
     name = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-	[fileManager release];
 	
 	IMBNode* node = [[[IMBNode alloc] initWithParser: self topLevel:YES] autorelease];
 	node.icon = [self iconForItemAtURL:url error:NULL];
@@ -363,7 +362,7 @@
 
 - (NSNumber*) directoryHasVisibleSubfolders:(NSURL*)directory error:(NSError**)outError;
 {
-	NSFileManager* fileManager = [[NSFileManager alloc] init];
+	NSFileManager* fileManager = [[[NSFileManager alloc] init] autorelease];
 
     IMBResourceAccessibility accessibility = [directory imb_accessibility];
 	if (!(accessibility == kIMBResourceIsAccessible)) return [NSNumber numberWithBool:NO];
@@ -372,7 +371,6 @@
                                    includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLIsDirectoryKey,NSURLIsPackageKey,nil] 
                                                       options:NSDirectoryEnumerationSkipsHiddenFiles 
                                                         error:outError];
-    [fileManager release];
     
 	if (!contents)
 	{
