@@ -231,10 +231,6 @@
 		}
 	});
 	
-    // Every parser must have its current parser messenger set
-    
-    [self setParserMessengerForParsers];
-    
 	return (NSArray*)parsers;
 }
 

@@ -80,7 +80,6 @@
 	NSString* _identifier;
 	NSString* _mediaType;
 	NSURL* _mediaSource;
-    IMBParserMessenger* _parserMessenger;
 }
 
 // Together these parameters uniquely specify a parser instance. The values are taken from IMBParserFacrtory...
@@ -88,7 +87,6 @@
 @property (copy) NSString* identifier;	
 @property (copy) NSString* mediaType;	
 @property (retain) NSURL* mediaSource;
-@property (assign) IMBParserMessenger* parserMessenger;
 
 // The following three methods are at the heart of parser classes and must be implemented. They will be called on
 // on the XPC service side: Together they create the iMedia data model tree, which gets serialized and sent back

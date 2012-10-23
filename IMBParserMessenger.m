@@ -231,17 +231,6 @@
 }
 
 
-// Sets this parser messenger's instance to all parsers of this instance
-
-- (void) setParserMessengerForParsers
-{
-    for (IMBParser *parser in [[self class] parsers])
-    {
-        parser.parserMessenger = self;
-    }
-}
-
-
 // Helper method to resolve any attached bookmarks, thus giving the XPC service access to parts of the file system...
 
 //- (void) _resolveAccessRightsBookmarks

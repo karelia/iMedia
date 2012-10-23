@@ -174,7 +174,6 @@
             self.mediaType = inParser.mediaType;
             self.parserIdentifier = inParser.identifier;
             self.mediaSource = inParser.mediaSource;
-            self.parserMessenger = inParser.parserMessenger;
             
             if (self.isTopLevelNode)
             {

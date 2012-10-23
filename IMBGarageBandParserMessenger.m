@@ -205,10 +205,6 @@ static dispatch_once_t sOnceToken = 0;
 		}
 	});
 
-    // Every parser must have its current parser messenger set
-    
-    [self setParserMessengerForParsers];
-    
 	return (NSArray*)parsers;
 }
 

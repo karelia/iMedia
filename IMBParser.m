@@ -89,7 +89,6 @@
 @synthesize identifier = _identifier;
 @synthesize mediaType = _mediaType;
 @synthesize mediaSource = _mediaSource;
-@synthesize parserMessenger = _parserMessenger;
 
 
 //----------------------------------------------------------------------------------------------------------------------
