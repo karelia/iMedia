@@ -240,32 +240,4 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location that corresponds to the skimming index provided. Must be subclassed.
-// Note: This method must only be invoked in an XPC service (because implementations will most likely
-//       take advantage of the parser associated with this object).
-
-- (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
-{
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
-	NSLog(@"%@", errorMessage);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
-	
-	return nil;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location of the key image. Must be subclassed.
-
-- (id) keyImageLocation
-{
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
-	NSLog(@"%@", errorMessage);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
-	
-	return nil;
-}
-
-
 @end

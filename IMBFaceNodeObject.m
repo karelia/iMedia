@@ -179,45 +179,6 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location that corresponds to the skimming index provided
-
-- (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
-{
-    NSString* imageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:skimmingIndex];
-    IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
-    
-    // Get the metadata of the nth image in which this face occurs 
-    NSDictionary* imageFaceMetadata = [[[self preliminaryMetadata] objectForKey:@"ImageFaceMetadataList"] objectAtIndex:skimmingIndex];
-    
-    // What is the number of this face inside of this image?
-    NSNumber* faceIndex = [imageFaceMetadata objectForKey:@"face index"];
-    
-    // A clipped image of this face in this image is stored in the filesystem
-    NSString* imagePath = [parser imagePathForFaceIndex:faceIndex inImageWithKey:imageKey];
-    
-    return [NSURL fileURLWithPath:imagePath isDirectory:NO];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location of the key image
-
-- (id) keyImageLocation
-{
-	NSString* imageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-	IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
-	
-    // What is the number of this face inside of this image?
-    NSNumber* faceIndex = [[self preliminaryMetadata] objectForKey:@"key image face index"];
-    
-    // A clipped image of this face in this image is stored in the filesystem
-    NSString* imagePath = [parser imagePathForFaceIndex:faceIndex inImageWithKey:imageKey];
-    
-    return [NSURL fileURLWithPath:imagePath isDirectory:NO];
-}
-
-
 - (NSUInteger) imageCount
 {
 	return [[self.preliminaryMetadata objectForKey:@"KeyList"] count];

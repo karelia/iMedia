@@ -70,14 +70,6 @@
 // Returns the image location that corresponds to the current skimming index. Must be subclassed.
 - (id) imageLocationForCurrentSkimmingIndex;
 
-// Returns the image location that corresponds to the skimming index provided. Must be subclassed.
-
-- (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex;
-    
-// Returns the image location of the key image. Must be subclassed.
-
-- (id) keyImageLocation;
-
 // Need to set this flag from skimmable controller while skimming
 
 - (void) setIsLoadingThumbnail:(BOOL)inIsLoadingThumbnail;

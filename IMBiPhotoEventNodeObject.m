@@ -154,30 +154,6 @@
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location that corresponds to the skimming index provided
-
-- (id) imageLocationAtSkimmingIndex:(NSUInteger)skimmingIndex
-{
-	NSString* imageKey = [[self.preliminaryMetadata objectForKey:@"KeyList"] objectAtIndex:skimmingIndex];
-	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
-
-    return [NSURL fileURLWithPath:[parser imagePathForImageKey:imageKey] isDirectory:NO];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// Returns the image location of the key image
-
-- (id) keyImageLocation
-{
-	NSString* imageKey = [self.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
-	
-    return [NSURL fileURLWithPath:[parser imagePathForImageKey:imageKey] isDirectory:NO];
-}
-
-
 - (NSUInteger) imageCount
 {
 	return [[self.preliminaryMetadata objectForKey:@"KeyList"] count];
