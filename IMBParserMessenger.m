@@ -179,9 +179,21 @@
 }
 
 
++ (NSString*) xpcServiceIdentifierPrefix
+{
+	return @"im.edia.";
+}
+
+
++ (NSString*) xpcServiceIdentifierPostfix
+{
+	return [[self identifier] pathExtension];
+}
+
+
 + (NSString*) xpcServiceIdentifier
 {
-	return [self identifier];
+	return [[self xpcServiceIdentifierPrefix] stringByAppendingString:[self xpcServiceIdentifierPostfix]];
 }
 
 

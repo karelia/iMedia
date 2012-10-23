@@ -89,9 +89,9 @@ static dispatch_once_t sMovieOnceToken = 0;
 
 // Both audio and movie use the same xpc service, so override this method...
 
-+ (NSString*) xpcServiceIdentifier
++ (NSString*) xpcServiceIdentifierPostfix
 {
-	return @"com.karelia.imedia.iTunes";
+	return @"iTunes";
 }
 
 

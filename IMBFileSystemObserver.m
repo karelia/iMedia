@@ -165,7 +165,7 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 {
 	// Launch the FSEvents XPC service and establish a connection to it...
 	
-	_connection = [[XPCConnection alloc] initWithServiceName:@"com.karelia.imedia.FSEvents"];
+	_connection = [[XPCConnection alloc] initWithServiceName:@"im.edia.FSEvents"];
 	
 	// Install a global event handler to receive replies. For each pathDidChange reply we'll get,  
 	// we will send out a notification on the main thread that any interested parties (probably 

@@ -86,9 +86,13 @@
 }
 
 
-+ (NSString*) xpcServiceIdentifier
+//----------------------------------------------------------------------------------------------------------------------
+// All different types of folder parser messengers (image, audio, movie) use the same XPC service
+// (but have different identifiers)
+
++ (NSString*) xpcServiceIdentifierPostfix
 {
-	return @"com.karelia.imedia.Folder";
+	return @"Folder";
 }
 
 

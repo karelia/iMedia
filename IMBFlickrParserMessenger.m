@@ -140,11 +140,6 @@
 }
 
 
-+ (NSString*) xpcServiceIdentifier {
-	return @"com.karelia.imedia.Flickr";
-}
-
-
 #pragma mark 
 #pragma mark Properties
 

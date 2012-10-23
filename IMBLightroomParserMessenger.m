@@ -145,9 +145,9 @@ static dispatch_once_t sOnceToken = 0;
 }
 
 
-+ (NSString*) xpcServiceIdentifier
++ (NSString*) xpcServiceIdentifierPostfix
 {
-	return @"com.karelia.imedia.Lightroom";
+	return @"Lightroom";
 }
 
 
