@@ -333,16 +333,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 				if (dict == nil || 0 == dict.count)
 				{
 					NSLog (@"The iPhoto or Aperture XML file seems to be empty. This is an unhealthy condition!");
-				}
-				
-				// Since this parser confines itself to deal with the "List of Albums" only
-				// we add an events node to the album list to incorporate events in the browser.
-				// This is why we need a mutable library dictionary.
-				
-				if (dict)
-				{
+				} else {
+                    // Since this parser confines itself to deal with the "List of Albums" only
+                    // we add an events node to the album list to incorporate events in the browser.
+                    // This is why we need a mutable library dictionary.
+                    
 					[self addSpecialAlbumsToAlbumsInLibrary:dict];
-				}
+                }
 				
 				self.atomic_plist = dict;
 				self.modificationDate = modificationDate;
