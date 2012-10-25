@@ -164,8 +164,8 @@
 	id obj = [sender representedObject];
 	if ([obj isKindOfClass:[IMBObject class]]) {
 		IMBObject* imbObject = (IMBObject*) obj;
-		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
-		[[NSWorkspace imb_threadSafeWorkspace] openURL:webPage];
+		NSString *webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
+		[[NSWorkspace imb_threadSafeWorkspace] openURL:[NSURL URLWithString:webPage]];
 	} else {
 		NSLog (@"Can't handle this kind of object.");
 	}
@@ -178,12 +178,12 @@
 	id obj = [sender representedObject];
 	if ([obj isKindOfClass:[IMBObject class]]) {
 		IMBObject* imbObject = (IMBObject*) obj;
-		NSURL* webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
+		NSString *webPage = [[imbObject metadata] objectForKey:@"webPageURL"];
 
 		NSPasteboard *pb = [NSPasteboard generalPasteboard];
 		NSArray *types = [NSArray arrayWithObjects:NSStringPboardType, nil];
 		[pb declareTypes:types owner:self];
-		[pb setString:[webPage absoluteString] forType:NSStringPboardType];
+		[pb setString:webPage forType:NSStringPboardType];
 	
 	} else {
 		NSLog (@"Can't handle this kind of object.");
