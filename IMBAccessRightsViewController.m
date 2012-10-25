@@ -249,45 +249,49 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 // Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
 // bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
 // to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
+// Note that this is an empty operation if not sandboxed.
 
 - (void) grantAccessRightsForNode:(IMBNode*)inNode
 {
-	// Calculate the best possible folder to select...
-	
-	IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
-	NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
-	IMBNode* node = nodes.count==1 ? [nodes objectAtIndex:0] : nil;
-	NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
-	NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
-	
-	// Show an NSOpenPanel with this folder...
-	
-	[self _showForSuggestedURL:proposedURL name:node.name completionHandler:^(NSURL* inGrantedURL)
-	{
-		if (inGrantedURL)
-		{
-			// Create bookmark...
-			
-			NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
-			
-			// Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
-			
-			[self _reloadTopLevelNodesWithoutAccessRightsWithURL:inGrantedURL bookmark:bookmark];
-			
-			// Also send it to the FSEvents service, so that it can do its job...
-			
-			[[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
-		}
-	}];
+    if (SBIsSandboxed())
+    {
+        // Calculate the best possible folder to select...
+        
+        IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
+        NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+        IMBNode* node = nodes.count==1 ? [nodes objectAtIndex:0] : nil;
+        NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
+        NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
+        
+        // Show an NSOpenPanel with this folder...
+        
+        [self _showForSuggestedURL:proposedURL name:node.name completionHandler:^(NSURL* inGrantedURL)
+         {
+             if (inGrantedURL)
+             {
+                 // Create bookmark...
+                 
+                 NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
+                 
+                 // Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
+                 
+                 [self _reloadTopLevelNodesWithoutAccessRightsWithURL:inGrantedURL bookmark:bookmark];
+                 
+                 // Also send it to the FSEvents service, so that it can do its job...
+                 
+                 [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+             }
+         }];
+    }
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// Note that this is an empty operation if not sandboxed.
 
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode
 {
-	if (inNode.objects.count > 0 && inNode.badgeTypeNormal != kIMBBadgeTypeLoading)
+	if (SBIsSandboxed() && inNode.objects.count > 0 && inNode.badgeTypeNormal != kIMBBadgeTypeLoading)
 	{
 		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
 
@@ -332,32 +336,38 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// Note that this is an empty operation (except for completion handler) if not sandboxed.
+// In that case only completion handler will be called (synchronously)
 
 + (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler
 {
-    IMBParserMessenger* messenger = inFolderParserMessenger;
-    void(^completionHandler)(void) = [inCompletionHandler copy];
-    
-    // Create bookmark...
-    
-    NSURL* url = messenger.mediaSource;
-    NSData* bookmark = [IMBAccessRightsController bookmarkForURL:url];
-    
-    // Send it to the XPC service, so it has access to the folder...
-    
-    SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
-
-        ^(NSURL* inReceivedURL,NSError* inError)
-        {
-            NSLog(@"%s  url=%@  error=%@",__FUNCTION__,inReceivedURL,inError);
-            completionHandler();
-            [completionHandler release];
-        });
-
-    // Also send it to the FSEvents service, so that it can do its job...
-    
-    [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+    if (SBIsSandboxed())
+    {
+        IMBParserMessenger* messenger = inFolderParserMessenger;
+        void(^completionHandler)(void) = [inCompletionHandler copy];
+        
+        // Create bookmark...
+        
+        NSURL* url = messenger.mediaSource;
+        NSData* bookmark = [IMBAccessRightsController bookmarkForURL:url];
+        
+        // Send it to the XPC service, so it has access to the folder...
+        
+        SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+                               
+                               ^(NSURL* inReceivedURL,NSError* inError)
+                               {
+                                   NSLog(@"%s  url=%@  error=%@",__FUNCTION__,inReceivedURL,inError);
+                                   completionHandler();
+                                   [completionHandler release];
+                               });
+        
+        // Also send it to the FSEvents service, so that it can do its job...
+        
+        [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+    } else {
+        inCompletionHandler();
+    }
 }
 
 
