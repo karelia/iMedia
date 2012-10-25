@@ -315,7 +315,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		NSMutableDictionary *metadata = [NSMutableDictionary dictionary];
 		[metadata addEntriesFromDictionary:photoDict];		// give metaData the whole thing!
 		NSURL *webPageURL = [context photoWebPageURLFromDictionary:photoDict];
-		[metadata setObject:webPageURL forKey:@"webPageURL"];
+		[metadata setObject:[webPageURL absoluteString] forKey:@"webPageURL"];
 		
 		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:context];
 		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
