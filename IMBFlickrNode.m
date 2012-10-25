@@ -318,7 +318,7 @@ NSString* const IMBFlickrNodeProperty_UUID = @"uuid";
 		[metadata setObject:[webPageURL absoluteString] forKey:@"webPageURL"];
 		
 		NSURL *quickLookURL = [self imageURLForDesiredSize:kIMBFlickrSizeSpecifierMedium fromPhotoDict:photoDict context:context];
-		[metadata setObject:quickLookURL forKey:@"quickLookURL"];
+		[metadata setObject:[quickLookURL absoluteString] forKey:@"quickLookURL"];
 
 		// But give it a better 'description' without the nested item
 		NSString *descHTML = [[photoDict objectForKey:@"description"] objectForKey:@"_text"];
