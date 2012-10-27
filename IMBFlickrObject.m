@@ -77,7 +77,10 @@
 
 - (NSURL*) previewItemURL
 {
-	NSURL* quickLookURL = [self.metadata objectForKey:@"quickLookURL"];
+	NSString *quickLookURLString = [self.metadata objectForKey:@"quickLookURL"];
+    if (!quickLookURLString) return nil;
+    
+    NSURL *quickLookURL = [NSURL URLWithString:quickLookURLString];
 	NSURL* previewItemURL = nil;
 	
 	if (quickLookURL)
