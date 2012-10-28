@@ -1789,9 +1789,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 			if ([promise.objects count] > 0)	// if not downloadable, these won't appear in objects list
 			{
 				NSData* promiseData = [NSKeyedArchiver archivedDataWithRootObject:promise];
-				
-				NSArray* declaredTypes = nil;
-				
+								
 				// We currently use a mix of 10.5 and 10.6 style pasteboard behaviors.
 				//
 				// 10.6 affords us the opportunity to write multiple items on the pasteboard at once, 
@@ -1859,16 +1857,11 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 					
 					if ([self writesLocalFilesToPasteboard])
 					{
-						// Try declaring promise AFTER the other types
-						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilesPromisePboardType,NSFilenamesPboardType, 
-										 
-										 // Also our own special metadata types that clients can make use of
-										 kIMBPublicTitleListPasteboardType, kIMBPublicMetadataListPasteboardType,
-										 
-										 nil]; 
-						// Used to be this. Any advantage to having both?  [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSFilenamesPboardType,nil]
-						
-						for (IMBObject *object in [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes])
+						[inPasteboard declareTypes:[NSArray arrayWithObject:kIMBPasteboardTypeObjectsPromise] owner:self];  // gets written in a moment
+                        
+                        // Setup file promise, but only for remote files
+                        // And only if the drag source is actually capable of supporting it. Best guess for that right now is the pasteboard being for dragging
+                        for (IMBObject *object in [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes])
 						{
 							NSString *path = [object path];
 							NSString *type = [path pathExtension];
@@ -1878,32 +1871,48 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 								// Keep all 3 items in sync, so the arrays are of the same length.
 								[fileTypes addObject:type];
 								[titles addObject:object.name];
-								[metadatas addObject:object.metadata];								
+								[metadatas addObject:object.metadata];
 							}
 						}
+                        
+                        if ([fileTypes count])
+                        {
+                            if (inPasteboard == [NSPasteboard pasteboardWithName:NSDragPboard] &&
+                                [promise isKindOfClass:[IMBRemoteObjectsPromise class]])
+                            {
+                                [inPasteboard addTypes:[NSArray arrayWithObject:NSFilesPromisePboardType] owner:self];
+                                BOOL wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+                                if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
+                            }
+                            
+                            // Write more generic bits
+                            [inPasteboard addTypes:[NSArray arrayWithObjects:
+                                                    NSFilenamesPboardType,
+                                                    kIMBPublicTitleListPasteboardType,
+                                                    kIMBPublicMetadataListPasteboardType,
+                                                    nil]
+                                             owner:self];
+						
+						    BOOL wasSet = NO;
+                            wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
+                            if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
+                            wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
+                            if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
+                            
+                            //						#ifdef DEBUG
+                            //						NSLog(@"Titles on pasteboard: %@", titles);
+                            //						NSLog(@"MetaData on pasteboard: %@", metadatas);
+                            //						#endif
+                        }
 					}
 					else
 					{
-						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil];
+                        [inPasteboard declareTypes:[NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil]
+                                             owner:self];
 					}
 					
-					[inPasteboard declareTypes:declaredTypes owner:self];
+                    // Write general iMedia promise
 					[inPasteboard setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
-					if ([fileTypes count])
-					{
-						BOOL wasSet = NO;
-						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
-						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
-						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
-
-//						#ifdef DEBUG
-//						NSLog(@"Titles on pasteboard: %@", titles);
-//						NSLog(@"MetaData on pasteboard: %@", metadatas);
-//						#endif
-					}
 				}
                 
                 [parser didWriteObjects:promise.objects toPasteboard:inPasteboard];
