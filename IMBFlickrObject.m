@@ -168,7 +168,7 @@
 	NSString *creatorAndURL = [NSString stringWithFormat:@"%@ - %@", credit, [shortWebPageURL absoluteString]];
 	NSDictionary *IPTCProperties = [NSDictionary dictionaryWithObjectsAndKeys:
 									creatorAndURL, kCGImagePropertyIPTCSource,
-									licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms not in 10.5 headers
+									licenseDescription, kCGImagePropertyIPTCRightsUsageTerms,
 									appSource, kCGImagePropertyIPTCOriginatingProgram,
 									nil];
 	NSDictionary *properties = [NSDictionary dictionaryWithObject:IPTCProperties forKey:(NSString *)kCGImagePropertyIPTCDictionary];
