@@ -1878,29 +1878,35 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 								[metadatas addObject:object.metadata];								
 							}
 						}
+                        
+                        [inPasteboard declareTypes:declaredTypes owner:self];
+                        
+                        
+                        // Write the specific data
+                        if ([fileTypes count])
+                        {
+                            BOOL wasSet = NO;
+                            wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
+                            if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
+                            wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
+                            if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
+                            wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
+                            if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
+                            
+                            //						#ifdef DEBUG
+                            //						NSLog(@"Titles on pasteboard: %@", titles);
+                            //						NSLog(@"MetaData on pasteboard: %@", metadatas);
+                            //						#endif
+                        }
 					}
 					else
 					{
 						declaredTypes = [NSArray arrayWithObjects:kIMBPasteboardTypeObjectsPromise,NSURLPboardType,kUTTypeURL,nil];
+                        [inPasteboard declareTypes:declaredTypes owner:self];
 					}
 					
-					[inPasteboard declareTypes:declaredTypes owner:self];
+                    // Write general iMedia promise
 					[inPasteboard setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
-					if ([fileTypes count])
-					{
-						BOOL wasSet = NO;
-						wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", NSFilesPromisePboardType, fileTypes);
-						wasSet = [inPasteboard setPropertyList:titles forType:kIMBPublicTitleListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicTitleListPasteboardType, titles);
-						wasSet = [inPasteboard setPropertyList:metadatas forType:kIMBPublicMetadataListPasteboardType];
-						if (!wasSet) NSLog(@"Could not set pasteboard type %@ to be %@", kIMBPublicMetadataListPasteboardType, metadatas);
-
-//						#ifdef DEBUG
-//						NSLog(@"Titles on pasteboard: %@", titles);
-//						NSLog(@"MetaData on pasteboard: %@", metadatas);
-//						#endif
-					}
 				}
                 
                 [parser didWriteObjects:promise.objects toPasteboard:inPasteboard];
