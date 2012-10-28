@@ -1857,6 +1857,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 						[inPasteboard declareTypes:[NSArray arrayWithObject:kIMBPasteboardTypeObjectsPromise] owner:self];  // gets written in a moment
                         
                         // Setup file promise, but only for remote files
+                        // And only if the drag source is actually capable of supporting it. Best guess for that right now is the pasteboard being for dragging
                         for (IMBObject *object in [[ibObjectArrayController arrangedObjects] objectsAtIndexes:indexes])
 						{
 							NSString *path = [object path];
@@ -1873,7 +1874,8 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
                         
                         if ([fileTypes count])
                         {
-                            if ([promise isKindOfClass:[IMBRemoteObjectsPromise class]])
+                            if (inPasteboard == [NSPasteboard pasteboardWithName:NSDragPboard] &&
+                                [promise isKindOfClass:[IMBRemoteObjectsPromise class]])
                             {
                                 [inPasteboard addTypes:[NSArray arrayWithObject:NSFilesPromisePboardType] owner:self];
                                 BOOL wasSet = [inPasteboard setPropertyList:fileTypes forType:NSFilesPromisePboardType];
