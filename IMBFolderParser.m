@@ -191,6 +191,11 @@
 {
 	NSString* folder = inNode.mediaSource;
     NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
+    
+    // Handle the folder being a symlink; becomes more likely when sandboxed
+    folderURL = [folderURL URLByResolvingSymlinksInPath];
+    if (!folderURL) folderURL = [NSURL fileURLWithPath:folder]; // fallback
+    
     NSFileManager* fm = [NSFileManager imb_threadSafeManager];
     
     NSArray* files = [fm contentsOfDirectoryAtURL:folderURL
