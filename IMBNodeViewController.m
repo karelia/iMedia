@@ -902,7 +902,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 // Change text attributes of outline cell so that Hide/Show buttons' appearance can be customized
 // based on section header appearance
 
--(void)outlineView:(NSOutlineView *)inOutlineView willDisplayOutlineCell:(id)inCell forTableColumn:(NSTableColumn *)tableColumn item:(id)inItem
+-(void)outlineView:(NSOutlineView *)inOutlineView willDisplayOutlineCell:(id)inCell
+    forTableColumn:(NSTableColumn *)tableColumn
+              item:(id)inItem
 {    
     if ([inCell isKindOfClass:[NSButtonCell class]] &&
         [inOutlineView isKindOfClass:[IMBOutlineView class]])
@@ -917,8 +919,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
             [paragraphStyle setAlignment:NSRightTextAlignment];
             [effectiveTextAttributes setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
             
+            // If we use default appearance don't mess with background style
+            // (would otherwise void implicit highlight color of disclosure triangle)
+            // But if we use some other appearance we want to apply another color to triangle.
+            // For some reason we have to set the cell's background style for the color to have any effect.
             
-            [inCell setBackgroundStyle:0];      // Remove shadows from disclosure triangles
+            NSNumber* isDefaultAppearanceNumber = [textAttributes objectForKey:IMBIsDefaultAppearanceAttributeName];
+            if ((!isDefaultAppearanceNumber || ![isDefaultAppearanceNumber boolValue]) &&
+                [textAttributes objectForKey:NSForegroundColorAttributeName])
+            {
+                // This causes the foreground color of the attributed string to be used for triangle
+                // (for whatever reason)
+                
+                [inCell setBackgroundStyle:0];
+            }
             NSAttributedString *attrStr = [[[NSAttributedString alloc] initWithString:[inCell title]
                                                                            attributes:effectiveTextAttributes] autorelease];
             [inCell setAttributedTitle:attrStr];

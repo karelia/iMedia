@@ -52,6 +52,8 @@
 @class IMBNode;
 @class IMBTableViewAppearance;
 
+extern NSString* IMBIsDefaultAppearanceAttributeName;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -391,6 +391,8 @@
 #pragma mark
 #pragma mark Appearance
 
+NSString* IMBIsDefaultAppearanceAttributeName = @"IMBIsDefaultAppearanceAttributeName";
+
 - (IMBTableViewAppearance*) defaultAppearance
 {
     IMBTableViewAppearance* appearance = [[[IMBTableViewAppearance alloc] initWithView:self] autorelease];
@@ -403,6 +405,7 @@
                                               [NSColor disabledControlTextColor], NSForegroundColorAttributeName,
                                               [NSFont boldSystemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName,
                                               shadow, NSShadowAttributeName,
+                                              [NSNumber numberWithBool:YES], IMBIsDefaultAppearanceAttributeName,
                                               nil];
     
     appearance.rowTextAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
