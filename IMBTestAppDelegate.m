@@ -571,7 +571,7 @@
      [NSFont fontWithName:@"Lucida Grande Bold" size:12], NSFontAttributeName,
      nil];
     
-    NSMutableParagraphStyle* paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    NSMutableParagraphStyle* paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
     [paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
     
     NSDictionary* subRowTextAttributes =
