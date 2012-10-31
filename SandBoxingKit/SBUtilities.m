@@ -66,10 +66,10 @@ BOOL SBIsSandboxed()
 					{
 						sIsSandboxed = YES;
 					};
+                    CFRelease(reqRef);
 				}
-                CFRelease(reqRef);
+                CFRelease(codeRef);
 			}
-            CFRelease(codeRef);
 		}
     });
 	
