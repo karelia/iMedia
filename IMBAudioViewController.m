@@ -146,7 +146,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+	return [[NSWorkspace sharedWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
 }
 
 - (NSString*) displayName

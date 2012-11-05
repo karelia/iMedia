@@ -129,7 +129,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
+	return [[NSWorkspace sharedWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
 }
 
 - (NSString*) displayName
