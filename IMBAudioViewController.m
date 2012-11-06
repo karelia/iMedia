@@ -146,7 +146,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace sharedWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iTunes"];
+	return [[self class] iconForAppWithBundleIdentifier:@"com.apple.iTunes" fallbackFolder:NSMusicDirectory];
 }
 
 - (NSString*) displayName

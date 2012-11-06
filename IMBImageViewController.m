@@ -127,7 +127,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace sharedWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
+    return [[self class] iconForAppWithBundleIdentifier:@"com.apple.iPhoto" fallbackFolder:NSPicturesDirectory];
 }
 
 - (NSString*) displayName
