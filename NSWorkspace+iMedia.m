@@ -79,12 +79,6 @@
 	return instance;	
 }
 	
-- (NSImage *)imb_iconForAppWithBundleIdentifier:(NSString *)bundleID
-{
-	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
-	return [self iconForFile:path];
-}
-
 - (NSImage *)imb_iconForFile:(NSString *)path size:(NSSize)size
 {
 	if (path)
