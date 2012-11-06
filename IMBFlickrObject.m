@@ -77,7 +77,10 @@
 
 - (NSURL*) previewItemURL
 {
-	NSURL* quickLookURL = [self.metadata objectForKey:@"quickLookURL"];
+	NSString *quickLookURLString = [self.metadata objectForKey:@"quickLookURL"];
+    if (!quickLookURLString) return nil;
+    
+    NSURL *quickLookURL = [NSURL URLWithString:quickLookURLString];
 	NSURL* previewItemURL = nil;
 	
 	if (quickLookURL)
@@ -160,7 +163,7 @@
 	NSString *creatorAndURL = [NSString stringWithFormat:@"%@ - %@", credit, [shortWebPageURL absoluteString]];
 	NSDictionary *IPTCProperties = [NSDictionary dictionaryWithObjectsAndKeys:
 									creatorAndURL, kCGImagePropertyIPTCSource,
-									licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms not in 10.5 headers
+									licenseDescription, @"UsageTerms", // kCGImagePropertyIPTCRightsUsageTerms claims to be 10.6+ but in reality is not found when launched on 10.6, killing your app on launch
 									appSource, kCGImagePropertyIPTCOriginatingProgram,
 									nil];
 	NSDictionary *properties = [NSDictionary dictionaryWithObject:IPTCProperties forKey:(NSString *)kCGImagePropertyIPTCDictionary];

@@ -765,6 +765,41 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 #pragma mark 
 
++ (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
+{
+    // Use app's icon, falling back to the folder's icon, and finally generic folder
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    NSString *path = [workspace absolutePathForAppBundleWithIdentifier:identifier];
+	NSImage *result = [workspace iconForFile:path];
+    
+    if (!result)
+    {
+        NSURL *picturesFolder = [[NSFileManager defaultManager] URLForDirectory:directory
+                                                                       inDomain:NSUserDomainMask
+                                                              appropriateForURL:nil
+                                                                         create:NO
+                                                                          error:NULL];
+        
+        picturesFolder = [picturesFolder URLByResolvingSymlinksInPath]; // tends to be a symlink when sandboxed
+        
+        if (![picturesFolder getResourceValue:&result forKey:NSURLEffectiveIconKey error:NULL] || result == nil)
+        {
+            result = [workspace iconForFileType:(NSString *)kUTTypeFolder];
+        }
+    }
+    
+	return result;
+}
+
+- (NSString*) displayName
+{
+	return nil;	// Must be overridden by subclass
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Depending of the IMBConfig setting useGlobalViewType, the controller either uses a global state, or each
 // controller keeps its own state. It is up to the application developer to choose a behavior...
 

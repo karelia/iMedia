@@ -301,7 +301,7 @@
     NSString *result = [path stringByAppendingPathComponent:filename];
     NSInteger i = 1;
     while ([self fileExistsAtPath:result]) {
-        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, (long)i, extension];
+        filename = [NSString stringWithFormat:@"%@ %ld.%@", basename, i, extension];
         result = [path stringByAppendingPathComponent:filename];
         i++;
     }    
