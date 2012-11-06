@@ -129,7 +129,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.Safari"];
+	return [[self class] iconForAppWithBundleIdentifier:@"com.apple.Safari" fallbackFolder:0];
 }
 
 - (NSString*) displayName

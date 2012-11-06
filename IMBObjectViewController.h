@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Mike Abdullah
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,6 +198,9 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 - (NSImage*) icon;
 - (NSString*) displayName;
 + (CALayer*) iconViewBackgroundLayer;
+
+// Support for subclasses; please don't rely on it in your own apps
++ (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
 
 + (NSString*) objectCountFormatSingular;
 + (NSString*) objectCountFormatPlural;
