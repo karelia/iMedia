@@ -44,7 +44,7 @@
 */
 
 
-// Author: Jason Jobe
+// Author: Jason Jobe, Mike Abdullah
 
 
 #import "NSWorkspace+iMedia.h"
@@ -82,10 +82,6 @@
 - (NSImage *)imb_iconForAppWithBundleIdentifier:(NSString *)bundleID
 {
 	NSString *path = [self absolutePathForAppBundleWithIdentifier:bundleID];
-	if (nil == path)
-	{
-		return [NSImage imageNamed:@"NSDefaultApplicationIcon"];
-	}
 	return [self iconForFile:path];
 }
 

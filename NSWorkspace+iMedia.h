@@ -44,7 +44,7 @@
 */
 
 
-// Author: Unknown
+// Author: Unknown, Mike Abdullah
 
 
 #import <Cocoa/Cocoa.h>
