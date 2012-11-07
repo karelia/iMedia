@@ -125,6 +125,9 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 @property (retain) IMBLibraryController* libraryController;
 
+// Support for subclasses; please don't rely on it in your own apps
++ (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
+
 - (NSString*) mediaType;
 - (NSImage*) icon;
 - (NSString*) displayName;

@@ -195,6 +195,7 @@ IMBObjectFilter;
 @property (readonly) BOOL canUseIconSize;
 
 @property (readonly) NSString* objectCountString;
+
 @property (retain) NSString* objectCountFormatSingular;
 @property (retain) NSString* objectCountFormatPlural;
 
