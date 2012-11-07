@@ -104,7 +104,7 @@
 
 // Add/remove custom parsers. This is usually used for folder based parsers that are dragged into the outline view.
 // Please note that this method should be called after loadParsers...
-
+// SANDBOXING: Requires the com.apple.security.files.bookmarks.app-scope entitlement
 - (BOOL) addCustomParser:(IMBParser*)inParser forMediaType:(NSString*)inMediaType;
 - (BOOL) removeCustomParser:(IMBParser*)inParser;
 
