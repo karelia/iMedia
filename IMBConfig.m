@@ -314,13 +314,19 @@ static NSMutableSet *sLibraryPaths = nil;
 
 + (void) registerLibraryPath:(NSString*)inPath
 {
-	if (nil == sLibraryPaths)
-	{
-		sLibraryPaths = [NSMutableSet new];
-	}
+	static dispatch_once_t sOnceToken;
 	
-	[sLibraryPaths addObject:inPath];
+	dispatch_once(&sOnceToken, ^()
+    {
+        sLibraryPaths = [NSMutableSet new];
+    });
+	
+	@synchronized(sLibraryPaths)
+	{
+        [sLibraryPaths addObject:inPath];
+	}
 }
+
 
 + (BOOL) isLibraryAtURL:(NSURL *)url;
 {
