@@ -245,7 +245,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 			{
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
-                NSFileManager *fileManager = [[NSFileManager alloc] init];
 				
 				// Create a parser instance preconfigure with that path...
 				
@@ -263,8 +262,6 @@ static dispatch_once_t sMovieOnceToken = 0;
 				
 				NSString* libraryPath = [path stringByDeletingLastPathComponent];
 				[IMBConfig registerLibraryPath:libraryPath];
-                
-                [fileManager release];
 			}
 			
 			if (recentLibraries) CFRelease(recentLibraries);

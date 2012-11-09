@@ -207,8 +207,6 @@
 				NSURL* url = [NSURL URLWithString:library];
 				NSString* path = [url path];
 
-				NSFileManager *fileManager = [[NSFileManager alloc] init];
-
 				IMBAppleMediaParser* parser = [self newParserWithMediaSource:url];
                 
                 // All parsers are kept in static list
@@ -224,8 +222,6 @@
 				  
 				NSString* libraryPath = [path stringByDeletingLastPathComponent];
 				[IMBConfig registerLibraryPath:libraryPath];
-
-				[fileManager release];
 			}
 			if (recentLibraries) CFRelease(recentLibraries);
 		}
