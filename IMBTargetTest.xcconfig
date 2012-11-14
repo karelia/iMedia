@@ -8,7 +8,6 @@
 // is now referencing your own set of xcconfig files.
 
 
-DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 GCC_MODEL_TUNING = G5
 GCC_PRECOMPILE_PREFIX_HEADER = YES
 
