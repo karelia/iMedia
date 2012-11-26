@@ -1,3 +1,5 @@
+NOTE: This is the readme file for iMedia 2.5. The information presented here only partially applies to iMedia 3.0. Regarding sandboxing it does not apply at all.
+
 Overview
 ========
 
