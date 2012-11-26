@@ -144,7 +144,10 @@ static IMBIconCache* sSharedIconCache;
                 if (image) {
 //                    NSLog(@"Loaded image %@", effectiveIconName);
                 } else {
-                    NSLog(@"Could not load image %@", effectiveIconName);
+                    // Do not report non-existence of highlight icons. Framework must handle this gracefully.
+                    if (!inHighlight) {
+                        NSLog(@"Could not load image %@", effectiveIconName);
+                    }
                 }
 
 				// if the image doesn't exist, try using another image at a specific location (but not for highlight icon)
