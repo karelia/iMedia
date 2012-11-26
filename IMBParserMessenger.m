@@ -61,6 +61,7 @@
 #import "SBUtilities.h"
 #import "NSObject+iMedia.h"
 #import "NSFileManager+iMedia.h"
+#import "NSBundle+iMedia.h"
 #import "IMBAccessRightsController.h"
 
 
@@ -201,9 +202,10 @@
 
 - (id) connection
 {
-	if (_connection == nil && SBIsSandboxed())
+    NSString* identifier = [[self class] xpcServiceIdentifier];
+    
+	if (_connection == nil && [[NSBundle mainBundle] supportsXPCServiceWithIdentifier:identifier])
 	{
-		NSString* identifier = [[self class] xpcServiceIdentifier];
 		_connection = [[NSClassFromString(@"XPCConnection") alloc] initWithServiceName:identifier];
 	}
 	
