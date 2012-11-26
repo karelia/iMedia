@@ -26,3 +26,5 @@ GCC_OPTIMIZATION_LEVEL = 0
 // keep debugging symbols in separate files
 GCC_GENERATE_DEBUGGING_SYMBOLS = YES
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+
+CODE_SIGN_IDENTITY = Mac Developer
