@@ -765,6 +765,9 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 #pragma mark 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Depending of the IMBConfig setting useGlobalViewType, the controller either uses a global state, or each
 // controller keeps its own state. It is up to the application developer to choose a behavior...
 

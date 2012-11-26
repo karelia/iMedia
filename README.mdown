@@ -48,6 +48,10 @@ Recent Release Notes
 
 * `+[NSImage imb_imageForResource:fromAppWithBundleIdentifier:fallbackName:]` replaces `+imb_imageResourceNamed:fromApplication:fallbackTo:`. Apps likely shouldn't use this method anyway as it's fairly iMedia-specific. The new method nicely returns retina-compatible images if a suitable name is specified, like the other Cocoa image APIs.
 
+### 2.5.4
+
+* -[NSWorkspace imb_iconForAppWithBundleIdentifier:] has been removed. It's fallback mechanism was buggy and relied on private implementation details in the OS frameworks, which have since broke. If you are using this method in your app, provide your own implementation instead
+
 
 Development
 ========
