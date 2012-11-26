@@ -67,6 +67,7 @@
 		3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; };
 		3099018E16637B93006C1212 /* NSBundle+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3099018C16637B93006C1212 /* NSBundle+iMedia.h */; };
 		3099018F16637B93006C1212 /* NSBundle+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3099018D16637B93006C1212 /* NSBundle+iMedia.m */; };
+		309901941663B2A3006C1212 /* im.edia.Aperture.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39AC152ACD1300E30C43 /* im.edia.Aperture.xpc */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
@@ -528,6 +529,7 @@
 				D0F2DDCF152486360059DF8D /* im.edia.iTunes.xpc in Copy XPCServices */,
 				D0680C3C1518CCCE00CED506 /* im.edia.Folder.xpc in Copy XPCServices */,
 				30FFEBFE150A0AA70009C1D0 /* im.edia.iPhoto.xpc in Copy XPCServices */,
+				309901941663B2A3006C1212 /* im.edia.Aperture.xpc in Copy XPCServices */,
 			);
 			name = "Copy XPCServices";
 			runOnlyForDeploymentPostprocessing = 0;

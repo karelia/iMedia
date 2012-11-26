@@ -54,6 +54,7 @@
 
 #import "IMBLibraryController.h"
 #import "IMBParserController.h"
+#import "IMBAccessRightsController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
@@ -187,6 +188,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.subnodes = nil; //[NSMutableArray array];
 		_isReplacingNode = NO;
 		
+        // Ensure that app-scoped bookmarks are loaded from prefs
+        // if we are running sandboxed with GCD instead of XPC services
+        
+        [IMBAccessRightsController sharedAccessRightsController];
+
 		// Listen to changes on the file system...
 		
 		[[NSNotificationCenter defaultCenter]
