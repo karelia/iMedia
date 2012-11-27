@@ -86,7 +86,7 @@
 {
 	IMBLibraryController* _libraryController;
 	NSString* _selectedNodeIdentifier;
-	NSMutableArray* _expandedNodeIdentifiers;
+	NSArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
     NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
 	IMBParser* _selectedParser;
@@ -124,8 +124,8 @@
 @property (retain) NSView* standardObjectView;
 @property (retain) NSView* customObjectView;
 
-@property (retain) NSString* selectedNodeIdentifier;
-@property (retain) NSMutableArray* expandedNodeIdentifiers;
+@property (copy) NSString* selectedNodeIdentifier;
+@property (copy) NSArray* expandedNodeIdentifiers;
 @property (readonly) IMBNode* selectedNode;
 @property (retain) IMBParser* selectedParser;
 

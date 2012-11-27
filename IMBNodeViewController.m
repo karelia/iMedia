@@ -94,7 +94,6 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (void) _setPreferences:(NSMutableDictionary*)inDict;
 - (void) _saveStateToPreferences;
 - (void) _loadStateFromPreferences;
-- (NSMutableArray*) _expandedNodeIdentifiers;
 
 - (void) _nodesWillChange;
 - (void) _nodesDidChange;
@@ -124,7 +123,17 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 @synthesize libraryController = _libraryController;
 @synthesize nodeTreeController = ibNodeTreeController;
+
 @synthesize selectedNodeIdentifier = _selectedNodeIdentifier;
+- (void)setSelectedNodeIdentifier:(NSString *)identifier;
+{
+    identifier = [identifier copy];
+    [_selectedNodeIdentifier release]; _selectedNodeIdentifier = identifier;
+    
+    // Persist
+    [self _saveStateToPreferences];
+}
+
 @synthesize expandedNodeIdentifiers = _expandedNodeIdentifiers;
 @synthesize selectedParser = _selectedParser;
 
@@ -197,30 +206,11 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (id) initWithNibName:(NSString*)inNibName bundle:(NSBundle*)inBundle
-{
-	if (self = [super initWithNibName:inNibName bundle:inBundle])
-	{
-		_selectedNodeIdentifier = nil;
-		_expandedNodeIdentifiers = nil;
-		_isRestoringState = NO;
-	}
-	
-	return self;
-}
-
-
 - (void) awakeFromNib
 {
 	// We need to save preferences before tha app quits...
 	
-	[[NSNotificationCenter defaultCenter] 
-		addObserver:self 
-		selector:@selector(_saveStateToPreferences) 
-		name:NSApplicationWillTerminateNotification 
-		object:nil];
-	
-	[[NSNotificationCenter defaultCenter] 
+	[[NSNotificationCenter defaultCenter]
 		addObserver:self 
 		selector:@selector(_revealNodeWithIdentifier:) 
 		name:kIMBRevealNodeWithIdentifierNotification 
@@ -399,9 +389,9 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 
 - (void) _loadStateFromPreferences
 {
-	NSMutableDictionary* stateDict = [self _preferences];
+	NSDictionary* stateDict = [[IMBConfig prefsForClass:self.class] objectForKey:self.mediaType];
 	
-	self.expandedNodeIdentifiers = [NSMutableArray arrayWithArray:[stateDict objectForKey:@"expandedNodeIdentifiers"]];
+	self.expandedNodeIdentifiers = [stateDict objectForKey:@"expandedNodeIdentifiers"];
 	self.selectedNodeIdentifier = [stateDict objectForKey:@"selectedNodeIdentifier"];
 	
 	float splitviewPosition = [[stateDict objectForKey:@"splitviewPosition"] floatValue];
@@ -538,24 +528,27 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 // pending populate operation for the nodes that were just collapsed...
 	
 
-- (void) _setExpandedNodeIdentifiers
+- (void) _setExpandedNodeIdentifiersFromOutlineView
 {
 	if (!_isRestoringState && !self.libraryController.isReplacingNode)
 	{
 		self.expandedNodeIdentifiers = [self _expandedNodeIdentifiers];
+        
+        // Persist
+        [self _saveStateToPreferences];
 	}
 }
 
 
 - (void) outlineViewItemDidExpand:(NSNotification*)inNotification
 {
-	[self _setExpandedNodeIdentifiers];
+	[self _setExpandedNodeIdentifiersFromOutlineView];
 }
 
 
 - (void) outlineViewItemDidCollapse:(NSNotification*)inNotification
 {
-	[self _setExpandedNodeIdentifiers];
+	[self _setExpandedNodeIdentifiersFromOutlineView];
 
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
 	IMBNode* node = [item representedObject];
@@ -765,7 +758,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 // Get the identifiers of all currently expanded nodes. The result is a flat array, which is needed in the method
 // _restoreUserInterfaceState to try to restore the state of the user interface...
 
-- (NSMutableArray*) _expandedNodeIdentifiers
+- (NSArray*) _expandedNodeIdentifiers
 {
 	NSMutableArray* expandedNodeIdentifiers = [NSMutableArray array];
 	
@@ -982,7 +975,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		{
 			id item = [ibNodeOutlineView itemAtRow:i];
 			[ibNodeOutlineView expandItem:item];
-			[self _setExpandedNodeIdentifiers];
+			[self _setExpandedNodeIdentifiersFromOutlineView];
 			break;
 		}
 	}
@@ -1619,7 +1612,7 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 		IMBNode* node = [_libraryController nodeWithIdentifier:identifier];
 		NSInteger i = [self _revealNode:node];
 		if (i != NSNotFound) [ibNodeOutlineView scrollRowToVisible:i];
-		[self _setExpandedNodeIdentifiers];
+		[self _setExpandedNodeIdentifiersFromOutlineView];
 	}
 }
 
