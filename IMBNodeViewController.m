@@ -831,7 +831,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 	cell.isGroupCell = node.isGroupNode;
 	cell.node = node;
-    cell.title = node.name;
+    cell.title = node.name ? node.name : @"–––";   // Safeguard against setting title to nil which would raise assertion failure
 	cell.badgeType = node.badgeTypeNormal;
 	
 	if (node.accessibility == kIMBResourceDoesNotExist)
