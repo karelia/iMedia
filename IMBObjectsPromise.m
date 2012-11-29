@@ -65,7 +65,6 @@
 #import "IMBURLDownloadOperation.h"
 #import "IMBURLGetSizeOperation.h"
 #import "NSFileManager+iMedia.h"
-#import "NSData+SKExtensions.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
