@@ -115,11 +115,11 @@
 			
 			if (HH > 0)
 			{
-				result = [NSString stringWithFormat:@"%ld:%ld:%02ld",HH,MM,SS];
+				result = [NSString stringWithFormat:@"%ld:%ld:%02ld",(long)HH,(long)MM,(long)SS];
 			}	
 			else
 			{
-				result = [NSString stringWithFormat:@"%ld:%02ld",MM,SS];
+				result = [NSString stringWithFormat:@"%ld:%02ld",(long)MM,(long)SS];
 			}	
 		}
 	}

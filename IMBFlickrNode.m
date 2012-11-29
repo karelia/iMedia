@@ -504,7 +504,7 @@ typedef enum {
 	// Example of a photo that can't be downloaded: THE DECEIVING title.
 	
 	//	load the specified page...
-	NSString* page = [NSString stringWithFormat:@"%ld", self.page + 1];
+	NSString* page = [NSString stringWithFormat:@"%ld", (long)(self.page + 1)];
 	[arguments setObject:page forKey:@"page"];
 	
 	return arguments;

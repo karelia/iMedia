@@ -666,7 +666,7 @@
 	
 	if ([_objects count] > 0)
 	{
-		[description appendFormat:@"\n\t\tobjects = %lu",[_objects count]];
+		[description appendFormat:@"\n\t\tobjects = %lu", (unsigned long)[_objects count]];
 		for (IMBObject* object in _objects)
 		{
 			[description appendFormat:@"\n\t\t\t%@",object.name];
@@ -677,7 +677,7 @@
 	
 	if ([_subNodes count] > 0)
 	{
-		[description appendFormat:@"\n\t\tsubnodes = %lu",[_subNodes count]];
+		[description appendFormat:@"\n\t\tsubnodes = %lu", (unsigned long)[_subNodes count]];
 		for (IMBNode* subnode in _subNodes)
 		{
 			[description appendFormat:@"\n\t\t\t%@",subnode.name];

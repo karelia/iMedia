@@ -58,7 +58,6 @@
 #import "IMBObjectsPromise.h"
 #import "IMBLibraryController.h"
 #import "NSString+iMedia.h"
-#import "NSData+SKExtensions.h"
 #import <Quartz/Quartz.h>
 #import <QTKit/QTKit.h>
 #import "NSURL+iMedia.h"

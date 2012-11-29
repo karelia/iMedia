@@ -178,9 +178,9 @@
 	NSRange visibleRows = [self rowsInRect:visibleRect];
 	NSMutableArray* keysToRemove = [NSMutableArray array];
 	
-	for (NSString* row in _subviewsInVisibleRows)
+	for (NSNumber* row in _subviewsInVisibleRows)
 	{
-		NSInteger i = [row intValue];
+		NSInteger i = [row integerValue];
 		id item = [self itemAtRow:i];
 		IMBNode* node = [item representedObject];
 		
@@ -201,7 +201,7 @@
 	{
 		id item = [self itemAtRow:i];
 		IMBNode* node = [item representedObject];
-		NSString* row = [NSString stringWithFormat:@"%ld",i];
+		NSNumber* row = @(i);
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
 		if (node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)

@@ -58,7 +58,6 @@
 #import "IMBLightroom3Parser.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
-#import "NSData+SKExtensions.h"
 
 
 // TODO: should subclassed methods be public?
@@ -134,7 +133,9 @@
 		}
 		
 		const char pattern[3] = { 0xFF, 0xD8, 0xFF };
-		NSUInteger index = [data lastIndexOfBytes:pattern length:3];
+        NSData *patternData = [[NSData alloc] initWithBytesNoCopy:(void *)pattern length:3 freeWhenDone:NO];
+		NSUInteger index = [data rangeOfData:patternData options:NSDataSearchBackwards range:NSMakeRange(0, [data length])].location;
+        [patternData release];
 		
 		// Should we cache that index?
 		if (index != NSNotFound) {
