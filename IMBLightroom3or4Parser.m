@@ -60,7 +60,6 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
-#import "NSData+SKExtensions.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
 #import "NSWorkspace+iMedia.h"
@@ -455,14 +454,15 @@
 		//		< data padding >
 		
 		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
+        NSData *patternData = [NSData dataWithBytesNoCopy:(void *)pattern length:4 freeWhenDone:NO];
 		
 		NSUInteger index = NSNotFound;
 		
 		if (maximumSize == nil) {
-			index = [data lastIndexOfBytes:pattern length:4];
+			index = [data rangeOfData:patternData options:NSDataSearchBackwards range:NSMakeRange(0, [data length])].location;
 		}
 		else {
-			index = [data indexOfBytes:pattern length:4];
+			index = [data rangeOfData:patternData options:0 range:NSMakeRange(0, [data length])].location;
 		}
 		
 		NSData* previousData = nil;
@@ -512,7 +512,7 @@
 					}
 					
 					previousData = jpegData;
-					index = [data indexOfBytes:pattern length:4 options:0 range:NSMakeRange(index + 4, [data length] - index - 4)];
+					index = [data rangeOfData:patternData options:0 range:NSMakeRange(index + 4, [data length] - index - 4)].location;
 					
 					continue;
 				}
