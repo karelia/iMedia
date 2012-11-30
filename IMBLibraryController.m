@@ -716,6 +716,12 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
 //	}
 	
+	if (inOldNode != nil && inOldNode.parentNode == nil)
+	{
+		NSLog(@"%s inOldNode has already been removed. This was problably a race condition...",__FUNCTION__);
+		return;
+	}
+	
 	// Tell user interface that we are going to modify the data model...
 	
 	_isReplacingNode = YES;
