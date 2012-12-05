@@ -795,8 +795,12 @@
 		[pool drain];
 	}
 	
-    inNode.objects = objects;
-
+	NSSortDescriptor* dateDescriptor = [[[NSSortDescriptor alloc]
+                                         initWithKey:@"preliminaryMetadata.DateAsTimerInterval"
+                                         ascending:YES] autorelease];
+	NSArray* sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
+    
+    inNode.objects = [objects sortedArrayUsingDescriptors:sortDescriptors];
 }
 
 
