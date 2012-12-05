@@ -204,9 +204,7 @@
 
 - (NSUInteger) imageCount
 {
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
-	NSLog(@"%@", errorMessage);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
+    [self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return NSNotFound;
 }
@@ -232,9 +230,7 @@
 
 - (id) imageLocationForCurrentSkimmingIndex
 {
-    NSString *errorMessage = [NSString stringWithFormat:@"-[%@ %s] must be subclassed", [self className], (char *)_cmd];
-	NSLog(@"%@", errorMessage);
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:errorMessage userInfo:nil] raise];
+    [self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
