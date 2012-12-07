@@ -182,15 +182,17 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 // Returns the image location for the image represented by inImageKey in the master image list (aka dictionary)
 
-- (NSString*) imagePathForImageKey:(NSString*)inImageKey;
+- (NSString*) thumbnailPathForImageKey:(NSString*)inImageKey;
 
 // Specific method for populating Faces nodes (in Aperture and iPhoto library)
 
 - (void) populateFacesNode:(IMBNode*)inNode withFaces:(NSDictionary*)inFaces images:(NSDictionary*)inImages;
 
-// Checks inKey whether it is a valid key in resource list and returns it if valid.
-// If not checks all other candidates for validity and returns the first that is valid.
-// If not returns nil.
+// Tries to ensure that a skimmable node (face or event or project) has a valid key photo key (in terms of
+// exists in master image list). Will replace that key if invalid with any other valid key of that node.
+// Returns NO if no valid key was found, otherwise returns YES.
+// NOTE: inNodeDict must have the following keys: "name" or "RollName", "KeyPhotoKey", "KeyList"
 
-- (NSString *)validatedResourceKey:(NSString *)inKey relativeToResourceList:(NSDictionary *)inResources otherCandidates:(NSArray *)inKeyList;
+- (BOOL)ensureValidKeyPhotoKeyForSkimmableNode:(NSDictionary *)inNodeDict
+                     relativeToMasterImageList:(NSDictionary *)inMasterImages;
 @end

@@ -79,7 +79,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 @interface IMBAppleMediaParser ()
 
-- (NSString*) imagePathForImageKey:(NSString*)inImageKey;
+- (NSString*) thumbnailPathForImageKey:(NSString*)inImageKey;
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey;
 - (BOOL) supportsPhotoStreamFeatureInVersion:(NSString *)inVersion;
 - (NSString *) rootNodeIdentifier;
@@ -475,7 +475,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	}
 	
 	// Events
-	return [self imagePathForImageKey:imageKey];
+	return [self thumbnailPathForImageKey:imageKey];
 }
 
 
@@ -496,7 +496,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	}
 	
 	// Events
-	return [self imagePathForImageKey:imageKey];
+	return [self thumbnailPathForImageKey:imageKey];
 }
 
 
@@ -573,7 +573,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 // (The values provided by the according dictionary in .plist are mostly wrong because we separate node children by
 // media types 'Image' and 'Movie' into different views.) Must be subclassed.
 
-- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+- (NSDictionary*) childrenInfoForNode:(NSDictionary*)inNodeDict images:(NSDictionary*)inImages
 {
 	NSLog(@"%s Please use a custom subclass of IMBAppleMediaParser...",__FUNCTION__);
 	[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Please use a custom subclass of IMBAppleMediaParser" userInfo:nil] raise];
@@ -655,6 +655,9 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
         IMBSkimmableObject *skimmableObject = (IMBSkimmableObject *)inObject;
         
         skimmableObject.imageLocation = [skimmableObject imageLocationForCurrentSkimmingIndex];
+        if (!skimmableObject.imageLocation) {
+            return nil;
+        }
     }
     
     // IKImageBrowser can also deal with NSData type (IKImageBrowserNSDataRepresentationType)
@@ -673,6 +676,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	}
 	else
 	{
+        inObject.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
 		return (id)[self thumbnailFromLocalImageFileForObject:inObject error:outError];
 	}
 }
@@ -692,12 +696,20 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 //----------------------------------------------------------------------------------------------------------------------
 // Returns the image location for the image represented by inImageKey in the master image list (aka dictionary)
 
-- (NSString*) imagePathForImageKey:(NSString*)inImageKey
+- (NSString*) thumbnailPathForImageKey:(NSString*)inImageKey
 {
+    NSString* imagePath = nil;
+    
 	NSDictionary* images = [[self plist] objectForKey:@"Master Image List"];
 	NSDictionary* imageDict = [images objectForKey:inImageKey];
-	NSString* imagePath = [self imageLocationForObject:imageDict];
-	
+    
+    if (imageDict) {
+        imagePath = [self imageLocationForObject:imageDict];
+    }
+    if (!imagePath) {
+        NSBundle* bundle = [NSBundle bundleForClass:[self class]];
+        imagePath = [bundle pathForResource:@"missing-thumbnail" ofType:@"jpg"];
+    }
 	return imagePath; 
 }
 
@@ -708,12 +720,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 
 - (NSString*) imagePathForFaceIndex:(NSNumber*)inFaceIndex inImageWithKey:(NSString*)inImageKey
 {
-	NSString* imagePath = [self imagePathForImageKey:inImageKey];
+	NSString* imagePath = [self thumbnailPathForImageKey:inImageKey];
 	
-	return [NSString stringWithFormat:@"%@_face%@.%@",
-			[imagePath stringByDeletingPathExtension],
-			inFaceIndex,
-			[imagePath pathExtension]];
+    if (imagePath) {
+        return [NSString stringWithFormat:@"%@_face%@.%@",
+                [imagePath stringByDeletingPathExtension],
+                inFaceIndex,
+                [imagePath pathExtension]];
+    } else {
+        NSBundle* bundle = [NSBundle bundleForClass:[self class]];
+        NSString* path = [bundle pathForResource:@"missing-thumbnail" ofType:@"jpg"];
+        return path;
+    }
 }
 
 
@@ -883,19 +901,31 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 	// Setup the loop
 	
 	NSUInteger index = 0;
-	NSString* faceKeyPhotoKey = nil;
-	NSString* path = nil;
 	NSString* thumbnailPath = nil;
 	IMBFaceNodeObject* object = nil;
 	NSString* subNodeType = @"Face";
 	
-	for (NSDictionary* faceDict in sortedFaces)
+	for (id faceDict in sortedFaces)
 	{
 		NSString* subnodeName = [faceDict objectForKey:@"name"];
 		
 		if ([self shouldUseAlbumType:subNodeType] && 
 			[self shouldUseAlbum:faceDict images:inImages])
 		{
+            // Validate node dictionary and repair if necessary
+            // For that we need a mutable version of node dictionary
+            
+            faceDict = [NSMutableDictionary dictionaryWithDictionary:faceDict];
+            
+			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
+			// because movies and images are not jointly displayed in iMedia browser...
+			
+			[faceDict addEntriesFromDictionary:[self childrenInfoForNode:faceDict images:inImages]];
+			
+            if (![self ensureValidKeyPhotoKeyForSkimmableNode:faceDict relativeToMasterImageList:inImages]) {
+                continue;
+            }
+            
 			// Create subnode for this node...
 			
 			IMBNode* subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
@@ -929,31 +959,21 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 			[objects addObject:object];
 			[object release];
 			
-			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary
-			// because movies and images are not jointly displayed in iMedia browser...
-			
-			NSMutableDictionary* preliminaryMetadata = [NSMutableDictionary dictionaryWithDictionary:faceDict];
-			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
-			
-			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+			object.preliminaryMetadata = faceDict;	// This metadata from the XML file is available immediately
             [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
 			
-			// Obtain key photo dictionary (key photo is displayed while not skimming)...
-			
-			faceKeyPhotoKey = [object.preliminaryMetadata objectForKey:@"KeyPhotoKey"];
-			NSDictionary* keyPhotoDict = [inImages objectForKey:faceKeyPhotoKey];
-			path = [keyPhotoDict objectForKey:@"ImagePath"];
-			
 			object.representedNodeIdentifier = subnode.identifier;
-			object.location = [NSURL fileURLWithPath:path isDirectory:NO];
+            
+            // NOTE: Since faces represent multiple resources we do not set their "location" property
+
 			object.name = subnode.name;
 			object.parserIdentifier = [self identifier];
 			object.index = index++;
 			
 			thumbnailPath = [self imagePathForFaceIndex:[faceDict objectForKey:@"key image face index"]
-                                         inImageWithKey:faceKeyPhotoKey];
+                                         inImageWithKey:[faceDict objectForKey:@"KeyPhotoKey"]];
 			object.imageLocation = (id)[NSURL fileURLWithPath:thumbnailPath isDirectory:NO];
 			object.imageRepresentationType = [self requestedImageRepresentationType];
 			object.imageRepresentation = nil;
@@ -1151,4 +1171,37 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     return nil;
 }
 
+// Tries to ensure that a skimmable node (face or event or project) has a valid key photo key (in terms of
+// exists in master image list). Will replace that key if invalid with any other valid key of that node.
+// Returns NO if no valid key was found, otherwise returns YES.
+// NOTE: inNodeDict must have the following keys: "name" or "RollName", "KeyPhotoKey", "KeyList"
+
+- (BOOL)ensureValidKeyPhotoKeyForSkimmableNode:(NSMutableDictionary *)ioNodeDict
+                     relativeToMasterImageList:(NSDictionary *)inMasterImages
+{
+    // Check for valid key photo key in node dict and try to replace with some other if necessary
+    // (We've had occurences where key photo key was invalid (not key in master image list))
+    
+    NSString* keyPhotoKeyCandidate = [ioNodeDict objectForKey:@"KeyPhotoKey"];
+    NSString* validKeyPhotoKey = [self validatedResourceKey:keyPhotoKeyCandidate
+                                     relativeToResourceList:inMasterImages
+                                            otherCandidates:[ioNodeDict objectForKey:@"KeyList"]];
+    
+    if (!validKeyPhotoKey)
+    {
+        NSString *nodeName = [ioNodeDict objectForKey:@"name"] ?
+                             [ioNodeDict objectForKey:@"name"] :
+                             [ioNodeDict objectForKey:@"RollName"];
+        
+        NSLog(@"%s Could not create skimmable node %@ because could not determine key photo", __FUNCTION__, nodeName);
+        return NO;
+    }
+    
+    if (![keyPhotoKeyCandidate isEqualToString:validKeyPhotoKey])
+    {
+        // Replace
+        [ioNodeDict setObject:validKeyPhotoKey forKey:@"KeyPhotoKey"];
+    }
+    return YES;
+}
 @end

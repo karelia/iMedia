@@ -685,7 +685,7 @@
 // Returns an empty dictionary for now.
 // TODO: Verify whether we need to return some "true" values for "KeyList", "KeyPhotoKey" and "PhotoCount"
 
-- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+- (NSDictionary*) childrenInfoForNode:(NSDictionary*)inNodeDict images:(NSDictionary*)inImages
 {
     return [NSDictionary dictionaryWithObjectsAndKeys:nil];
 }
