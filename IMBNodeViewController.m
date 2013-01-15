@@ -1836,22 +1836,34 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-- (NSInteger) _revealNode:(IMBNode*)inNode
-{
-	// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
-	// revealed too...
+// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
+// revealed too...
 	
+- (void) __revealNode:(IMBNode*)inNode
+{
 	IMBNode* parentNode = [inNode parentNode];
 	
 	if (parentNode)
 	{
-		[self _revealNode:parentNode];
+		[self __revealNode:parentNode];
 	}
 	
-	// Now find the row of our node. Expand it and return it row number...
+	if (inNode) [ibNodeOutlineView expandItem:inNode];
+}
+
+
+- (NSInteger) _revealNode:(IMBNode*)inNode
+{
+	IMBNode* parentNode = [inNode parentNode];
+	
+	if (parentNode)
+	{
+		[self __revealNode:parentNode];
+	}
+	
+	// Now find the row of our node and return its row number...
 	
 	NSInteger row = [ibNodeOutlineView rowForItem:inNode];
-	if (inNode) [ibNodeOutlineView expandItem:inNode];
 	return row;
 }
 
