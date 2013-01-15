@@ -707,14 +707,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	if (inOldNode == nil && inNewNode == nil) return;
 	
-	// If we were given both old and new nodes, then the identifiers must be the same. If not log an error 
-	// and throw an exception because this is a programmer error...
-	
-//	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
-//	{
-//		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
-//	}
+	// Log an error if we are supposed to remove an old node, but it already removed from the tree...
 	
 	if (inOldNode != nil && inOldNode.parentNode == nil)
 	{
