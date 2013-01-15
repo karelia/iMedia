@@ -1235,7 +1235,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			if (!inNode.isPopulated) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+			if (!(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
 
 			[self installObjectViewForNode:inNode];
 			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
