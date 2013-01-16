@@ -459,7 +459,7 @@
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
 			albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
-			albumNode.name = albumName;
+			albumNode.name = [self localizedNameForAlbumName:albumName];
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
@@ -894,6 +894,5 @@
     }
     return [super typeForAlbum:album];
 }
-
 
 @end

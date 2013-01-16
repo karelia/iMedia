@@ -151,7 +151,7 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
                 (eventsDict = [oldAlbumList objectAtIndex:insertionIndex]))
             {
 				NSNumber *allPhotosId = [NSNumber numberWithUnsignedInt:ALL_PHOTOS_NODE_ID];
-				NSString *allPhotosName = NSLocalizedStringWithDefaultValue(@"IMB.ApertureParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library");
+				NSString *allPhotosName = [self localizedNameForAlbumName:@"Photos"];
                 NSDictionary* allPhotos = [[NSDictionary alloc] initWithObjectsAndKeys:
                                            allPhotosId,   @"AlbumId",
                                            allPhotosName, @"AlbumName",
@@ -1175,4 +1175,18 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
     }
     return YES;
 }
+
+// Some album names in AlbumData.xml and ApertureData.xml don't seem to be localized anymore (e.g. iPhoto 9.4)
+// We localize them ourselves.
+
+- (NSString*) localizedNameForAlbumName:(NSString*)albumName
+{
+    if ([albumName isEqualToString:@"Photos"])
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library or not localized in Aperture or iPhoto");
+    else if ([albumName isEqualToString:@"Flagged"])
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.flagged", nil, IMBBundle(), @"Flagged", @"Flagged photos node shown in Aperture library or not localized in Aperture or iPhoto");
+    else return albumName;
+}
+
+
 @end

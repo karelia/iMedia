@@ -195,4 +195,9 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 
 - (BOOL)ensureValidKeyPhotoKeyForSkimmableNode:(NSDictionary *)inNodeDict
                      relativeToMasterImageList:(NSDictionary *)inMasterImages;
+
+// Some album names in AlbumData.xml and ApertureData.xml don't seem to be localized anymore (e.g. iPhoto 9.4)
+// We localize them ourselves.
+
+- (NSString*) localizedNameForAlbumName:(NSString*)albumName;
 @end
