@@ -219,7 +219,10 @@ static NSString* kBookmarksPrefsKey = @"accessRightsBookmarks";
         //       This should not matter since Apple documentation says that associated kernel resources
         //       will be reclaimed when the process ends.
         
-		[url startAccessingSecurityScopedResource];
+        if ([url respondsToSelector:@selector(startAccessingSecurityScopedResource)])   // True for 10.7.3 and later
+        {
+            [url startAccessingSecurityScopedResource];
+        }
         
 //        NSLog(@"Entitlements: Loaded from preferences security scoped URL %@", url);
 	}
