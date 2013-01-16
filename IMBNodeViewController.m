@@ -712,10 +712,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.accessibility == kIMBResourceIsAccessible)
 	{
-		if (!_shouldSuppressPopulateNode)
-		{
-			[self.libraryController populateNode:node];
-		}
+        [self.libraryController populateNode:node];
 	}
 }
 
@@ -788,7 +785,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
-				if (!_shouldSuppressPopulateNode) [self.libraryController populateNode:newNode];
+                [self.libraryController populateNode:newNode];
 				[ibNodeOutlineView showProgressWheels];
 			}
 			else if (newNode.accessibility == kIMBResourceDoesNotExist)
@@ -1929,10 +1926,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 	if (objectViewController == self.objectViewController && node != nil)
 	{
-		_shouldSuppressPopulateNode = YES;
-		[self _revealNode:node];
-		_shouldSuppressPopulateNode = NO;
-		
+		[self _revealNode:node];		
 		[self selectNode:node];
 	}
 }

@@ -106,7 +106,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
- 	BOOL _shouldSuppressPopulateNode;
 	NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
 	id<IMBNodeViewControllerDelegate> _delegate;
 	
