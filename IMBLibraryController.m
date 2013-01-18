@@ -454,7 +454,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			else
 			{
 				inNode.isLoading = NO;
-				inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+				inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 				inNode.error = inError;
 			}
 		});		
