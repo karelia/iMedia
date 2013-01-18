@@ -30,6 +30,7 @@
 #import <Security/SecRequirement.h>
 #import <sys/types.h>
 #import <pwd.h>
+#import <XPCKit/XPCKit.h>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,14 +204,6 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 #pragma mark XPC Abstraction
 
 
-// Prototype for XPCConnection instance method to silence compiler warning on untyped connection object (which is  
-// used because of weak linking XPCKit)...
-
-@interface NSObject()
--(void) sendSelector:(SEL)inSelector withTarget:(id)inTarget object:(id)inObject returnValueHandler:(SBReturnValueHandler)inReturnHandler;
-@end
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -227,10 +220,33 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
     
     if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)])
     {
+        SBReturnValueHandler returnHandler = [inReturnHandler copy];
+        
         [inConnection sendSelector:inSelector
                         withTarget:inTarget
                             object:inObject
-                returnValueHandler:inReturnHandler];
+                returnValueHandler:
+         ^(id object, NSError* inError)
+         {
+             // Avoid direct propagation of technical XPC errors to app
+             
+             if ([[inError domain] isEqualToString:kXPCKitErrorDomain])
+             {
+                 NSString* title = NSLocalizedStringWithDefaultValue(@"SB.XPCError.requestFailed", @"SandboxingKit", IMBBundle(), @"Error", @"Error title");
+                 NSString* description =  NSLocalizedStringWithDefaultValue(@"SB.XPCError.couldNotComplete", @"SandboxingKit", IMBBundle(), @"Operation could not be completed", @"Error description");
+                 
+                 NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       title,@"title",
+                                       description,NSLocalizedDescriptionKey,
+                                       nil];
+                 
+                 inError = [NSError errorWithDomain:kSandboxingKitErrorDomain
+                                               code:kSandboxingKitErrorCouldNotComplete
+                                           userInfo:info];
+             }
+             returnHandler(object, inError);
+             [returnHandler release];
+         }];
     }
     
     // If we are not sandboxed (e.g. running on Snow Leopard) we'll just do the work directly (but asynchronously)

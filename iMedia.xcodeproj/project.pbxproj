@@ -64,6 +64,18 @@
 		303FFD73152CBCD80026B8CF /* IMBSkimmableObjectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30394AC712DC665000ACA531 /* IMBSkimmableObjectViewController.m */; };
 		303FFD76152CBD000026B8CF /* IMBFaceNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD74152CBD000026B8CF /* IMBFaceNodeObject.h */; };
 		303FFD77152CBD000026B8CF /* IMBFaceNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 303FFD75152CBD000026B8CF /* IMBFaceNodeObject.m */; };
+		30421DE416A9943400311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF116A995A900311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF216A995CF00311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF316A995D800311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF416A995E100311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF516A995E900311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF616A995F100311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF716A995F500311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF816A995FA00311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DF916A995FE00311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DFA16A9960300311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30421DFB16A9960900311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
@@ -585,6 +597,17 @@
 		303FFD6E152CBC690026B8CF /* IMBAppleMediaParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAppleMediaParserMessenger.m; sourceTree = "<group>"; };
 		303FFD74152CBD000026B8CF /* IMBFaceNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFaceNodeObject.h; sourceTree = "<group>"; };
 		303FFD75152CBD000026B8CF /* IMBFaceNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFaceNodeObject.m; sourceTree = "<group>"; };
+		30421DE516A9943400311AC4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DE716A9943900311AC4 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DE816A9944000311AC4 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DE916A9944100311AC4 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DEA16A9944200311AC4 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DEB16A9944300311AC4 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DEC16A9944400311AC4 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DED16A9944500311AC4 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SandboxingKit.strings"; sourceTree = "<group>"; };
+		30421DEE16A9944700311AC4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SandboxingKit.strings"; sourceTree = "<group>"; };
+		30421DEF16A9944800311AC4 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		30421DF016A9944900311AC4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
 		3089F94A151C8FDD00D56DC0 /* XPCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XPCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableViewAppearance.h; sourceTree = "<group>"; };
 		308DEF141609C6CE00F889C8 /* IMBTableViewAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTableViewAppearance.m; sourceTree = "<group>"; };
@@ -1243,6 +1266,7 @@
 				30E7771D1511055800413AEF /* SBUtilities.m */,
 				D08109A7151A052300201850 /* SBServiceMain.m */,
 				D08109A6151A052300201850 /* SBService-Info.plist */,
+				30421DE616A9943400311AC4 /* SandboxingKit.strings */,
 			);
 			name = SandBoxingKit;
 			path = XPCKit/XPCKit/ThirdParty/SandBoxingKit;
@@ -2392,6 +2416,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE3B16A85CD600798D2E /* Localizable.strings in Resources */,
+				30421DF216A995CF00311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2505,6 +2530,7 @@
 				D0FDC6541668ACC000181E15 /* iTunes11-icon-21@2x.png in Resources */,
 				D0FDC6651668ACC000181E15 /* iTunes11-icon-30.png in Resources */,
 				D0FDC6661668ACC000181E15 /* iTunes11-icon-30@2x.png in Resources */,
+				30421DE416A9943400311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2513,6 +2539,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE4016A85D0A00798D2E /* Localizable.strings in Resources */,
+				30421DF716A995F500311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2521,6 +2548,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE3C16A85CDD00798D2E /* Localizable.strings in Resources */,
+				30421DF316A995D800311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2529,6 +2557,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE3D16A85CEC00798D2E /* Localizable.strings in Resources */,
+				30421DF416A995E100311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2536,6 +2565,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30421DF516A995E900311AC4 /* SandboxingKit.strings in Resources */,
 				3010BE3E16A85CFD00798D2E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2545,6 +2575,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE4116A85D1100798D2E /* Localizable.strings in Resources */,
+				30421DF816A995FA00311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2553,6 +2584,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE4216A85D1700798D2E /* Localizable.strings in Resources */,
+				30421DF916A995FE00311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2561,6 +2593,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE4416A85D2600798D2E /* Localizable.strings in Resources */,
+				30421DFB16A9960900311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2569,6 +2602,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE4316A85D1E00798D2E /* Localizable.strings in Resources */,
+				30421DFA16A9960300311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2588,6 +2622,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30421DF116A995A900311AC4 /* SandboxingKit.strings in Resources */,
 				3010BE3916A85CD000798D2E /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2597,6 +2632,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3010BE3F16A85D0300798D2E /* Localizable.strings in Resources */,
+				30421DF616A995F100311AC4 /* SandboxingKit.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2858,6 +2894,25 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		30421DE616A9943400311AC4 /* SandboxingKit.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				30421DE516A9943400311AC4 /* en */,
+				30421DE716A9943900311AC4 /* de */,
+				30421DE816A9944000311AC4 /* fr */,
+				30421DE916A9944100311AC4 /* it */,
+				30421DEA16A9944200311AC4 /* nl */,
+				30421DEB16A9944300311AC4 /* es */,
+				30421DEC16A9944400311AC4 /* ja */,
+				30421DED16A9944500311AC4 /* pt-BR */,
+				30421DEE16A9944700311AC4 /* zh-Hans */,
+				30421DEF16A9944800311AC4 /* cs */,
+				30421DF016A9944900311AC4 /* nb */,
+			);
+			name = SandboxingKit.strings;
+			path = SandBoxingKit;
+			sourceTree = SOURCE_ROOT;
+		};
 		308FC1FE16A9498B00B42F49 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (

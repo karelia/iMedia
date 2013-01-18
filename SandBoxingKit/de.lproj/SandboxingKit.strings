@@ -1,0 +1,13 @@
+/* 
+  SandboxingKit.strings
+  iMedia
+
+  Created by Jörg Jacobsen on 18.01.13.
+
+*/
+
+/* Error title */
+"SB.XPCError.requestFailed" = "Fehler";
+
+/* Error description */
+"SB.XPCError.couldNotComplete" = "Die Anforderung konnte nicht ausgeführt werden";
