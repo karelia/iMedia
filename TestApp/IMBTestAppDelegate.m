@@ -139,12 +139,14 @@
 	
 	self.usedObjects = [NSMutableDictionary dictionary];
 
-	if (SBIsSandboxed())
-	{
-		NSString* title = ibDragDestinationWindow.title;
-		title = [NSString stringWithFormat:@"%@ (SANDBOXED)",title];
-		ibDragDestinationWindow.title = title;
-	}
+    NSString* sandboxIndicator = SBIsSandboxed() ? @" (Sandboxed)" : @"";
+    
+    
+    NSString* titleFormat = NSLocalizedStringWithDefaultValue(@"IMBTestAppDelegate.dragWindowTitleFormat", nil,
+                                                              [NSBundle mainBundle], @"Drag Media Here%@",
+                                                              @"Parameter is either \" (Sandboxed)\" or empty");
+
+    ibDragDestinationWindow.title = [NSString stringWithFormat:titleFormat,sandboxIndicator];
 	
 	#if CUSTOM_USER_INTERFACE
 	

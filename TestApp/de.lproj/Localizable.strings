@@ -5,3 +5,6 @@
   Created by Jörg Jacobsen on 18.01.13.
 
 */
+
+/* Parameter is either " (Sandboxed)" or empty */
+"IMBTestAppDelegate.dragWindowTitleFormat" = "Medien in dieses Fenster ziehen%@";
