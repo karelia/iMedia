@@ -1182,9 +1182,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 - (NSString*) localizedNameForAlbumName:(NSString*)albumName
 {
     if ([albumName isEqualToString:@"Photos"])
-        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.allPhotos", nil, IMBBundle(), @"Photos", @"All photos node shown in Aperture library or not localized in Aperture or iPhoto");
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.allPhotos", nil, IMBBundle(), @"Photos", @"'Photos' node in Aperture or iPhoto");
     else if ([albumName isEqualToString:@"Flagged"])
-        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.flagged", nil, IMBBundle(), @"Flagged", @"Flagged photos node shown in Aperture library or not localized in Aperture or iPhoto");
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.flagged", nil, IMBBundle(), @"Flagged", @"'Flagged' node in Aperture or iPhoto");
+    else if ([albumName isEqualToString:@"Last Import"])
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.lastImport", nil, IMBBundle(), @"Last Import", @"'Last Import' node in Aperture or iPhoto");
+    else if ([albumName isEqualToString:@"Last 12 Months"])
+        return NSLocalizedStringWithDefaultValue(@"IMBAppleMediaParser.last12Months", nil, IMBBundle(), @"Last 12 Months", @"'Last 12 Months' node in Aperture or iPhoto");
     else return albumName;
 }
 
