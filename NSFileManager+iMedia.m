@@ -206,9 +206,8 @@
 	{
 		strcpy(tempFileNameCString, tempFileTemplateCString);
 
-		char *tmpName = mktemp(tempFileNameCString);
-		
-		tempFilePath = [NSString stringWithUTF8String:tmpName];	
+        mkstemp(tempFileNameCString);
+		tempFilePath = [NSString stringWithUTF8String:tempFileNameCString];	
 		
 		free(tempFileNameCString);
 	}
