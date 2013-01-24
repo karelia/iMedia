@@ -232,8 +232,8 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
              
              if ([[inError domain] isEqualToString:kXPCKitErrorDomain])
              {
-                 NSString* title = NSLocalizedStringWithDefaultValue(@"SB.XPCError.requestFailed", @"SandboxingKit", IMBBundle(), @"Error", @"Error title");
-                 NSString* description =  NSLocalizedStringWithDefaultValue(@"SB.XPCError.couldNotComplete", @"SandboxingKit", IMBBundle(), @"Operation could not be completed", @"Error description");
+                 NSString* title = NSLocalizedStringWithDefaultValue(@"SB.XPCError.requestFailed", @"SandboxingKit", IMBBundle(), @"Media Browser Error", @"Error title");
+                 NSString* description = NSLocalizedStringWithDefaultValue(@"SB.XPCError.couldNotComplete", @"SandboxingKit", IMBBundle(), @"The last operation could not be completed. It is possible that some media files are not displayed correctly.", @"Error description");
                  
                  NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
                                        title,@"title",

@@ -7,7 +7,7 @@
 */
 
 /* Error title */
-"SB.XPCError.requestFailed" = "Error";
+"SB.XPCError.requestFailed" = "Media Browser Error";
 
 /* Error description */
-"SB.XPCError.couldNotComplete" = "Operation could not be completed";
+"SB.XPCError.couldNotComplete" = "The last operation could not be completed. It is possible that some media files are not displayed correctly.";
