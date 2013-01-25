@@ -505,7 +505,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				dispatch_async(dispatch_get_main_queue(),^()
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					[NSApp presentError:inError];
+					inOldNode.isLoading = NO;
+					inOldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+					inOldNode.error = inError;
 				});
 			}
 			
