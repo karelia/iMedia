@@ -10,4 +10,4 @@
 "SB.XPCError.requestFailed" = "Media Browser Fehler";
 
 /* Error description */
-"SB.XPCError.couldNotComplete" = "Die letzte Anforderung konnte nicht ausgeführt werden. Es ist möglich, dass einige Mediadateien nicht angezeigt werden.";
+"SB.XPCError.couldNotComplete" = "Die letzte Anforderung konnte nicht ausgeführt werden.";
