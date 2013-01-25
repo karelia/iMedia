@@ -27,6 +27,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+#define kSandboxingKitErrorDomain @"com.joergjacobsen.sandboxingkit"
+
+#define kSandboxingKitErrorCouldNotComplete 100
 
 //----------------------------------------------------------------------------------------------------------------------
 

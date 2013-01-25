@@ -81,7 +81,7 @@
 
 - (NSImage*) icon
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] imb_iconForAppWithBundleIdentifier:@"com.apple.iPhoto"];
+    return [[self class] iconForAppWithBundleIdentifier:@"com.apple.iPhoto" fallbackFolder:NSPicturesDirectory];
 }
 
 

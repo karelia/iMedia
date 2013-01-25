@@ -1,0 +1,13 @@
+/* 
+  SandboxingKit.strings
+  iMedia
+
+  Created by Jörg Jacobsen on 18.01.13.
+
+*/
+
+/* Error title */
+"SB.XPCError.requestFailed" = "Erreur Média";
+
+/* Error description */
+"SB.XPCError.couldNotComplete" = "La dernière opération n'a pas pu être terminée.";

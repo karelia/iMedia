@@ -459,7 +459,7 @@
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
 			albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
-			albumNode.name = albumName;
+			albumNode.name = [self localizedNameForAlbumName:albumName];
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 			
@@ -505,7 +505,8 @@
 	
 	// Image path should currently be pointing to image in subdirectory of ./Data (iPhoto 8) or ./Thumbnails (iPhoto 9).
 	
-	if (![fileManager fileExistsAtPath:imagePath]) {
+	if (![fileManager fileExistsAtPath:imagePath] ||
+        [imagePath rangeOfString:@"missing_thumbnail"].location != NSNotFound) {
 		
 		// Oops, could not locate face image here. Provide alternate path
 		NSLog(@"Could not find face image at %@", imagePath);
@@ -534,19 +535,15 @@
 // (The values provided by the according dictionary in .plist are mostly wrong because we separate node children by
 // media types 'Image' and 'Movie' into different views.)
 
-- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+- (NSDictionary*) childrenInfoForNode:(NSDictionary*)inNodeDict images:(NSDictionary*)inImages
 {
-	// We saved a reference to the album dictionary when this node was created
-	// (ivar 'attributes') and now happily reuse it here.
-	NSDictionary* albumDict = [inNode.attributes objectForKey:@"nodeSource"];
-	
 	// Determine images relevant to this view.
 	// Note that everything regarding 'ImageFaceMetadata' is only relevant
 	// when providing a faces node. Otherwise it will be nil'ed.
 	
-	NSArray* imageKeys = [albumDict objectForKey:@"KeyList"];
+	NSArray* imageKeys = [inNodeDict objectForKey:@"KeyList"];
 	NSMutableArray* relevantImageKeys = [NSMutableArray array];
-	NSArray* imageFaceMetadataList = [albumDict objectForKey:@"ImageFaceMetadataList"];
+	NSArray* imageFaceMetadataList = [inNodeDict objectForKey:@"ImageFaceMetadataList"];
 	NSMutableArray* relevantImageFaceMetadataList = imageFaceMetadataList ? [NSMutableArray array] : nil;
 	
 	// Loop setup
@@ -579,7 +576,7 @@
 		keyPhotoKey = [relevantImageKeys objectAtIndex:0];
 		keyImageFaceIndex = [[relevantImageFaceMetadataList objectAtIndex:0] objectForKey:@"face index"];
 	} else {
-		keyPhotoKey = [albumDict objectForKey:@"KeyPhotoKey"];
+		keyPhotoKey = [inNodeDict objectForKey:@"KeyPhotoKey"];
 	}
 
     return [NSDictionary dictionaryWithObjectsAndKeys:
@@ -617,11 +614,10 @@
 	
 	// Events node is populated with node objects that represent events
 	
-	NSString* path = nil;
+	NSString* thumbnailPath = nil;
 	IMBiPhotoEventNodeObject* object = nil;
-    NSMutableDictionary* mutableSubnodeDict = nil;
 	
-	for (NSDictionary* subnodeDict in inEvents)
+	for (id subnodeDict in inEvents)
 	{
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
@@ -630,28 +626,18 @@
 		if ([self shouldUseAlbumType:subNodeType] && 
 			[self shouldUseAlbum:subnodeDict images:inImages])
 		{
-            // We need a mutable version of sub node dictionary
+            // Validate node dictionary and repair if necessary
+            // For that we need a mutable version of node dictionary
             
-            mutableSubnodeDict = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
+            subnodeDict = [NSMutableDictionary dictionaryWithDictionary:subnodeDict];
             
-            // Check for valid key photo key in node dict and try to replace with some other if necessary
-            // (We've had occurences since iPhoto 9.4 where key photo key was invalid (not key in master image list))
-
-            NSString* keyPhotoKeyCandidate = [mutableSubnodeDict objectForKey:@"KeyPhotoKey"];
-            NSString* validKeyPhotoKey = [self validatedResourceKey:keyPhotoKeyCandidate
-                                             relativeToResourceList:inImages
-                                                    otherCandidates:[mutableSubnodeDict objectForKey:@"KeyList"]];
+			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and
+			// images are not jointly displayed in iMedia browser...
+			
+			[subnodeDict addEntriesFromDictionary:[self childrenInfoForNode:subnodeDict images:inImages]];
             
-            if (!validKeyPhotoKey)
-            {
-                NSLog(@"%s Could not create event node %@ because could not determine key photo",__FUNCTION__,subnodeName);
+            if (![self ensureValidKeyPhotoKeyForSkimmableNode:subnodeDict relativeToMasterImageList:inImages]) {
                 continue;
-            }
-
-            if (![keyPhotoKeyCandidate isEqualToString:validKeyPhotoKey])
-            {
-                // Replace
-                [mutableSubnodeDict setObject:validKeyPhotoKey forKey:@"KeyPhotoKey"];
             }
             
 			// Create subnode for this node...
@@ -669,14 +655,14 @@
 			// Keep a ref to the subnode dictionary for potential later use
 			
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  mutableSubnodeDict, @"nodeSource",
+                                  subnodeDict, @"nodeSource",
                                   [self nodeTypeForNode:subnode], @"nodeType", nil];
 			
 			// Set the node's identifier. This is needed later to link it to the correct parent node. Please note 
 			// that older versions of iPhoto didn't have AlbumId, so we are generating fake AlbumIds in this case
 			// for backwards compatibility...
 			
-			NSNumber* subnodeId = [mutableSubnodeDict objectForKey:@"RollID"];
+			NSNumber* subnodeId = [subnodeDict objectForKey:@"RollID"];
 			if (subnodeId == nil) subnodeId = [NSNumber numberWithInt:_fakeAlbumID++]; 
 			subnode.identifier = [self identifierForId:subnodeId inSpace:EVENTS_ID_SPACE];
 			
@@ -690,46 +676,26 @@
 			[objects addObject:object];
 			[object release];
 			
-			// Adjust keys "KeyPhotoKey", "KeyList", and "PhotoCount" in metadata dictionary because movies and 
-			// images are not jointly displayed in iMedia browser...
-			
-			NSMutableDictionary* preliminaryMetadata = mutableSubnodeDict;
-			[preliminaryMetadata addEntriesFromDictionary:[self childrenInfoForNode:subnode images:inImages]];
-
-			object.preliminaryMetadata = preliminaryMetadata;	// This metadata from the XML file is available immediately
+			object.preliminaryMetadata = subnodeDict;           // This metadata from the XML file is available immediately
             [object resetCurrentSkimmingIndex];                 // Must be done *after* preliminaryMetadata is set
 			object.metadata = nil;								// Build lazily when needed (takes longer)
 			object.metadataDescription = nil;					// Build lazily when needed (takes longer)
             object.name = subnode.name;
 			
-			// Obtain key photo dictionary (key photo is displayed while not skimming)
-			
-            if (validKeyPhotoKey)
-            {
-                NSDictionary* keyPhotoDict = [inImages objectForKey:validKeyPhotoKey];
-                path = [keyPhotoDict objectForKey:@"ImagePath"];
-
-                if (path)
-                {
-                    object.representedNodeIdentifier = subnode.identifier;
-                    object.location = [NSURL fileURLWithPath:path isDirectory:NO];
-                    object.parserIdentifier = [self identifier];
-                    object.index = index++;
-                    
-                    object.imageLocation = (id)[NSURL fileURLWithPath:[self imageLocationForObject:keyPhotoDict] isDirectory:NO];
-                    object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
-                    object.imageRepresentation = nil;
-                }
-                else
-                {
-                    NSLog(@"%s event node %@ failed because path is nil",__FUNCTION__,object.name);
-                    [objects removeObjectIdenticalTo:object];
-                    [subnodes removeObjectIdenticalTo:subnode];
-                }
-            }
+            object.representedNodeIdentifier = subnode.identifier;
+            
+            // NOTE: Since events represent multiple resources we do not set their "location" property
+            
+            object.parserIdentifier = [self identifier];
+            object.index = index++;
+            
+            thumbnailPath = [self thumbnailPathForImageKey:[subnodeDict objectForKey:@"KeyPhotoKey"]];
+            object.imageLocation = (id)[NSURL fileURLWithPath:thumbnailPath isDirectory:NO];
+            object.imageRepresentationType = IKImageBrowserCGImageRepresentationType;
+            object.imageRepresentation = nil;
 		}
 		[pool drain];
-	}	
+	}
 	inNode.objects = objects;
 	
 }
@@ -795,8 +761,12 @@
 		[pool drain];
 	}
 	
-    inNode.objects = objects;
-
+	NSSortDescriptor* dateDescriptor = [[[NSSortDescriptor alloc]
+                                         initWithKey:@"preliminaryMetadata.DateAsTimerInterval"
+                                         ascending:YES] autorelease];
+	NSArray* sortDescriptors = [NSArray arrayWithObject:dateDescriptor];
+    
+    inNode.objects = [objects sortedArrayUsingDescriptors:sortDescriptors];
 }
 
 
@@ -924,6 +894,5 @@
     }
     return [super typeForAlbum:album];
 }
-
 
 @end

@@ -106,7 +106,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 	NSString* _selectedNodeIdentifier;
 	NSMutableArray* _expandedNodeIdentifiers;
 	BOOL _isRestoringState;
-    NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
+	NSPoint _nodeOutlineViewSavedVisibleRectOrigin;
 	id<IMBNodeViewControllerDelegate> _delegate;
 	
 	NSViewController* _standardHeaderViewController;
@@ -124,6 +124,9 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 // Library...
 
 @property (retain) IMBLibraryController* libraryController;
+
+// Support for subclasses; please don't rely on it in your own apps
++ (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
 
 - (NSString*) mediaType;
 - (NSImage*) icon;

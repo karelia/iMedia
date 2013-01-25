@@ -58,6 +58,7 @@
 #import "IMBFileSystemObserver.h"
 #import "IMBFileWatcher.h"
 #import "IMBFSEventsWatcher.h"
+#import "NSBundle+iMedia.h"
 #import "SBUtilities.h"
 #import <XPCKit/XPCKit.h>
 
@@ -126,7 +127,7 @@ NSString* kIMBPathDidChangeNotification = @"IMBPathDidChange";
 	{
 		_notificationDelay = 2.0;
 		
-		if (SBIsSandboxed())
+		if ([[NSBundle mainBundle] supportsXPCServiceWithIdentifier:@"im.edia.FSEvents"])
 		{
 			[self _setupXPCService];
 		}

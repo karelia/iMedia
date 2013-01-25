@@ -150,7 +150,7 @@
 {
 	IMBiPhotoParser *parser = (IMBiPhotoParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
     
-    return [NSURL fileURLWithPath:[parser imagePathForImageKey:_currentImageKey] isDirectory:NO];
+    return [NSURL fileURLWithPath:[parser thumbnailPathForImageKey:_currentImageKey] isDirectory:NO];
 }
 
 

@@ -54,6 +54,7 @@
 
 #import "IMBLibraryController.h"
 #import "IMBParserController.h"
+#import "IMBAccessRightsController.h"
 #import "IMBNode.h"
 #import "IMBObject.h"
 #import "IMBParserMessenger.h"
@@ -187,6 +188,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		self.subnodes = nil; //[NSMutableArray array];
 		_isReplacingNode = NO;
 		
+        // Ensure that app-scoped bookmarks are loaded from prefs
+        // if we are running sandboxed with GCD instead of XPC services
+        
+        [IMBAccessRightsController sharedAccessRightsController];
+
 		// Listen to changes on the file system...
 		
 		[[NSNotificationCenter defaultCenter]
@@ -448,7 +454,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			else
 			{
 				inNode.isLoading = NO;
-				inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
+				inNode.badgeTypeNormal = kIMBBadgeTypeNone;
 				inNode.error = inError;
 			}
 		});		
@@ -499,7 +505,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				dispatch_async(dispatch_get_main_queue(),^()
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
-					[NSApp presentError:inError];
+					inOldNode.isLoading = NO;
+					inOldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+					inOldNode.error = inError;
 				});
 			}
 			
@@ -701,14 +709,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 {
 	if (inOldNode == nil && inNewNode == nil) return;
 	
-	// If we were given both old and new nodes, then the identifiers must be the same. If not log an error 
-	// and throw an exception because this is a programmer error...
+	// Log an error if we are supposed to remove an old node, but it already removed from the tree...
 	
-//	if (inOldNode != nil && inNewNode != nil && ![inOldNode.identifier isEqual:inNewNode.identifier])
-//	{
-//		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-//		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: oldNode and newNode must have same identifiers" userInfo:nil] raise];
-//	}
+	if (inOldNode != nil && inOldNode.parentNode == nil)
+	{
+		NSLog(@"%s inOldNode has already been removed. This was problably a race condition...",__FUNCTION__);
+		return;
+	}
 	
 	if (inOldNode != nil && inOldNode.parentNode == nil)
 	{

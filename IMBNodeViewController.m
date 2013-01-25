@@ -413,6 +413,33 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
++ (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
+{
+    // Use app's icon, falling back to the folder's icon, and finally generic folder
+    NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+    NSString *path = [workspace absolutePathForAppBundleWithIdentifier:identifier];
+	NSImage *result = [workspace iconForFile:path];
+    
+    if (!result)
+    {
+        NSURL *picturesFolder = [[NSFileManager defaultManager] URLForDirectory:directory
+                                                                       inDomain:NSUserDomainMask
+                                                              appropriateForURL:nil
+                                                                         create:NO
+                                                                          error:NULL];
+        
+        picturesFolder = [picturesFolder URLByResolvingSymlinksInPath]; // tends to be a symlink when sandboxed
+        
+        if (![picturesFolder getResourceValue:&result forKey:NSURLEffectiveIconKey error:NULL] || result == nil)
+        {
+            result = [workspace iconForFileType:(NSString *)kUTTypeFolder];
+        }
+    }
+    
+	return result;
+}
+
+
 - (NSImage*) icon
 {
 	return nil;	// Must be overridden by subclass
@@ -685,7 +712,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.accessibility == kIMBResourceIsAccessible)
 	{
-		[self.libraryController populateNode:node];
+        [self.libraryController populateNode:node];
 	}
 }
 
@@ -758,7 +785,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
-				[self.libraryController populateNode:newNode];
+                [self.libraryController populateNode:newNode];
 				[ibNodeOutlineView showProgressWheels];
 			}
 			else if (newNode.accessibility == kIMBResourceDoesNotExist)
@@ -1208,7 +1235,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			if (!inNode.isPopulated) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+			if (!(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
 
 			[self installObjectViewForNode:inNode];
 			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
@@ -1809,22 +1836,34 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 }
 
 
-- (NSInteger) _revealNode:(IMBNode*)inNode
-{
-	// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
-	// revealed too...
+// Recursively expand and reveal the parent node, so that we can be sure that inNode is visible and can be 
+// revealed too...
 	
+- (void) __revealNode:(IMBNode*)inNode
+{
 	IMBNode* parentNode = [inNode parentNode];
 	
 	if (parentNode)
 	{
-		[self _revealNode:parentNode];
+		[self __revealNode:parentNode];
 	}
 	
-	// Now find the row of our node. Expand it and return it row number...
+	if (inNode) [ibNodeOutlineView expandItem:inNode];
+}
+
+
+- (NSInteger) _revealNode:(IMBNode*)inNode
+{
+	IMBNode* parentNode = [inNode parentNode];
+	
+	if (parentNode)
+	{
+		[self __revealNode:parentNode];
+	}
+	
+	// Now find the row of our node and return its row number...
 	
 	NSInteger row = [ibNodeOutlineView rowForItem:inNode];
-	if (inNode) [ibNodeOutlineView expandItem:inNode];
 	return row;
 }
 
@@ -1887,7 +1926,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 	if (objectViewController == self.objectViewController && node != nil)
 	{
-		[self _revealNode:node];
+		[self _revealNode:node];		
 		[self selectNode:node];
 	}
 }

@@ -1,0 +1,13 @@
+/* 
+  SandboxingKit.strings
+  iMedia
+
+  Created by Jörg Jacobsen on 18.01.13.
+
+*/
+
+/* Error title */
+"SB.XPCError.requestFailed" = "Media Browser Error";
+
+/* Error description */
+"SB.XPCError.couldNotComplete" = "The last operation could not be completed.";

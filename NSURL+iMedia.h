@@ -44,7 +44,7 @@
 */
 
 
-// Author: Dan Wood, Mike Abdullah
+// Author: Dan Wood, Mike Abdullah, Jörg Jacobsen
 
 #import <Cocoa/Cocoa.h>
 

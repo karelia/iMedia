@@ -174,8 +174,9 @@
 - (id) imageLocationForCurrentSkimmingIndex
 {
 	IMBAppleMediaParser *parser = (IMBAppleMediaParser *)[self.parserMessenger parserWithIdentifier:self.parserIdentifier];
+    NSString *thumbnailPath = [parser imagePathForFaceIndex:self.currentFaceIndex inImageWithKey:self.currentImageKey];
     
-    return [NSURL fileURLWithPath:[parser imagePathForFaceIndex:self.currentFaceIndex inImageWithKey:self.currentImageKey] isDirectory:NO];
+    return [NSURL fileURLWithPath:thumbnailPath isDirectory:NO];
 }
 
 

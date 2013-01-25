@@ -383,7 +383,7 @@
 		case 1:	 return YES;	// Album
 		case 2:	 return YES;	// Smart album
 		case 3:	 return YES;	// Smart album
-		case 4:	 return NO;		// Project
+		case 4:	 return YES;	// Project
 		case 5:	 return NO;		// All projects
 		case 6:	 return NO;		// Folder
 		case 7:	 return NO;		// Folder
@@ -646,7 +646,7 @@
 			albumNode.isLeafNode = [self isLeafAlbumType:albumType];
 			albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
 			albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
-			albumNode.name = albumName;
+			albumNode.name = [self localizedNameForAlbumName:albumName];
 			albumNode.watchedPath = inParentNode.watchedPath;	// These two lines are important to make file watching work for nested 
 			albumNode.watcherType = kIMBWatcherTypeNone;        // subfolders. See IMBLibraryController _reloadNodesWithWatchedPath:
 
@@ -685,7 +685,7 @@
 // Returns an empty dictionary for now.
 // TODO: Verify whether we need to return some "true" values for "KeyList", "KeyPhotoKey" and "PhotoCount"
 
-- (NSDictionary*) childrenInfoForNode:(IMBNode*)inNode images:(NSDictionary*)inImages
+- (NSDictionary*) childrenInfoForNode:(NSDictionary*)inNodeDict images:(NSDictionary*)inImages
 {
     return [NSDictionary dictionaryWithObjectsAndKeys:nil];
 }
