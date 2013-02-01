@@ -110,7 +110,7 @@
 
 // Library...
 
-@property (retain) IMBLibraryController* libraryController;
+@property (retain, nonatomic) IMBLibraryController* libraryController;
 @property (readonly) NSString* mediaType;
 
 // Nodes (sourcelist)...

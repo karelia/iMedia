@@ -81,7 +81,7 @@
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
+@property (retain, nonatomic) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (assign) NSInteger version;

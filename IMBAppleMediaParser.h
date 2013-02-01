@@ -109,7 +109,7 @@ extern NSString* const kIMBiPhotoNodeObjectTypeFace;  // = @"faces"
 	NSDate* _modificationDate;
 }
 
-@property (retain) NSDictionary* plist;
+@property (retain, nonatomic) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 
 

@@ -76,7 +76,7 @@
 @property (assign) BOOL placeholderParser;
 @property (retain) NSString* appPath;
 @property (assign) BOOL shouldDisplayLibraryName;
-@property (assign) NSInteger version;
+@property (assign, nonatomic) NSInteger version;
 
 @end
 

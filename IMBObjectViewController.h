@@ -163,7 +163,7 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 // Library...
 
-@property (retain) IMBLibraryController* libraryController;
+@property (retain, nonatomic) IMBLibraryController* libraryController;
 @property (retain) IMBNodeViewController* nodeViewController;
 @property (readonly) NSString* mediaType;
 @property (readonly) IMBNode* currentNode;

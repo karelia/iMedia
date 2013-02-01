@@ -70,7 +70,7 @@
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSDictionary* plist;
+@property (retain, nonatomic) NSDictionary* plist;
 @property (retain) NSDate* modificationDate;
 @property (retain) NSMutableDictionary* safariFaviconCache;
 

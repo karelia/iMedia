@@ -123,7 +123,7 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (retain) NSDictionary* preliminaryMetadata;		// Immediate (cheap) metadata
 @property (retain) NSDictionary* metadata;					// On demand (expensive) metadata (also contains preliminaryMetadata), initially nil
 @property (retain) NSString* metadataDescription;			// Metadata as display in UI (optional)
-@property (retain) IMBParser* parser;						// Parser that created this object
+@property (retain, nonatomic) IMBParser* parser;						// Parser that created this object
 @property (assign) NSUInteger index;						// Index of object in the array (optional)
 @property (assign) BOOL shouldDrawAdornments;				// YES if border/shadow should be drawn
 @property (assign) BOOL shouldDisableTitle;					// YES if title should be shown as disabled (e.g. not draggable)
@@ -144,7 +144,7 @@ extern NSString* kIMBQuickLookImageProperty;
 @property (retain) id imageRepresentation;	
 @property (readonly) BOOL isSelectable;
 @property (readonly) BOOL isDraggable;
-@property (assign) BOOL needsImageRepresentation;
+@property (assign, nonatomic) BOOL needsImageRepresentation;
 @property (retain) NSString* imageRepresentationType;
 @property (readonly) NSString* imageTitle;
 @property (assign) NSUInteger imageVersion;
