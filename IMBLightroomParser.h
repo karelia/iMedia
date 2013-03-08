@@ -107,6 +107,10 @@ IMBLightroomNodeType;
 @property (retain,readonly) FMDatabase* thumbnailDatabase;
 
 + (NSString*) identifier;
++ (NSString*) lightroomPath;
+
+// Return an array to Lightroom library files...
++ (NSArray*) libraryPaths;
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 
 - (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
@@ -143,7 +147,6 @@ IMBLightroomNodeType;
 
 @interface IMBLightroomParser (Abstract)
 
-+ (NSString*) lightroomPath;
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
 
 - (NSString*) rootFolderQuery;

@@ -68,14 +68,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
-
-+ (NSString*) lightroomPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom"];
-}
-
-
 // Unique identifier for this parser...
 
 + (NSString*) identifier
@@ -83,38 +75,29 @@
 	return @"com.karelia.imedia.Lightroom1";
 }
 
+// The bundle identifier of the Lightroom app this parser is based upon
+
++ (NSString*) lightroomAppBundleIdentifier
+{
+    return @"com.adobe.Lightroom";
+}
+
+// Key in Ligthroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+    return @"AgLibrary_activeLibraryPath11";
+}
+
+// Key in Ligthroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+    return @"recentLibraries11";
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
-{
-	NSMutableArray* libraryPaths = [NSMutableArray array];
-    
-    if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"AgLibrary_activeLibraryPath11",
-																		(CFStringRef)@"com.adobe.Lightroom");
-		
-		if (activeLibraryPath) {
-			[libraryPaths addObject:(NSString*)activeLibraryPath];
-			CFRelease(activeLibraryPath);
-		}
-    }
-    
-	if ([libraryPaths count] == 0) {
-		CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries11",
-																(CFStringRef)@"com.adobe.Lightroom");
-	
-		if (recentLibrariesList) {
-			[self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-			CFRelease(recentLibrariesList);
-		}
-    }
-	
-	return libraryPaths;
-}
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType
 {

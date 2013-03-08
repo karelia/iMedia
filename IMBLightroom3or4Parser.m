@@ -93,16 +93,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
-
-+ (NSString*) lightroomPath
-{
-	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
-
-	return nil;
-}
-
-
 // Unique identifier for this parser...
 
 + (NSString*) identifier
@@ -113,17 +103,22 @@
 }
 
 
+// Key in Ligthroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+    return @"libraryToLoad20";
+}
+
+// Key in Ligthroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+    return @"recentLibraries20";
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
-{
-	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
-	
-	return nil;
-}
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType
 {

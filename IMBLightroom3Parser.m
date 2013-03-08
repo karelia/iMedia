@@ -92,14 +92,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
-
-+ (NSString*) lightroomPath
-{
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom3"];
-}
-
-
 // Unique identifier for this parser...
 
 + (NSString*) identifier
@@ -107,38 +99,17 @@
 	return @"com.karelia.imedia.Lightroom3";
 }
 
+// The bundle identifier of the Lightroom app this parser is based upon
+
++ (NSString*) lightroomAppBundleIdentifier
+{
+    return @"com.adobe.Lightroom3";
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
-{
-	NSMutableArray* libraryPaths = [NSMutableArray array];
-    
-    if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom3");
-		
-		if (activeLibraryPath) {
-			[libraryPaths addObject:(NSString*)activeLibraryPath];
-			CFRelease(activeLibraryPath);
-		}
-    }
-
-    if ([libraryPaths count] == 0) {
-		CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom3");
-	
-		if (recentLibrariesList) {
-			[self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-			CFRelease(recentLibrariesList);
-		}
-    }
-	
-    
-	return libraryPaths;
-}
 
 - (FMDatabase*) libraryDatabase
 {

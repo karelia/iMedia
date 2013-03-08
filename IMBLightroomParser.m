@@ -76,6 +76,7 @@
 #import "NSString+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSURL+iMedia.h"
+#import "NSObject+iMedia.h"
 #import "SBUtilities.h"
 
 #import <Quartz/Quartz.h>
@@ -143,6 +144,14 @@ static NSArray* sSupportedUTIs = nil;
 @synthesize shouldDisplayLibraryName = _shouldDisplayLibraryName;
 @synthesize databases = _databases;
 @synthesize thumbnailDatabases = _thumbnailDatabases;
+
+
+// Check if Lightroom is installed...
+
++ (NSString*) lightroomPath
+{
+	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:[self lightroomAppBundleIdentifier]];
+}
 
 
 // Returns the path to the previews database as soon as the mediaSource is accessible.
@@ -214,6 +223,31 @@ static NSArray* sSupportedUTIs = nil;
 
 + (NSString*) identifier
 {
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	return nil;
+}
+
+// The bundle identifier of the Lightroom app this parser is based upon
+
++ (NSString*) lightroomAppBundleIdentifier
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	return nil;
+}
+
+// Key in Ligthroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
+	return nil;
+}
+
+// Key in Ligthroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+	[self imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	return nil;
 }
 
@@ -250,7 +284,12 @@ static NSArray* sSupportedUTIs = nil;
  
 				BOOL exists,changed;
 				exists = [fileManager imb_fileExistsAtPath:&path wasChanged:&changed];
-				if (exists) [inLibraryPaths addObject:path];
+				if (exists) {
+                    [inLibraryPaths addObject:path];
+// Maybe we only want to return the first existing library from the recents list?
+//                    [fileManager release];
+//                    break;
+                }
                 
                 [fileManager release];
                 path = @"";
@@ -261,6 +300,39 @@ static NSArray* sSupportedUTIs = nil;
     }
 }
 
+
+// Return an array to Lightroom library files...
+
++ (NSArray*) libraryPaths
+{
+	NSMutableArray* libraryPaths = [NSMutableArray array];
+    Class parserClass = [self class];
+    
+    if ([libraryPaths count] == 0) {
+		CFPropertyListRef activeLibraryPath = SBPreferencesCopyAppValue((CFStringRef)[parserClass preferencesLibraryToLoadKey],
+																		(CFStringRef)[parserClass lightroomAppBundleIdentifier]);
+		
+		if (activeLibraryPath) {
+            IMBResourceAccessibility libraryAccessibility = [[NSURL fileURLWithPath:activeLibraryPath] imb_accessibility];
+            if (libraryAccessibility != kIMBResourceDoesNotExist) {
+                [libraryPaths addObject:(NSString*)activeLibraryPath];
+            }
+			CFRelease(activeLibraryPath);
+		}
+    }
+    
+	if ([libraryPaths count] == 0) {
+		CFStringRef recentLibrariesList = SBPreferencesCopyAppValue((CFStringRef)[parserClass preferencesRecentLibrariesKey],
+                                                                    (CFStringRef)[parserClass lightroomAppBundleIdentifier]);
+        
+		if (recentLibrariesList) {
+			[self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
+			CFRelease(recentLibrariesList);
+		}
+    }
+	
+	return libraryPaths;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
