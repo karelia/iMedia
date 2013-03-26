@@ -713,7 +713,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
     NSString *path = [workspace absolutePathForAppBundleWithIdentifier:identifier];
 	NSImage *result = [workspace iconForFile:path];
     
-    if (!result)
+    if (result.representations.count == 0)
     {
         NSURL *picturesFolder = [[NSFileManager defaultManager] URLForDirectory:directory
                                                                        inDomain:NSUserDomainMask
@@ -723,7 +723,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
         
         picturesFolder = [picturesFolder URLByResolvingSymlinksInPath]; // tends to be a symlink when sandboxed
         
-        if (![picturesFolder getResourceValue:&result forKey:NSURLEffectiveIconKey error:NULL] || result == nil)
+        if (![picturesFolder getResourceValue:&result forKey:NSURLEffectiveIconKey error:NULL] || result.representations.count == 0)
         {
             result = [workspace iconForFileType:(NSString *)kUTTypeFolder];
         }
