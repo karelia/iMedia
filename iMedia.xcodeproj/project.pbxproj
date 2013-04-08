@@ -78,9 +78,17 @@
 		30421DFB16A9960900311AC4 /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
 		3043924B130D1DDC00DD1D34 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
 		305B64C71372EF6C009B53BD /* cork-background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CE394AC11371A1F700EF0D1E /* cork-background.jpg */; };
+		306D987C16EF75C5004BE4EA /* IMBFacebookParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 306D987A16EF75C5004BE4EA /* IMBFacebookParser.h */; };
+		306D987D16EF75C5004BE4EA /* IMBFacebookParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 306D987B16EF75C5004BE4EA /* IMBFacebookParser.m */; };
+		306D988116EF7680004BE4EA /* IMBFacebookParserMessenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 306D987F16EF7680004BE4EA /* IMBFacebookParserMessenger.h */; };
+		306D988216EF7680004BE4EA /* IMBFacebookParserMessenger.m in Sources */ = {isa = PBXBuildFile; fileRef = 306D988016EF7680004BE4EA /* IMBFacebookParserMessenger.m */; };
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
+		308BF46116F0D2F800D7A11D /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30C8ACCA16F089B5005674CA /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		308BF46216F0D31300D7A11D /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30C8ACC816F08996005674CA /* Accounts.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		308BF46516F2184400D7A11D /* facebook_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BF46316F2184400D7A11D /* facebook_logo.png */; };
+		308BF46616F2184400D7A11D /* facebook_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BF46416F2184400D7A11D /* facebook_logo@2x.png */; };
 		308DEF151609C6CE00F889C8 /* IMBTableViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		308DEF161609C6CE00F889C8 /* IMBTableViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 308DEF141609C6CE00F889C8 /* IMBTableViewAppearance.m */; };
 		308FC1FC16A9498B00B42F49 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 308FC1FE16A9498B00B42F49 /* Localizable.strings */; };
@@ -97,6 +105,16 @@
 		3099018E16637B93006C1212 /* NSBundle+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3099018C16637B93006C1212 /* NSBundle+iMedia.h */; };
 		3099018F16637B93006C1212 /* NSBundle+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3099018D16637B93006C1212 /* NSBundle+iMedia.m */; };
 		309901941663B2A3006C1212 /* im.edia.Aperture.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39AC152ACD1300E30C43 /* im.edia.Aperture.xpc */; };
+		30B83AD01701AFDB000EC74E /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
+		30B83AD21701AFDB000EC74E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
+		30B83AD31701AFDB000EC74E /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
+		30B83AD41701AFDB000EC74E /* iMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* iMedia.framework */; };
+		30B83AD51701AFDB000EC74E /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
+		30B83AD71701AFDB000EC74E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D02CD4CB1224F78E00C773A2 /* Localizable.strings */; };
+		30B83AD81701AFDB000EC74E /* SandboxingKit.strings in Resources */ = {isa = PBXBuildFile; fileRef = 30421DE616A9943400311AC4 /* SandboxingKit.strings */; };
+		30B83ADF1701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */; };
+		30B83AE01701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */; };
+		30B83AE11701B1C8000EC74E /* im.edia.Facebook.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = 30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
@@ -528,6 +546,7 @@
 			dstPath = Contents/XPCServices;
 			dstSubfolderSpec = 1;
 			files = (
+				30B83AE11701B1C8000EC74E /* im.edia.Facebook.xpc in Copy XPCServices */,
 				D0904DAC152CAA4A003FDD08 /* im.edia.Lightroom.xpc in Copy XPCServices */,
 				D0904DAD152CAA4A003FDD08 /* im.edia.Flickr.xpc in Copy XPCServices */,
 				D0904DAE152CAA4A003FDD08 /* im.edia.Safari.xpc in Copy XPCServices */,
@@ -608,7 +627,13 @@
 		30421DEE16A9944700311AC4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SandboxingKit.strings"; sourceTree = "<group>"; };
 		30421DEF16A9944800311AC4 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
 		30421DF016A9944900311AC4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SandboxingKit.strings; sourceTree = "<group>"; };
+		306D987A16EF75C5004BE4EA /* IMBFacebookParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFacebookParser.h; sourceTree = "<group>"; };
+		306D987B16EF75C5004BE4EA /* IMBFacebookParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFacebookParser.m; sourceTree = "<group>"; };
+		306D987F16EF7680004BE4EA /* IMBFacebookParserMessenger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFacebookParserMessenger.h; sourceTree = "<group>"; };
+		306D988016EF7680004BE4EA /* IMBFacebookParserMessenger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFacebookParserMessenger.m; sourceTree = "<group>"; };
 		3089F94A151C8FDD00D56DC0 /* XPCKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = XPCKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		308BF46316F2184400D7A11D /* facebook_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facebook_logo.png; sourceTree = "<group>"; };
+		308BF46416F2184400D7A11D /* facebook_logo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "facebook_logo@2x.png"; sourceTree = "<group>"; };
 		308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBTableViewAppearance.h; sourceTree = "<group>"; };
 		308DEF141609C6CE00F889C8 /* IMBTableViewAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBTableViewAppearance.m; sourceTree = "<group>"; };
 		308FC1FD16A9498B00B42F49 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -625,6 +650,10 @@
 		3091F6B415C9508E005019A1 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3099018C16637B93006C1212 /* NSBundle+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+iMedia.h"; sourceTree = "<group>"; };
 		3099018D16637B93006C1212 /* NSBundle+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+iMedia.m"; sourceTree = "<group>"; };
+		30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = im.edia.Facebook.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = im.edia.Facebook.entitlements; sourceTree = "<group>"; };
+		30C8ACC816F08996005674CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
+		30C8ACCA16F089B5005674CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventNodeObject.h; sourceTree = "<group>"; };
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
 		30E7771C1511055800413AEF /* SBUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBUtilities.h; path = SandBoxingKit/SBUtilities.h; sourceTree = SOURCE_ROOT; };
@@ -1053,6 +1082,17 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		30B83AD11701AFDB000EC74E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30B83AD21701AFDB000EC74E /* Foundation.framework in Frameworks */,
+				30B83AD31701AFDB000EC74E /* Quartz.framework in Frameworks */,
+				30B83AD41701AFDB000EC74E /* iMedia.framework in Frameworks */,
+				30B83AD51701AFDB000EC74E /* XPCKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		30FFEBE9150A08DB0009C1D0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1068,6 +1108,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				308BF46216F0D31300D7A11D /* Accounts.framework in Frameworks */,
+				308BF46116F0D2F800D7A11D /* Social.framework in Frameworks */,
 				D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
@@ -1221,6 +1263,7 @@
 				D05D39F0152ACD6800E30C43 /* im.edia.Firefox.xpc */,
 				D05D3A01152ACD8800E30C43 /* im.edia.FSEvents.xpc */,
 				D05D3A13152AD0D000E30C43 /* im.edia.Chrome.xpc */,
+				30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1228,6 +1271,8 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
+				30C8ACCA16F089B5005674CA /* Social.framework */,
+				30C8ACC816F08996005674CA /* Accounts.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
 				D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */,
 				D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */,
@@ -1258,6 +1303,20 @@
 			);
 			name = "iMedia Framework";
 			sourceTree = SOURCE_ROOT;
+		};
+		306D987E16EF75F3004BE4EA /* Facebook */ = {
+			isa = PBXGroup;
+			children = (
+				308BF46316F2184400D7A11D /* facebook_logo.png */,
+				308BF46416F2184400D7A11D /* facebook_logo@2x.png */,
+				306D987F16EF7680004BE4EA /* IMBFacebookParserMessenger.h */,
+				306D988016EF7680004BE4EA /* IMBFacebookParserMessenger.m */,
+				306D987A16EF75C5004BE4EA /* IMBFacebookParser.h */,
+				306D987B16EF75C5004BE4EA /* IMBFacebookParser.m */,
+				30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */,
+			);
+			name = Facebook;
+			sourceTree = "<group>";
 		};
 		30E77715151104A900413AEF /* SandBoxingKit */ = {
 			isa = PBXGroup;
@@ -1711,6 +1770,7 @@
 				D02E53C510A5558800B205BD /* Lightroom */,
 				D0F2DDB4152473500059DF8D /* iTunes */,
 				D0B6FAA21043227A00280DDC /* GarageBand */,
+				306D987E16EF75F3004BE4EA /* Facebook */,
 				D032CE8A109B311A00D84782 /* Flickr */,
 				D05D3A03152AD05C00E30C43 /* Safari */,
 				D05D3A04152AD07400E30C43 /* FireFox */,
@@ -2124,12 +2184,31 @@
 				3000AE26161816CD00EDC78E /* IMBOutlineView+iMediaPrivate.h in Headers */,
 				3000AE2B161A996000EDC78E /* IMBAppleMediaParser+iMediaPrivate.h in Headers */,
 				3099018E16637B93006C1212 /* NSBundle+iMedia.h in Headers */,
+				306D987C16EF75C5004BE4EA /* IMBFacebookParser.h in Headers */,
+				306D988116EF7680004BE4EA /* IMBFacebookParserMessenger.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		30B83ACE1701AFDB000EC74E /* im.edia.Facebook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 30B83AD91701AFDB000EC74E /* Build configuration list for PBXNativeTarget "im.edia.Facebook" */;
+			buildPhases = (
+				30B83ACF1701AFDB000EC74E /* Sources */,
+				30B83AD11701AFDB000EC74E /* Frameworks */,
+				30B83AD61701AFDB000EC74E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = im.edia.Facebook;
+			productName = "iPhoto Parser XPC Service";
+			productReference = 30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
 		30FFEBEB150A08DB0009C1D0 /* im.edia.iPhoto */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 30FFEBF9150A08DC0009C1D0 /* Build configuration list for PBXNativeTarget "im.edia.iPhoto" */;
@@ -2405,12 +2484,23 @@
 				D05D39E1152ACD6800E30C43 /* im.edia.Firefox */,
 				D05D3A05152AD0D000E30C43 /* im.edia.Chrome */,
 				D05D39F2152ACD8800E30C43 /* im.edia.FSEvents */,
+				30B83ACE1701AFDB000EC74E /* im.edia.Facebook */,
 				D02CD49E1224F22400C773A2 /* genstrings */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		30B83AD61701AFDB000EC74E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30B83AD71701AFDB000EC74E /* Localizable.strings in Resources */,
+				30B83AD81701AFDB000EC74E /* SandboxingKit.strings in Resources */,
+				30B83AE01701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		30FFEBEA150A08DB0009C1D0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2531,6 +2621,9 @@
 				D0FDC6651668ACC000181E15 /* iTunes11-icon-30.png in Resources */,
 				D0FDC6661668ACC000181E15 /* iTunes11-icon-30@2x.png in Resources */,
 				30421DE416A9943400311AC4 /* SandboxingKit.strings in Resources */,
+				308BF46516F2184400D7A11D /* facebook_logo.png in Resources */,
+				308BF46616F2184400D7A11D /* facebook_logo@2x.png in Resources */,
+				30B83ADF1701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2655,6 +2748,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		30B83ACF1701AFDB000EC74E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				30B83AD01701AFDB000EC74E /* SBServiceMain.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		30FFEBE8150A08DB0009C1D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2795,6 +2896,8 @@
 				3000AE021617288200EDC78E /* IMBComboTableViewAppearance.m in Sources */,
 				3000AE201617AE2200EDC78E /* IMBViewAppearance.m in Sources */,
 				3099018F16637B93006C1212 /* NSBundle+iMedia.m in Sources */,
+				306D987D16EF75C5004BE4EA /* IMBFacebookParser.m in Sources */,
+				306D988216EF7680004BE4EA /* IMBFacebookParserMessenger.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2958,12 +3061,15 @@
 			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
+				ONLY_ACTIVE_ARCH = YES;
+				"OTHER_LDFLAGS[arch=x86_64]" = "";
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -2974,12 +3080,14 @@
 			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
@@ -3003,6 +3111,64 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
 				PROVISIONING_PROFILE = "";
+			};
+			name = Release;
+		};
+		30B83ADA1701AFDB000EC74E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		30B83ADB1701AFDB000EC74E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CODE_SIGN_ENTITLEMENTS = "$(TARGET_NAME).entitlements";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "SandBoxingKit/SBService-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
 		};
@@ -3559,6 +3725,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /Library/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -3580,6 +3747,7 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks /Library/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -3617,6 +3785,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
@@ -3643,6 +3812,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../../../../Frameworks /Library/Frameworks";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xpc;
 			};
@@ -3723,6 +3893,15 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		30B83AD91701AFDB000EC74E /* Build configuration list for PBXNativeTarget "im.edia.Facebook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				30B83ADA1701AFDB000EC74E /* Debug */,
+				30B83ADB1701AFDB000EC74E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
