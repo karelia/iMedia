@@ -88,6 +88,11 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+// Use this switch in your subclass if you want to turn off XPC service usage for a particular service type
++ (BOOL) useXPCServiceWhenPresent
+{
+    return YES;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -202,6 +207,10 @@
 
 - (id) connection
 {
+    if (![[self class] useXPCServiceWhenPresent])
+    {
+        return nil;
+    }
     NSString* identifier = [[self class] xpcServiceIdentifier];
     
 	if (_connection == nil && [[NSBundle mainBundle] supportsXPCServiceWithIdentifier:identifier])
