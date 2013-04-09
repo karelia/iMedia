@@ -992,9 +992,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
     [[[inNode.parserMessenger class] accessRequester] requestAccessToNode:inNode completion:
      ^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
-         if (inGranted) {
-             [IMBLibraryController reloadTopLevelNodesWithoutAccessRights];
-         }
+         // Add customized completion code here
      }];
 }
 

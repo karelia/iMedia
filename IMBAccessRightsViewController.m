@@ -651,7 +651,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
                                                     
                                                     ^(NSURL* inReceivedURL,NSError* inError)
                                                     {
-                                                        inCompletion(inError == nil, YES);
+                                                        BOOL granted = inError == nil;
+                                                        if (granted) {
+                                                            [libraryController reloadNodeTree:node];
+                                                        }
+                                                        inCompletion(granted, YES);
                                                     });
                          }
                      }

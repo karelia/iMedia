@@ -556,8 +556,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		{
 //			if ([node.libraryRootURL.path hasPathPrefix:path])
 			{
-				node.badgeTypeNormal = kIMBBadgeTypeLoading;
-				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+//				node.badgeTypeNormal = kIMBBadgeTypeLoading;
+//				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
                 [libraryController reloadNodeTree:node];
             }
 		}
