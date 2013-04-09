@@ -678,7 +678,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
             case kIMBResourceNoPermission:
             {
                 shouldExpand = NO;
-                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+                [self requestAccessToNode:node];
                 break;
             }
             
@@ -832,7 +832,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
         switch (newNode.accessibility)
 		{
             case kIMBResourceNoPermission:
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+                [self requestAccessToNode:newNode];
 			break;
                 
             case kIMBResourceDoesNotExist:
@@ -985,7 +985,24 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
+#pragma mark Access Control
+
+- (void) requestAccessToNode:(IMBNode*)inNode
+{
+    [[[inNode.parserMessenger class] accessRequester] requestAccessToNode:inNode completion:
+     ^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
+         if (inGranted) {
+             [IMBLibraryController reloadTopLevelNodesWithoutAccessRights];
+         }
+     }];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark NSSplitView Delegate
 
 
@@ -1335,7 +1352,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.accessibility == kIMBResourceNoPermission)
 	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+        [self requestAccessToNode:node];
 	}
 	
 	[self selectNode:node];

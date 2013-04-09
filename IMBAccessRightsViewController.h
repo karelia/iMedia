@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Peter Baumgartner, Jörg Jacobson
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,6 +60,8 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+#import "IMBParserMessenger.h"
 
 
 #pragma mark CLASSES
@@ -74,7 +76,7 @@
 
 #pragma mark 
 
-@interface IMBAccessRightsViewController : NSViewController
+@interface IMBAccessRightsViewController : NSViewController <IMBAccessRequester>
 {
 	IBOutlet NSTextField* _warningTitle;
 	IBOutlet NSTextField* _warningMessage;
@@ -82,10 +84,6 @@
 
 + (IMBAccessRightsViewController*) sharedViewController;
 
-// User inteface to grant access to part of the file system. Returns a url for the folder that the user
-// actually selected or nil in case of Cancel...
-
-- (void) grantAccessRightsForNode:(IMBNode*)inNode;
 - (void) grantAccessRightsForObjectsOfNode:(IMBNode*)inNode;
 + (void) grantAccessRightsForFolder:(IMBParserMessenger*)inFolderParserMessenger completionHandler:(void(^)(void))inCompletionHandler;
 

@@ -124,6 +124,12 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 - (void) populateNode:(IMBNode*)inNode;
 - (void) reloadNodeTree:(IMBNode*)inOldNode;
 
+// Try to reload any top-level nodes that do not have access rights and which might benefit from the newly
+// granted URL...
+
++ (void) reloadTopLevelNodesWithoutAccessRights;
+
+
 // Node accessors (must only be called on the main thread)...
 
 @property (retain,readonly) NSMutableArray* subnodes;	

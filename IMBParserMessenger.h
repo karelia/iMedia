@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,6 +63,7 @@
 @class IMBNode;
 @class IMBObject;
 @class IMBParser;
+@protocol IMBAccessRequester;
 //@class XPCConnection;
 
 
@@ -157,7 +158,14 @@
 
 @interface IMBParserMessenger (App)
 
-// Called when the user right-clicks in the iMedia UI. Here the IMBParserMessenger has a chance to add custom   
+// Returns an access requesting view controller that will take care of
+// requesting access to a library associated with this parser messenger.
+// Default implementation returns shared IMBAccessRightsViewController.
+// Please override for different authorization scheme.
+
++ (id <IMBAccessRequester>) accessRequester;
+
+// Called when the user right-clicks in the iMedia UI. Here the IMBParserMessenger has a chance to add custom
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.
 // These methods are only called on the host app side...
 
@@ -197,4 +205,20 @@
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+// Typed handler on completion of access request to a node
+typedef void (^IMBRequestAccessCompletionHandler)(BOOL inGranted, BOOL inMayAffectOtherNodes);
+
+// If a node is marked as not permitted (kIMBResourceNoPermission)
+// it is asked to provide a mechanism (object) for authorization (requesting access).
+// The node view controller will ask this object to grant access to the node in question
+//
+@protocol IMBAccessRequester <NSObject>
+
+// Request access to node and call completion handler with success or failure indication and
+// with indication whether access granted may affect other nodes (i.e. grant access to those nodes as well)
+- (void) requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
+
+@end
 

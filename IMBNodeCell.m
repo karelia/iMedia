@@ -370,7 +370,9 @@
 	
 		[alert addButtonWithTitle:ok block:^()
 		{
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
+			[[IMBAccessRightsViewController sharedViewController] requestAccessToNode:self.node completion:^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
+                ;
+            }];
 			[alert close];
 		}];
 	
@@ -389,7 +391,12 @@
 		
 		if (button == NSOKButton)
 		{
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:self.node];
+            [[[self.node.parserMessenger class] accessRequester] requestAccessToNode:self.node completion:
+             ^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
+                 if (inGranted) {
+                     [IMBLibraryController reloadTopLevelNodesWithoutAccessRights];
+                 }
+             }];
 		}
 	}
 }
