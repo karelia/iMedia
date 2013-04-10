@@ -66,6 +66,7 @@
 #import "IMBFileSystemObserver.h"
 #import "NSWorkspace+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSString+iMedia.h"
 #import "SBUtilities.h"
 #import "IMBPopover.h"
 #import <XPCKit/XPCKit.h>
@@ -531,6 +532,36 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				}
 			}
 		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Try to reload any top-level nodes that do not have access rights
+// (e.g. because the user granted entitlements to another URL)
+// NOTE: Will reload nodes for _all_ media types
+
++ (void) reloadTopLevelNodesWithoutAccessRights /* RelativeToURL:(NSURL*)inURL */
+{
+	NSArray* mediaTypes = [IMBLibraryController knownMediaTypes];
+//	NSString* path = [inURL path];
+    
+	for (NSString* mediaType in mediaTypes)
+	{
+		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
+		NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+        
+		for (IMBNode* node in nodes)
+		{
+//			if ([node.libraryRootURL.path hasPathPrefix:path])
+			{
+//				node.badgeTypeNormal = kIMBBadgeTypeLoading;
+//				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+                [libraryController reloadNodeTree:node];
+            }
+		}
+	}
 }
 
 

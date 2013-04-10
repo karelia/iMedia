@@ -220,8 +220,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customFooterViewControllerForNode:(IMBNode*)inNode;
 
 @end
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 
