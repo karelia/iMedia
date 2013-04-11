@@ -262,6 +262,15 @@
 }
 
 
+// Get parser's media source current accessibility status. Defaults to imb_accessibility of media source URL.
+// Override in subclass to suit other parsers' needs.
+
+- (IMBResourceAccessibility) mediaSourceAccessibility
+{
+    return [[self mediaSource] imb_accessibility];
+}
+
+
 // Get object's resource current accessibility status
 
 - (IMBResourceAccessibility) accessibilityForObject:(IMBObject*)inObject

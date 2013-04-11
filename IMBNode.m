@@ -177,10 +177,10 @@
             
             if (self.isTopLevelNode)
             {
-                // Being sandboxed the app may yet not have entitlements to access this top level node
-                // accessibility = kIMBResourceIsAccessible if media source is not a file URL (e.g. Flickr node)
+                // Being sandboxed the app may yet not have entitlements to access this top level node if
+                // it's a file URL. Non-file URLs may have to authenticated before they can be used (e.g Facebook).
 
-                self.accessibility = [self.mediaSource imb_accessibility];
+                self.accessibility = [inParser mediaSourceAccessibility];
                 
 //                NSLog(@"Entitlements: %@ is accessible? %@", self.mediaSource, self.accessibility == kIMBResourceIsAccessible ? @"YES" :@"NO");
             }
