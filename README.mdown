@@ -6,9 +6,10 @@ This is the iMedia Browser framework that is used by a number of applications (a
 Sandboxing
 ==========
 
-We are in the process of getting iMedia sandbox-friendly on the `sandbox-compatibility` branch. It is working with the following caveats:
+iMedia 2.6 and later is compatible with common sandboxing setups, with the following notes:
 
 * Search the headers for `SANDBOXING` to make sure your app has the entitlements iMedia needs
+* Users must house their media within the standard Movies, Music and Pictures folders, or grant access to them by dragging in custom folders
 * iMovie Sound Effects have been removed on the basis that Apple doesn't want us poking around another app's resources
 
 There is also a longer-term effort in the `iMediaSandboxing` fork to farm out parsing to XPC processes.
@@ -17,9 +18,13 @@ There is also a longer-term effort in the `iMediaSandboxing` fork to farm out pa
 Compatibility
 ========
 
+### 2.6
+
+Out of the box (the `v2.6.x` branch), iMedia supports OS X 10.6 Snow Leopard and later. It is suitable for both 32 and 64 bit apps. See above for sandbox compatibility details.
+
 ### 2.5
 
-Out of the box (the `master` branch), iMedia supports OS X 10.6 Snow Leopard and later. It is suitable for both 32 and 64 bit apps.
+Basically the same as 2.6, minus sandbox compatibility.
 
 ### 2.1
 
@@ -50,6 +55,11 @@ Recent Release Notes
 ### 2.5.4
 
 * `-[NSWorkspace imb_iconForAppWithBundleIdentifier:]` has been removed. Its fallback mechanism was buggy and relied on private implementation details in the OS frameworks, which have since broke. If you are using this method in your app, provide your own implementation instead
+
+### 2.6
+
+* iMedia is now roughly compatible with the OS X app sandbox. See Sandboxing section above for full details
+* A few public APIs have been removed or changed in the process, but chances are you weren't using them, or the replacement is dead obvious in the headers
 
 
 Development
