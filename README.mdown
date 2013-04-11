@@ -28,7 +28,7 @@ Basically the same as 2.6, minus sandbox compatibility.
 
 ### 2.1
 
-For apps still supporting OS X 10.5 Leopard, we continue to support the existing iMedia 2.1 codebase on the `maintain-leopard-compatible` branch.
+For apps still supporting OS X 10.5 Leopard, we continue to support the existing iMedia 2.1 codebase on the `v2.1.x` branch.
 
 ### 1.x
 
