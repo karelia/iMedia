@@ -49,7 +49,7 @@ Recent Release Notes
 
 ### 2.5.4
 
-* -[NSWorkspace imb_iconForAppWithBundleIdentifier:] has been removed. It's fallback mechanism was buggy and relied on private implementation details in the OS frameworks, which have since broke. If you are using this method in your app, provide your own implementation instead
+* `-[NSWorkspace imb_iconForAppWithBundleIdentifier:]` has been removed. Its fallback mechanism was buggy and relied on private implementation details in the OS frameworks, which have since broke. If you are using this method in your app, provide your own implementation instead
 
 
 Development
