@@ -216,6 +216,8 @@ typedef void (^IMBRequestAccessCompletionHandler)(BOOL inGranted, BOOL inMayAffe
 //
 @protocol IMBAccessRequester <NSObject>
 
+@required
+
 // Request access to node and call completion handler with success or failure indication and
 // with indication whether access granted may affect other nodes (i.e. grant access to those nodes as well)
 - (void) requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;

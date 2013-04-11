@@ -39,127 +39,129 @@
 
 - (IMBNode*) unpopulatedTopLevelNode: (NSError**) outError
 {
-    // Running in app process or XPC service?
-    NSString *facebookAppId = FACEBOOK_APP_ID_APP_PROCESS;
+//    // Running in app process or XPC service?
+//    NSString *facebookAppId = FACEBOOK_APP_ID_APP_PROCESS;
+//    
+//    if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
+//    
+//    // This method must return synchronously with all necessary requests to facebook being already returned.
+//    // Use NSCondition and BOOL for that matter.
+//    
+//    NSCondition *authenticationCond = [[NSCondition alloc] init];
+//    __block BOOL authenticationDone = NO;
+//    
+//    [authenticationCond lock];
+//    
+//    self.accountStore = [[ACAccountStore alloc] init];
+//    
+//    NSLog(@"%@", [self.accountStore accounts]);
+//
+//    ACAccountType *facebookAccountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
+//    
+//    NSArray *facebookPermissions = [NSArray arrayWithObjects:@"email", nil];
+//    
+//    NSDictionary *facebookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+//                                              facebookAppId, ACFacebookAppIdKey,
+//                                              //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
+//                                              facebookPermissions, ACFacebookPermissionsKey, nil];
+//    
+//    [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:facebookClientAccessInfo completion:^(BOOL granted, NSError *error) {
+//        if (granted) {
+//            NSLog(@"Facebook access basically granted!!!");
+//            
+//            NSArray *facebookPermissions = [NSArray arrayWithObjects:
+//                                            @"user_photos", @"friends_photos",
+//                                            nil];
+//            NSDictionary *subseqFacbookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+//                                                           facebookAppId, ACFacebookAppIdKey,
+//                                                           //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
+//                                                           facebookPermissions, ACFacebookPermissionsKey, nil];
+//            [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:subseqFacbookClientAccessInfo completion:^(BOOL granted, NSError *error) {
+//                if (granted) {
+//                    NSLog(@"Facebook access totally granted!!!");
+//                    NSArray *accounts = [self.accountStore accountsWithAccountType:facebookAccountType];
+//                    self.account = [accounts lastObject];
+//                } else {
+//                    NSLog(@"No total Facebook access granted :-((");
+//                    *outError = error;
+//                }
+//                [authenticationCond lock];
+//                authenticationDone = YES;
+//                [authenticationCond signal];
+//                [authenticationCond unlock];
+//            }];
+//        } else {
+//            NSLog(@"No basic Facebook access granted :-((");
+//            *outError = error;
+//        }
+//    }];
+//    
+//    while (!authenticationDone) {
+//        [authenticationCond wait];
+//    }
+//    [authenticationCond unlock];
+//    
+//    if (outError && *outError) {
+//        return nil;
+//    }
+//    
+//    // Facebook user name will be part of Node name. Get user name from Facebook.
+//    
+//    NSURL *meURL = [NSURL URLWithString:@"https://graph.facebook.com/me"];
+//    NSDictionary *params = @{ @"fields" : @"id,name"};
+//    
+//    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
+//                                            requestMethod:SLRequestMethodGET
+//                                                      URL:meURL
+//                                               parameters:params];
+//    request.account = self.account;
+//    
+//    NSURLResponse *urlResponse = nil;
+//    NSError *error = nil;
+//    NSData *responseData = [NSURLConnection sendSynchronousRequest:[request preparedURLRequest]
+//                                                 returningResponse:&urlResponse
+//                                                             error:&error];
+//    if (error) {
+//        NSLog(@"%@ Access to me failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], error);
+//        *outError = error;
+//        return nil;
+//    }
+//    
+//    NSDictionary *me = (NSDictionary *) [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
+//    
+//    // Account for expired session
+//    
+//    __block IMBNode *node = nil;
+//    if ([self isSessionExpired:me])
+//    {
+//        NSCondition *condition = [[NSCondition alloc] init];
+//        __block BOOL conditionDone = NO;
+//        
+//        [condition lock];
+//        
+//        [self.accountStore renewCredentialsForAccount:self.account completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
+//            
+//            [condition lock];
+//            conditionDone = YES;
+//            [condition signal];
+//            [condition unlock];
+//            
+//            node = [self unpopulatedTopLevelNode:outError];
+//        }];
+//        while (!conditionDone) {
+//            [condition wait];
+//        }
+//        [condition unlock];
+//        
+//        return node;
+//    }
+//    
+//    NSLog(@"Facebook returned me: %@",me);
+//    
+//    NSString *myName = [me objectForKey:@"name"];
+//    NSString *myID = [me objectForKey:@"id"];
     
-    if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
-    
-    // This method must return synchronously with all necessary requests to facebook being already returned.
-    // Use NSCondition and BOOL for that matter.
-    
-    NSCondition *authenticationCond = [[NSCondition alloc] init];
-    __block BOOL authenticationDone = NO;
-    
-    [authenticationCond lock];
-    
-    self.accountStore = [[ACAccountStore alloc] init];
-    
-    NSLog(@"%@", [self.accountStore accounts]);
-
-    ACAccountType *facebookAccountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
-    
-    NSArray *facebookPermissions = [NSArray arrayWithObjects:@"email", nil];
-    
-    NSDictionary *facebookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                              facebookAppId, ACFacebookAppIdKey,
-                                              //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
-                                              facebookPermissions, ACFacebookPermissionsKey, nil];
-    
-    [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:facebookClientAccessInfo completion:^(BOOL granted, NSError *error) {
-        if (granted) {
-            NSLog(@"Facebook access basically granted!!!");
-            
-            NSArray *facebookPermissions = [NSArray arrayWithObjects:
-                                            @"user_photos", @"friends_photos",
-                                            nil];
-            NSDictionary *subseqFacbookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                           facebookAppId, ACFacebookAppIdKey,
-                                                           //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
-                                                           facebookPermissions, ACFacebookPermissionsKey, nil];
-            [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:subseqFacbookClientAccessInfo completion:^(BOOL granted, NSError *error) {
-                if (granted) {
-                    NSLog(@"Facebook access totally granted!!!");
-                    NSArray *accounts = [self.accountStore accountsWithAccountType:facebookAccountType];
-                    self.account = [accounts lastObject];
-                } else {
-                    NSLog(@"No total Facebook access granted :-((");
-                    *outError = error;
-                }
-                [authenticationCond lock];
-                authenticationDone = YES;
-                [authenticationCond signal];
-                [authenticationCond unlock];
-            }];
-        } else {
-            NSLog(@"No basic Facebook access granted :-((");
-            *outError = error;
-        }
-    }];
-    
-    while (!authenticationDone) {
-        [authenticationCond wait];
-    }
-    [authenticationCond unlock];
-    
-    if (outError && *outError) {
-        return nil;
-    }
-    
-    // Facebook user name will be part of Node name. Get user name from Facebook.
-    
-    NSURL *meURL = [NSURL URLWithString:@"https://graph.facebook.com/me"];
-    NSDictionary *params = @{ @"fields" : @"id,name"};
-    
-    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
-                                            requestMethod:SLRequestMethodGET
-                                                      URL:meURL
-                                               parameters:params];
-    request.account = self.account;
-    
-    NSURLResponse *urlResponse = nil;
-    NSError *error = nil;
-    NSData *responseData = [NSURLConnection sendSynchronousRequest:[request preparedURLRequest]
-                                                 returningResponse:&urlResponse
-                                                             error:&error];
-    if (error) {
-        NSLog(@"%@ Access to me failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], error);
-        *outError = error;
-        return nil;
-    }
-    
-    NSDictionary *me = (NSDictionary *) [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
-    
-    // Account for expired session
-    
-    __block IMBNode *node = nil;
-    if ([self isSessionExpired:me])
-    {
-        NSCondition *condition = [[NSCondition alloc] init];
-        __block BOOL conditionDone = NO;
-        
-        [condition lock];
-        
-        [self.accountStore renewCredentialsForAccount:self.account completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
-            
-            [condition lock];
-            conditionDone = YES;
-            [condition signal];
-            [condition unlock];
-            
-            node = [self unpopulatedTopLevelNode:outError];
-        }];
-        while (!conditionDone) {
-            [condition wait];
-        }
-        [condition unlock];
-        
-        return node;
-    }
-    
-    NSLog(@"Facebook returned me: %@",me);
-    
-    NSString *myName = [me objectForKey:@"name"];
-    NSString *myID = [me objectForKey:@"id"];
+    //------------------------------------------------------------------
     
 	//	load Facebook icon...
 	NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
@@ -178,15 +180,22 @@
     }
 	
     //  create an empty root node (unpopulated and without subnodes)...
-	node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+	IMBNode *node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
 	node.groupType = kIMBGroupTypeInternet;
 	node.icon = icon;
-	node.identifier = myID;
+	node.identifier = [self identifierForPath:@""];
 	node.isIncludedInPopup = YES;
 	node.isLeafNode = NO;
 	node.mediaSource = nil;
-	node.name = [NSString stringWithFormat:@"Facebook (%@)", myName];
-	node.accessibility = kIMBResourceIsAccessible;      // TODO/JJ: Be more elaborate here
+	node.accessibility = kIMBResourceNoPermission;      // TODO/JJ: Be more elaborate here
+    
+    NSString *nodeName, *myName = nil;
+    if (node.accessibility == kIMBResourceIsAccessible) {
+        nodeName = [NSString stringWithFormat:@"Facebook (%@)", myName];
+    } else {
+        nodeName = @"Facebook";
+    }
+    node.name = nodeName;
 	
 	return node;
 }

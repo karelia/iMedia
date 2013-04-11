@@ -8,6 +8,7 @@
 
 #import "IMBFacebookParserMessenger.h"
 #import "IMBFacebookParser.h"
+#import "IMBFacebookAccessController.h"
 
 @implementation IMBFacebookParserMessenger
 
@@ -68,6 +69,16 @@
     static dispatch_once_t onceToken = 0;
     
     return &onceToken;
+}
+
+#pragma mark - IMBAccessRequester Delegate
+
+//----------------------------------------------------------------------------------------------------------------------
+// Returns an access requesting controller that will take care of requesting access to Facebook
+
++ (id <IMBAccessRequester>) accessRequester
+{
+    return [[IMBFacebookAccessController alloc] init];
 }
 
 #pragma mark - Object Lifecycle

@@ -5,6 +5,9 @@
       location = "group:XPCKit/XPCKit.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:PhFacebook/PhFacebook.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:ObjectiveFlickr/ObjectiveFlickr.xcodeproj">
    </FileRef>
    <FileRef
