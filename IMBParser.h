@@ -105,6 +105,11 @@
 - (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError;
 - (NSData*) bookmarkForObject:(IMBObject*)inObject error:(NSError**)outError;
 
+// Get parser's media source current accessibility status. Defaults to imb_accessibility of media source URL.
+// Override in subclass to suit other parsers' needs.
+
+- (IMBResourceAccessibility) mediaSourceAccessibility;
+
 // Get object's resource current accessibility status
 
 - (IMBResourceAccessibility) accessibilityForObject:(IMBObject*)inObject;
