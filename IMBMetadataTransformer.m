@@ -67,21 +67,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Register the transformer...
-
-+ (void) load
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	IMBMetadataTransformer* transformer = [[IMBMetadataTransformer alloc] init];
-	[NSValueTransformer setValueTransformer:transformer forName:NSStringFromClass(self)];
-	[transformer release];
-	[pool drain];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
 + (Class) transformedValueClass
 {
 	return [NSString class];
