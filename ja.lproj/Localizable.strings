@@ -93,7 +93,7 @@
 "IMBFlickrParser.button.add" = "追加";
 
 /* Button title in Flickr Options */
-"IMBFlickrParser.button.remove" = "削除";
+"IMBFlickrParser.button.remove" = "取り除く";
 
 /* Format string for attribution credit; flickr user followed by short URL */
 "IMBFlickrParser.format.attribution" = "%1$@ - %2$@によって撮影";
@@ -248,7 +248,7 @@
 "IMBNodeViewController.menuItem.reload" = "再読み込み";
 
 /* Menu item in context menu of outline view */
-"IMBNodeViewController.menuItem.remove" = "取り除く";
+"IMBNodeViewController.menuItem.remove" = "削除";
 
 /* placeholder for untitled image */
 "IMBObject.untitled" = "名称未設定";
