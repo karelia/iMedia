@@ -93,12 +93,12 @@
 		if ([inValue isKindOfClass:[NSDictionary class]]) 
 		{
 			NSDictionary* metadata = (NSDictionary*)inValue;
-			NSNumber* width = [metadata objectForKey:@"width"];
-			NSNumber* height = [metadata objectForKey:@"height"];
+			int width = [[metadata objectForKey:@"width"] intValue];    // tolerate NSString sizes
+			int height = [[metadata objectForKey:@"height"] intValue];
 
-			if ([width integerValue] != 0 && [height integerValue] != 0)
+			if (width > 0 && width != INT_MAX && height > 0 && height != INT_MAX)
 			{
-				result = [NSString stringWithFormat:@"%ld×%ld",[width longValue],[height longValue]];
+				result = [NSString stringWithFormat:@"%i×%i", width, height];
 			} else {
 				result = @"";
 			}
