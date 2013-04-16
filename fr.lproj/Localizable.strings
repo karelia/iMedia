@@ -8,7 +8,7 @@
 "Comment" = "Commentaires";
 
 /* HTML markup to show link to iMedia home page */
-"IMB.availableLink" = "Disponible à  <a href='http://karelia.com/imedia/'>karelia.com/imedia</a>";
+"IMB.availableLink" = "Disponible à <a href='http://karelia.com/imedia/'>karelia.com/imedia</a>";
 
 /* HTML style text shown on credits for iMedia, introducting who wrote the software */
 "IMB.credits" = "Mentions :";
@@ -93,7 +93,7 @@
 "IMBFlickrParser.button.add" = "Ajouter";
 
 /* Button title in Flickr Options */
-"IMBFlickrParser.button.remove" = "Suprimer";
+"IMBFlickrParser.button.remove" = "Supprimer";
 
 /* Format string for attribution credit; flickr user followed by short URL */
 "IMBFlickrParser.format.attribution" = "Photo par %1$@ - %2$@";
@@ -281,7 +281,7 @@
 "IMBObjectViewController.menuItem.quickLook" = "Coup d'œil";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.revealInFinder" = "Révéler dans le Finder";
+"IMBObjectViewController.menuItem.revealInFinder" = "Afficher dans le Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Révéler l'image maître dans le Finder";
