@@ -79,7 +79,7 @@
 "IMBMovieViewController.countFormatPlural" = "%d filmer";
 "IMBMovieViewController.countFormatSingular" = "%d film";
 "IMBMovieViewController.displayName" = "Filmer";
-"IMBNodeViewController.menuItem.add" = "Legg til...";
+"IMBNodeViewController.menuItem.add" = "Legg til…";
 "IMBNodeViewController.menuItem.reload" = "Last inn på nytt";
 "IMBNodeViewController.menuItem.remove" = "Fjern";
 "IMBObject.untitled" = "uten navn";
