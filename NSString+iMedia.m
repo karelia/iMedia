@@ -54,8 +54,6 @@
 
 #import "NSString+iMedia.h"
 #import "NSFileManager+iMedia.h"
-#include <openssl/bio.h>
-#include <openssl/evp.h>
 #include <sys/stat.h>
 
 
