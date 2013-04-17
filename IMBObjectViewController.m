@@ -1904,6 +1904,11 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	[inPasteboard writeObjects:pasteboardItems];
 	[inPasteboard imb_setParserMessenger:parserMessenger];
 
+	// Also set the objects in a global array, which is the fast path shortcut for intra application drags. These
+	// objects are released again in draggingSession:endedAtPoint:operation: of our object views...
+	
+	[NSPasteboard imb_setIMBObjects:objects];
+	
     // Let the parser messenger know its objects are writing to the pasteboard, so for iPhoto objects,
     // can add additional data mimicking iPhoto
     // NOTE: This mimicking only works with the "old" pasteboard api because the associated item type is not UTI-compliant
