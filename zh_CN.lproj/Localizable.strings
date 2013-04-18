@@ -78,7 +78,7 @@
 "IMBAudioViewController.tableColumn.artist" = "表演者";
 
 /* Column title - should be a short word */
-"IMBAudioViewController.tableColumn.name" = "姓名";
+"IMBAudioViewController.tableColumn.name" = "名称";
 
 /* Column title - should be a short word */
 "IMBAudioViewController.tableColumn.time" = "时间";
@@ -188,7 +188,7 @@
 "IMBImageViewController.displayName" = "图像";
 
 /* Column title - should be a short word */
-"IMBImageViewController.tableColumn.name" = "姓名";
+"IMBImageViewController.tableColumn.name" = "名称";
 
 /* Column title - should be a short word */
 "IMBImageViewController.tableColumn.size" = "大小";
