@@ -39,7 +39,7 @@
 "IMB.option.gridPrompt" = "Grades de Foto:";
 
 /* back of window checkbox */
-"IMB.option.showTitles" = "Exibir Títulos";
+"IMB.option.showTitles" = "Mostrar Títulos";
 
 /* back of window checkbox */
 "IMB.option.smallSize" = "Tamanho pequeno";
@@ -126,7 +126,7 @@
 "IMBFlickrParser.menu.derivativeWorks" = "Obras Derivadas";
 
 /* Context menu item title to warn of not being downloadable */
-"IMBFlickrParser.menu.downloadingNotPermitted" = "Recebimento Não Permitido";
+"IMBFlickrParser.menu.downloadingNotPermitted" = "Transferência Não Permitida";
 
 /* Flickr parser node context menu title. */
 "IMBFlickrParser.menu.edit" = "Editar";
@@ -254,7 +254,7 @@
 "IMBObject.untitled" = "sem nome";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.download" = "Receber";
+"IMBObjectViewController.menuItem.download" = "Transferir";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.open" = "Abrir";
@@ -287,19 +287,19 @@
 "IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Mostrar Imagem Principal no Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.showAll" = "Exibir Tudo";
+"IMBObjectViewController.menuItem.showAll" = "Mostrar Tudo";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.showBadgedOnly" = "Exibir Somente com Crachá";
+"IMBObjectViewController.menuItem.showBadgedOnly" = "Mostrar Somente com Crachá";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.showUnbadgedOnly" = "Exibir Somente sem Crachá";
+"IMBObjectViewController.menuItem.showUnbadgedOnly" = "Mostrar Somente sem Crachá";
 
 /* Text message in progress panel of IMBObjectViewController */
 "IMBObjectViewController.progress.message.preparing" = "Preparando…";
 
 /* Window title of progress panel of IMBObjectViewController */
-"IMBObjectViewController.progress.title" = "Recebendo Arquivos de Mídia";
+"IMBObjectViewController.progress.title" = "Transferindo Arquivos de Mídia";
 
 /* segmented cell accessibilility description */
 "IMBObjectViewController.segment.combo" = "Combinação";
