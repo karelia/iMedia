@@ -176,7 +176,7 @@
 "IMBImageCaptureParser.Devices" = "デバイス";
 
 /* Caption for loading camera */
-"IMBImageCaptureParser.loading" = "読み込み中...";
+"IMBImageCaptureParser.loading" = "読み込み中…";
 
 /* Format string for object count in plural */
 "IMBImageViewController.countFormatPlural" = "%d イメージ";
@@ -296,7 +296,7 @@
 "IMBObjectViewController.menuItem.showUnbadgedOnly" = "バッジなしのみ表示";
 
 /* Text message in progress panel of IMBObjectViewController */
-"IMBObjectViewController.progress.message.preparing" = "準備中...";
+"IMBObjectViewController.progress.message.preparing" = "準備中…";
 
 /* Window title of progress panel of IMBObjectViewController */
 "IMBObjectViewController.progress.title" = "メディアファイルをダウンロード中";

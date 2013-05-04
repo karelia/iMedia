@@ -167,7 +167,7 @@
 "IMBImageCaptureParser.Devices" = "Zařízení";
 
 /* Caption for loading camera */
-"IMBImageCaptureParser.loading" = "Nahrávání...";
+"IMBImageCaptureParser.loading" = "Nahrávání…";
 
 /* Format string for object count in plural */
 "IMBImageViewController.countFormatPlural" = "%d obrázk(y)ů";
@@ -233,7 +233,7 @@
 "IMBMovieViewController.displayName" = "Videa";
 
 /* Menu item in context menu of outline view */
-"IMBNodeViewController.menuItem.add" = "Přidat...";
+"IMBNodeViewController.menuItem.add" = "Přidat…";
 
 /* Menu item in context menu of outline view */
 "IMBNodeViewController.menuItem.reload" = "Nahrát znovu";
@@ -287,7 +287,7 @@
 "IMBObjectViewController.menuItem.showUnbadgedOnly" = "Zobrazit pouze neoznačené";
 
 /* Text message in progress panel of IMBObjectViewController */
-"IMBObjectViewController.progress.message.preparing" = "Připravuji...";
+"IMBObjectViewController.progress.message.preparing" = "Připravuji…";
 
 /* Window title of progress panel of IMBObjectViewController */
 "IMBObjectViewController.progress.title" = "Stahuji soubory médií";
