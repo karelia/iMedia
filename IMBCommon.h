@@ -118,6 +118,7 @@ typedef NSUInteger IMBGroupType;
 // User Interface constants...
 
 #define kIMBMaxThumbnailSize 256.0
+#define kIMBFallbackThumbnailSize 1024.0    // apparently QLThumbnailImageCreate sometimes dislikes the smaller value https://github.com/karelia/iMedia/issues/86
 
 // Common error codes...
 

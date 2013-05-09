@@ -65,6 +65,12 @@
 	
 	CGSize size = CGSizeMake(kIMBMaxThumbnailSize,kIMBMaxThumbnailSize);
 	CGImageRef image = QLThumbnailImageCreate(kCFAllocatorDefault,(CFURLRef)self,size,NULL);
+    
+    if (!image) image = QLThumbnailImageCreate(kCFAllocatorDefault,
+                                               (CFURLRef)self,
+                                               CGSizeMake(kIMBFallbackThumbnailSize,kIMBFallbackThumbnailSize),
+                                               NULL);
+    
 	return (CGImageRef) [NSMakeCollectable(image) autorelease];
 }
 
