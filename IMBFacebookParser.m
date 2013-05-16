@@ -400,9 +400,15 @@
     {        
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[NSString stringWithFormat:@"%@/permissions", facebookID] HTTPMethod:@"DELETE"];
         
-        // JJ/TODO: Handle errors!
-        NSLog(@"Response from logging out: %@", responseDict);
-        self.facebook = nil;
+//        NSLog(@"Response from logging out: %@", responseDict);
+
+        NSError *error = [responseDict valueForKey:@"error"];
+        if (pError && error) {
+            *pError = error;
+        }
+        if (!error) {
+            self.facebook = nil;
+        }
     }
 }
 

@@ -1034,7 +1034,8 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
     [accessDelegate revokeAccessToNode:inNode completion:
      ^(BOOL reloadNode, NSError *error)
      {
-         if (error) {
+         inNode.error = error;
+         if (inNode.error) {
              [self showErrorPopoverForNode:inNode relativeToRect:inRect];
          } else if (reloadNode) {
              [self.libraryController reloadNodeTree:inNode];
