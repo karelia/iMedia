@@ -407,7 +407,13 @@
 			
 		if (error == nil)
 		{
-			movie = [QTMovie movieWithURL:url error:&error];
+			NSDictionary* attrs = [NSDictionary dictionaryWithObjectsAndKeys:
+				url, QTMovieURLAttribute,
+				@YES,QTMovieOpenForPlaybackAttribute,
+				@NO,QTMovieOpenAsyncOKAttribute,
+				nil];
+				
+			movie = [QTMovie movieWithAttributes:attrs error:&error];
 			
 			[[NSNotificationCenter defaultCenter] 
 				addObserver:self 
