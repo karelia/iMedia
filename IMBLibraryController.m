@@ -455,7 +455,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			else
 			{
 				inNode.isLoading = NO;
-				inNode.badgeTypeNormal = kIMBBadgeTypeNone;
+				inNode.badgeTypeNormal = [inNode badgeTypeNormalNonLoading];
 				inNode.error = inError;
 			}
 		});		
@@ -507,7 +507,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				{
 					NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
 					inOldNode.isLoading = NO;
-					inOldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+					inOldNode.badgeTypeNormal = [inOldNode badgeTypeNormalNonLoading];
 					inOldNode.error = inError;
 				});
 			}
@@ -529,6 +529,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					{
 						[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
 					}
+                    inNewNode.badgeTypeNormal = [inNewNode badgeTypeNormalNonLoading];
 				}
 			}
 		});		
@@ -829,7 +830,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (inNewNode)
 		{
 			inNewNode.isLoading = NO;
-			inNewNode.badgeTypeNormal = kIMBBadgeTypeNone;
+//			inNewNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
 		
         // Remove empty group nodes (i.e. that do not have any subnodes). This may happen if we went 
@@ -1116,8 +1117,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			[item setTarget:inTarget];						// Normal nodes get the desired target/action
 			[item setAction:inSelector];
 			
-			if (!(inNode.accessibility == kIMBResourceIsAccessible)) // Inaccessible nodes also get a warning icon appended
+			if (!(inNode.accessibility == kIMBResourceIsAccessible) ||
+                inNode.isAccessRevocable)
 			{
+                // Nodes are badged under these circumstances
+                
 				NSFont* font = [NSFont menuFontOfSize:[NSFont systemFontSize]];
 				NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
 					font,NSFontAttributeName,
@@ -1126,6 +1130,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
                 NSString* iconName = nil;
                 switch (inNode.accessibility)
                 {
+                    case kIMBResourceIsAccessible:
+                        iconName = @"IMBLogout.tiff";
+                        break;
                     case kIMBResourceDoesNotExist:
                         iconName = @"IMBStopIcon.icns";
                         break;

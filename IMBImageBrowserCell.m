@@ -292,6 +292,31 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
             [layer addSublayer:badgeLayer];
         }
         
+        CATextLayer *stampLayer = [CATextLayer layer];
+        [placeHolderLayer addSublayer:stampLayer];
+        if ([stampLayer respondsToSelector:@selector(setContentsScale:)])
+        {
+            stampLayer.contentsScale = [[[self imageBrowserView] window] backingScaleFactor];
+        }
+        NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMB.ObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
+        stampLayer.string = stampText;
+        stampLayer.fontSize = 13.0;
+//        stampLayer.alignmentMode = kCAAlignmentCenter;
+		CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 1.0};   // gray
+		color = CGColorCreate(colorSpace, fontColorComponents);
+        stampLayer.foregroundColor = color;
+        CGColorRelease(color);
+        //stampLayer.delegate = self;
+        
+        //stampLayer.backgroundColor = [[NSColor yellowColor] CGColor];
+        placeHolderLayer.layoutManager = [CAConstraintLayoutManager layoutManager];
+        [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidX relativeTo:@"superlayer" attribute:kCAConstraintMidX]];
+        [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidY relativeTo:@"superlayer" attribute:kCAConstraintMidY]];
+        [stampLayer setNeedsLayout];
+        
+        //stampLayer.contentsGravity = kCAGravityCenter;
+        stampLayer.name = type; // a way to refer to the layer location type during drawing if need be
+        //[stampLayer setNeedsDisplay];
 		return layer;
 	}
 	
@@ -389,6 +414,43 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 	}
 	
 	return nil;
+}
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark - CALayerDelegate Protocol
+
+- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context
+{
+    // Set the current context.
+    [NSGraphicsContext saveGraphicsState];
+    NSGraphicsContext *nscg = [NSGraphicsContext graphicsContextWithGraphicsPort:context flipped:NO];
+    [NSGraphicsContext setCurrentContext:nscg];
+    
+    NSString *stamp = @"Loading Thumbnail...";
+    
+    // Wrap and center the text
+    NSMutableParagraphStyle *paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+    [paragraphStyle setLineBreakMode:NSLineBreakByWordWrapping];
+    [paragraphStyle setAlignment:NSCenterTextAlignment];
+    
+    NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
+    [attrs setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+    [attrs setObject:[NSFont systemFontOfSize:12.0f] forKey:NSFontAttributeName];
+    
+    CGFloat padding = 4.0f;
+    
+    NSRect drawRect = NSMakeRect(20,
+                                 20, //-(self.imageFrame.size.height + padding),
+                                 self.frame.size.width,
+                                 100
+                                 );
+    [stamp drawInRect:drawRect withAttributes:attrs];
+    
+    [NSGraphicsContext restoreGraphicsState];
 }
 
 

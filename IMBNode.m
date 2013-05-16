@@ -121,6 +121,7 @@
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
 @synthesize accessibility = _accessibility;
+@synthesize isAccessRevocable = _isAccessRevocable;
 
 // Observing file system changes...
 
@@ -164,6 +165,7 @@
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
         self.accessibility = kIMBResourceIsAccessible;
+        self.isAccessRevocable = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -250,6 +252,7 @@
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	copy.accessibility = self.accessibility;
+    copy.isAccessRevocable = self.isAccessRevocable;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -322,6 +325,7 @@
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
 		self.accessibility = (IMBResourceAccessibility)[inCoder decodeInt64ForKey:@"accessibility"];
+		self.isAccessRevocable = [inCoder decodeBoolForKey:@"isAccessRevocable"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -381,6 +385,7 @@
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
     int64_t accessibility = (int64_t)self.accessibility;
 	[inCoder encodeInt64:accessibility forKey:@"accessibility"];
+	[inCoder encodeBool:self.isAccessRevocable forKey:@"isAccessRevocable"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
@@ -941,6 +946,18 @@
 }
 
 
+// The normal (non-mouseover), non-loading badge type for this node possibly derived
+// from other properties.
+//
+- (IMBBadgeType) badgeTypeNormalNonLoading
+{
+    if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable) {
+        return kIMBBadgeTypeEject;
+    } else {
+        return kIMBBadgeTypeNone;
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -999,6 +1016,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (BOOL)hasBadgeCallback {
+    return (self.badgeTarget && self.badgeSelector);
+}
+
+- (void)performBadgeCallback {
+    if ([self.badgeTarget respondsToSelector:self.badgeSelector])
+        [self.badgeTarget performSelector:self.badgeSelector withObject:self];
+}
 @end
 
 

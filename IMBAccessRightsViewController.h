@@ -76,7 +76,7 @@
 
 #pragma mark 
 
-@interface IMBAccessRightsViewController : NSViewController <IMBAccessRequester>
+@interface IMBAccessRightsViewController : NSViewController <IMBNodeAccessDelegate>
 {
 	IBOutlet NSTextField* _warningTitle;
 	IBOutlet NSTextField* _warningMessage;

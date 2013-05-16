@@ -6,16 +6,19 @@
 //
 //
 
+#import <PhFacebook/PhFacebook.h>
 #import "IMBFacebookParserMessenger.h"
 #import "IMBFacebookParser.h"
 #import "IMBFacebookAccessController.h"
+#import "NSImage+iMedia.h"
+#import "SBUtilities.h"
 
 @implementation IMBFacebookParserMessenger
 
 // Use this switch if you want to turn off XPC service usage for this service type
 + (BOOL) useXPCServiceWhenPresent
 {
-    return NO;
+    return YES;
 }
 
 + (void) load {
@@ -71,14 +74,15 @@
     return &onceToken;
 }
 
-#pragma mark - IMBAccessRequester Delegate
+
+#pragma mark - IMBRequestAccessDelegate Delegate
 
 //----------------------------------------------------------------------------------------------------------------------
 // Returns an access requesting controller that will take care of requesting access to Facebook
 
-+ (id <IMBAccessRequester>) accessRequester
++ (id <IMBNodeAccessDelegate>) nodeAccessDelegate
 {
-    return [[IMBFacebookAccessController alloc] init];
+    return [IMBFacebookAccessController sharedInstance];
 }
 
 #pragma mark - Object Lifecycle
@@ -88,14 +92,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // A single facebook parser is created and cached per facebook parser messenger
 
-- (NSArray *) parserInstancesWithError: (NSError **) outError
+- (NSArray *)parserInstancesWithError:(NSError **)outError
 {
     Class messengerClass = [self class];
     NSMutableArray *parsers = [messengerClass parsers];
     dispatch_once([messengerClass onceTokenRef],
                   ^{
                       IMBFacebookParser *parser = (IMBFacebookParser *)[self newParser];
-                      parser.identifier = [[self class] identifier];
+                      parser.identifier = [messengerClass identifier];
                       parser.mediaType = self.mediaType;
                       parser.mediaSource = self.mediaSource;
                       
@@ -105,7 +109,35 @@
 	return parsers;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// Set Facebook accessor object on parser for subsequent use
 
+- (void) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError
+{
+    // There is supposed to be only _one_ parser. If that condition no longer holds true
+    // we must find other ways to identify the correct parser here.
+    
+    IMBFacebookParser *parser = [[[self class] parsers] lastObject];
+    parser.facebook = facebook;
+    
+	if (outError) *outError = nil;
+}
+
+
+- (void) revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
+{
+    IMBFacebookParser *parser = (IMBFacebookParser *)[self parserWithIdentifier:node.parserIdentifier];
+
+    [parser revokeAccessToNode:node error:pError];
+}
+
+
+#pragma mark - Object Description
+
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+{
+	return [NSImage imb_imageMetadataDescriptionForMetadata:inMetadata];
+}
 
 
 @end

@@ -8,6 +8,12 @@
 
 #import <iMedia/iMedia.h>
 
+@class PhFacebook;
+
 @interface IMBFacebookParserMessenger : IMBParserMessenger
+
+// Set Facebook accessor object on parser for subsequent use
+
+- (void) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError;
 
 @end

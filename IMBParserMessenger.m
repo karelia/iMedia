@@ -80,6 +80,9 @@
 
 #pragma mark
 
+@interface IMBParserMessenger ()
+@end
+
 @implementation IMBParserMessenger
 
 @synthesize mediaType = _mediaType;
@@ -574,7 +577,7 @@
 // Default implementation returns shared IMBAccessRightsViewController.
 // Please override for different authorization scheme.
 
-+ (id <IMBAccessRequester>) accessRequester
++ (id <IMBNodeAccessDelegate>) nodeAccessDelegate
 {
     return [IMBAccessRightsViewController sharedViewController];
 }
@@ -647,6 +650,16 @@
 - (NSURL*) libraryRootURLForMediaSource:(NSURL*)inMediaSource
 {
     return inMediaSource;
+}
+
+#pragma mark
+#pragma mark Node Badges Support
+
+//
+//
+- (void) ejectNode:(IMBNode*)inNode
+{
+    
 }
 
 

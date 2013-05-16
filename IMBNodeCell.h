@@ -79,7 +79,6 @@
 - (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 
 - (IBAction) showAccessRightsPopover:(id)inSender;
-- (IBAction) showErrorPopover:(id)inSender;
 
 @end
 

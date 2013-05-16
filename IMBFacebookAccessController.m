@@ -7,8 +7,10 @@
 //
 
 #import "IMBFacebookAccessController.h"
+#import "IMBFacebookParserMessenger.h"
+#import "SBUtilities.h"
 
-#define FACEBOOK_APP_ID @"421570721265438"
+#define FACEBOOK_APP_ID @"509673709092685"
 
 @interface IMBFacebookAccessController ()
 
@@ -16,48 +18,137 @@
 
 @implementation IMBFacebookAccessController
 
-@synthesize facebook;
+@synthesize node=_node;
+
+// Returns a singleton instance of the class
+
++ (IMBFacebookAccessController *)sharedInstance
+{
+	static IMBFacebookAccessController  *sSharedInstance = nil;
+	static dispatch_once_t sOnceToken = 0;
+    
+    dispatch_once(&sOnceToken,
+                  ^{
+                      sSharedInstance = [[IMBFacebookAccessController alloc] init];
+                  });
+    
+ 	return sSharedInstance;
+}
+
 
 - (id)init
 {
     self = [super init];
     if (self) {
-        self.facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
     }
     return self;
 }
 
-
 #pragma mark
-#pragma mark IMBAccessRequester Protocol
+#pragma mark IMBRequestAccessDelegate Protocol
 
 //
-- (void) requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
+- (void) requestAccessToNode:(IMBNode *)node completion:(IMBRequestAccessCompletionHandler)completion
 {
-    [self.facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"read_stream", @"export_stream", nil] cached: NO];
+    if (self.isLoginDialogPending) {
+//        completion(NO, NO);
+    } else {
+        @synchronized(self)
+        {
+            self.loginDialogPending = YES;
+            self.node = node;               // This is only to hand over node to PhFacebook callback
+            
+            PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
+            
+            // JJ/TODO: Do we need all these permisstions?
+            [facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"read_stream", @"export_stream", @"user_photos", @"friends_photos", nil]
+                                            cached: NO
+                                        completion:
+             ^(NSDictionary *result)
+            {
+                if ([[result valueForKey: @"valid"] boolValue])
+                {
+                    self.node.badgeTypeNormal = kIMBBadgeTypeLoading;
+                    self.node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+                    IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)self.node.parserMessenger;
+                    
+                    SBPerformSelectorAsync(messenger.connection,
+                                           messenger,
+                                           @selector(setFacebookAccessor:error:),
+                                           facebook,
+                                           
+                                           ^(id nothing,NSError *error)
+                                           {
+                                               self.loginDialogPending = NO;
+                                               self.node = nil;
+                                               if (completion) {
+                                                   completion(NO, error);
+                                               }
+                                           });
+                }
+                else
+                {
+                    self.loginDialogPending = NO;
+                    if (completion) {
+                        completion(NO, [result valueForKey: @"error"]);
+                    }
+                }
+            }];
+        }
+    }
+}
+
+// Log out from Facebook
+// (will also delete Facebook cookies to enable different login id while auth token is not expired)
+//
+- (void) revokeAccessToNode:(IMBNode *)node completion:(IMBRevokeAccessCompletionHandler) completion
+{
+    // Delete Facebook cookies so user can later login with a different id
+    [self deleteFacebookCookies];
     
-    // JJ/TODO: completion handler would be invoked to early since API is not block- but callback-based. What to do?
+    IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)node.parserMessenger;
+    
+    SBPerformSelectorAsync(messenger.connection, messenger, @selector(revokeAccessToNode:error:), node,
+                           ^(id nothing, NSError *error)
+                           {
+                               if (completion) {
+                                   completion(error == nil, error);
+                               }
+                           });
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Delete all Facebook cookies (http and https) except facebook locale
+
+- (void) deleteFacebookCookies
+{
+    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    [cookieStorage setCookieAcceptPolicy:NSHTTPCookieAcceptPolicyOnlyFromMainDocumentDomain];
+    NSArray *domains = [NSArray arrayWithObjects:@"http://facebook.com/", @"https://facebook.com/", nil];
+    for (NSString *domain in domains) {
+        NSArray *cookies = [cookieStorage cookiesForURL:[NSURL URLWithString:domain]];
+        for (NSHTTPCookie *cookie in cookies) {
+            if (![cookie.name isEqualToString:@"locale"]
+                //&& ![cookie.name isEqualToString:@"c_user"]
+                )
+            {
+                //                NSLog(@"Deleting cookie: %@", cookie);
+                [cookieStorage deleteCookie:cookie];
+            }
+        }
+    }
+    //    NSLog(@"Cookies left: %@", [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]);
 }
 
 
 #pragma mark
-#pragma mark PHFacebookdelegate Protocol
+#pragma mark PhFacebookDelegate Protocol
 
 //
--(void)tokenResult:(NSDictionary *)result
+- (void) facebook:(PhFacebook *)facebook tokenResult:(NSDictionary *)result
 {
-    if ([[result valueForKey: @"valid"] boolValue])
-    {
-        // Send Token to associated XPC service
-        
-        // Reload node
-    }
-    else
-    {
-        // JJ/TODO: What to do with an error?
-        [result valueForKey: @"error"];
-    }
 }
+
 
 
 //

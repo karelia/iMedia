@@ -71,6 +71,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSCell+iMedia.h"
 #import "IMBTableViewAppearance+iMediaPrivate.h"
+#import "IMBAlertPopover.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -649,7 +650,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 
 #pragma mark 
-#pragma mark NSOutlineView Delegate
+#pragma mark IMBOutlineView Delegate (derived from NSOutlineViewDelegate)
 
 
 // If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
@@ -836,7 +837,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 			break;
                 
             case kIMBResourceDoesNotExist:
-			[IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
+                [IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
 			break;
                 
             default:
@@ -871,6 +872,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	{
 		cell.badgeType = kIMBBadgeTypeNoAccessRights;
 		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+		cell.badgeError = nil;
+	}
+	else if (node.accessibility == kIMBResourceIsAccessible && node.isAccessRevocable)
+	{
+		cell.badgeType = kIMBBadgeTypeEject;
+		cell.badgeIcon = [NSImage imb_imageNamed:@"IMBLogout.tiff"];
 		cell.badgeError = nil;
 	}
 	else if (node.error)
@@ -968,6 +975,24 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
     
 }
 
+
+- (void)outlineView:(IMBOutlineView *)inView badgeButtonRect:(NSRect)inRect clickedForItem:(id)inItem
+{
+    IMBNode* node = (IMBNode*) inItem;
+    
+    // Any errors to show via badge?
+
+    if (node.error)
+    {
+        [self showErrorPopoverForNode:node relativeToRect:inRect];
+    }
+    else if ([node badgeTypeNormalNonLoading] == kIMBBadgeTypeEject)
+    {
+        [self revokeAccessToNode:node errorRect:inRect];
+    }
+}
+
+
 - (BOOL)respondsToSelector:(SEL)aSelector;
 {
     // I found that (slightly weirdly), if you implement -outlineView:isGroupItem:, NSOutlineView assumes that you must have at least one group item somewhere in the tree, and so it automatically outdents all but the top-level nodes by 1. Thus if configured not to show group nodes, we need to pretend that method doesn't even exist so as to receive regular layout
@@ -990,13 +1015,34 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (void) requestAccessToNode:(IMBNode*)inNode
 {
-    [[[inNode.parserMessenger class] accessRequester] requestAccessToNode:inNode completion:
-     ^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
-         // Add customized completion code here
+    [[[inNode.parserMessenger class] nodeAccessDelegate] requestAccessToNode:inNode completion:
+     ^(BOOL inMayAffectOtherNodes, NSError *error)
+    {
+        if (!error) {
+            [self reloadNode:inNode];
+        }
+         
+//         [self.nodeOutlineView expandItem:inNode];
+//         [self _setExpandedNodeIdentifiers];
      }];
 }
 
 
+- (void) revokeAccessToNode:(IMBNode*)inNode errorRect:(NSRect)inRect
+{
+    id <IMBNodeAccessDelegate> accessDelegate = [[inNode.parserMessenger class] nodeAccessDelegate];
+    [accessDelegate revokeAccessToNode:inNode completion:
+     ^(BOOL reloadNode, NSError *error)
+     {
+         if (error) {
+             [self showErrorPopoverForNode:inNode relativeToRect:inRect];
+         } else if (reloadNode) {
+             [self.libraryController reloadNodeTree:inNode];
+             [self.nodeOutlineView collapseItem:inNode];
+             [self _setExpandedNodeIdentifiers];
+         }
+     }];
+}
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1465,6 +1511,35 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
 	IMBNode* node = [self selectedNode];
 	[self.libraryController reloadNodeTree:node];
+}
+
+
+// If node holds an error display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
+
+- (IBAction) showErrorPopoverForNode:(IMBNode*)inNode relativeToRect:(NSRect)inRect
+{
+    if (IMBRunningOnLionOrNewer())
+    {
+        NSString* title = [[inNode.error userInfo] objectForKey:@"title"];
+        NSString* description = [[inNode.error userInfo] objectForKey:NSLocalizedDescriptionKey];
+        NSString* ok = @"   OK   ";
+
+        IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+
+        [alert addButtonWithTitle:ok block:^()
+        {
+            [alert close];
+        }];
+
+        [alert showRelativeToRect:inRect ofView:self.view preferredEdge:NSMaxYEdge];
+    }
+    else
+    {
+        dispatch_async(dispatch_get_main_queue(),^()
+        {
+            [NSApp presentError:inNode.error];
+        });
+    }
 }
 
 

@@ -322,14 +322,9 @@
  
     if (inside)
 	{
-		_clickedRect = badgeRect;
-
-		if (_badgeError)
-		{
-			[self showErrorPopover:nil];
-		}
-    }
- 
+        IMBOutlineView* outlineView = (IMBOutlineView*) inControlView;
+        [((id <IMBOutlineViewDelegate>) outlineView.delegate) outlineView:outlineView badgeButtonRect:badgeRect clickedForItem:self.node];
+    } 
     return YES;
 }
 
@@ -370,9 +365,8 @@
 	
 		[alert addButtonWithTitle:ok block:^()
 		{
-			[[IMBAccessRightsViewController sharedViewController] requestAccessToNode:self.node completion:^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
-                ;
-            }];
+            [[[self.node.parserMessenger class] nodeAccessDelegate]
+            requestAccessToNode:self.node completion:nil];
 			[alert close];
 		}];
 	
@@ -391,43 +385,8 @@
 		
 		if (button == NSOKButton)
 		{
-            [[[self.node.parserMessenger class] accessRequester] requestAccessToNode:self.node completion:
-             ^(BOOL inGranted, BOOL inMayAffectOtherNodes) {
-                 // Add customized completion code here
-             }];
+            [[[self.node.parserMessenger class] nodeAccessDelegate] requestAccessToNode:self.node completion:nil];
 		}
-	}
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// If so then display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
-
-- (IBAction) showErrorPopover:(id)inSender
-{
-	if (IMBRunningOnLionOrNewer())
-	{
-		NSString* title = [[_badgeError userInfo] objectForKey:@"title"];
-		NSString* description = [[_badgeError userInfo] objectForKey:NSLocalizedDescriptionKey];
-		NSString* ok = @"   OK   ";
-
-		IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
-		
-		[alert addButtonWithTitle:ok block:^()
-		{
-			[alert close];
-		}];
-		
-		[alert showRelativeToRect:_clickedRect ofView:self.controlView preferredEdge:NSMaxYEdge];
-	}
-	else
-	{
-		dispatch_async(dispatch_get_main_queue(),^()
-		{
-			[NSApp presentError:_badgeError];
-		});
 	}
 }
 

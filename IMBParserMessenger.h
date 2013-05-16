@@ -63,7 +63,7 @@
 @class IMBNode;
 @class IMBObject;
 @class IMBParser;
-@protocol IMBAccessRequester;
+@protocol IMBNodeAccessDelegate;
 //@class XPCConnection;
 
 
@@ -95,7 +95,9 @@
 // For communicating with the XPC service...
 
 + (NSString*) xpcServiceIdentifier;							// For connecting to correct XPC service
-@property (retain,readonly) id connection;                  // Used internally (XPCConnection)
+@property (retain,readonly) id connection;
+
+// Used internally (XPCConnection)
 
 @end
 
@@ -163,7 +165,7 @@
 // Default implementation returns shared IMBAccessRightsViewController.
 // Please override for different authorization scheme.
 
-+ (id <IMBAccessRequester>) accessRequester;
++ (id <IMBNodeAccessDelegate>) nodeAccessDelegate;
 
 // Called when the user right-clicks in the iMedia UI. Here the IMBParserMessenger has a chance to add custom
 // menu items of its own, that go beyond the functionality of the standard items added by the controllers.
@@ -208,19 +210,26 @@
 
 
 // Typed handler on completion of access request to a node
-typedef void (^IMBRequestAccessCompletionHandler)(BOOL inGranted, BOOL inMayAffectOtherNodes);
+typedef void (^IMBRequestAccessCompletionHandler)(BOOL mayAffectOtherNodes, NSError *error);
+
+// Typed handler on completion of access revocation to a node
+typedef void (^IMBRevokeAccessCompletionHandler)(BOOL reloadNode, NSError *error);
 
 // If a node is marked as not permitted (kIMBResourceNoPermission)
 // it is asked to provide a mechanism (object) for authorization (requesting access).
 // The node view controller will ask this object to grant access to the node in question
 //
-@protocol IMBAccessRequester <NSObject>
+@protocol IMBNodeAccessDelegate <NSObject>
 
 @required
 
 // Request access to node and call completion handler with success or failure indication and
 // with indication whether access granted may affect other nodes (i.e. grant access to those nodes as well)
 - (void) requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
+
+// Revoke access to node and call completion handler with indication whether node should be reloaded
+// and an error object on failure
+- (void) revokeAccessToNode:(IMBNode*)inNode completion:(IMBRevokeAccessCompletionHandler)inCompletion;
 
 @end
 

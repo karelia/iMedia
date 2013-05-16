@@ -68,6 +68,11 @@
 // backend controller, while IMBNodeViewController is a frontend controller.
 
 
+#pragma mark HEADERS
+
+#import "IMBOutlineView.h"
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -83,7 +88,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 @class IMBLibraryController;
 @class NSObjectViewController;
-@class IMBOutlineView;
 @class IMBNode;
 @protocol IMBNodeViewControllerDelegate;
 
@@ -93,7 +97,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 #pragma mark 
 
-@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,NSOutlineViewDelegate,NSSplitViewDelegate>
+@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,IMBOutlineViewDelegate,NSSplitViewDelegate>
 {
 	IBOutlet NSSplitView* ibSplitView;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;

@@ -320,10 +320,16 @@
 // @"yyyy':'MM':'dd kk':'mm':'ss"           (EXIF)
 // @"yyyy'-'MM'-'dd'T'kk':'mm':'ss'.'SS"    (Lightroom)
 // @"yyyy'-'MM'-'dd'T'kk':'mm':'ss"         (Lightroom)
+// @"yyyy'-'MM'-'dd'T'kk':'mm':'ss"         (Lightroom)
+// @"yyyy'-'MM'-'dd'T'kk':'mm':'ssZ"        (Facebook)
 
 - (NSString *)imb_localizedDisplayDate
 {
 	NSDateFormatter *parser = [[NSDateFormatter alloc] init];
+    
+    // Must use a locale compatible with gregorian calendar
+    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+    [parser setLocale:locale];
     
     // This is for EXIF-formatted dates
     
@@ -343,6 +349,14 @@
         date = [parser dateFromString:self];
     }
     
+    // This is for Facebook-formatted dates
+    
+    if (!date)
+    {
+        [parser setDateFormat:@"yyyy'-'MM'-'dd'T'kk':'mm':'ssZ"];
+        date = [parser dateFromString:self];
+    }
+    
 	NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
 	[formatter setFormatterBehavior:NSDateFormatterBehavior10_4];
 	[formatter setDateStyle:NSDateFormatterMediumStyle];    // medium date
@@ -352,6 +366,7 @@
 
 	[formatter release];
 	[parser release];
+    [locale release];
 	
 	return result;
 }

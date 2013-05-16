@@ -10,11 +10,18 @@
 #import <PhFacebook/PhFacebook.h>
 #import "IMBParserMessenger.h"
 
-@interface IMBFacebookAccessController : NSObject <IMBAccessRequester, PhFacebookDelegate>
+@interface IMBFacebookAccessController : NSObject <IMBNodeAccessDelegate, PhFacebookDelegate>
 {
-    PhFacebook *facebook;
+    IMBNode *_node;
+    BOOL _loginDialogPending;
 }
 
-@property (retain) PhFacebook *facebook;
+// The node this access controller provides access to
+@property (retain) IMBNode *node;
 
+// Says whether the user already started a login dialog but did not complete it yet
+@property (getter = isLoginDialogPending) BOOL loginDialogPending;
+
+// Returns a singleton instance of the class
++ (IMBFacebookAccessController *)sharedInstance;
 @end

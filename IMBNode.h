@@ -112,6 +112,7 @@
 	BOOL _wantsRecursiveObjects;
 	BOOL _shouldDisplayObjectView;
     IMBResourceAccessibility _accessibility;
+    BOOL _isAccessRevocable;
 	
 	// Observing file system changes...
 	
@@ -216,6 +217,7 @@
 @property (assign) BOOL shouldDisplayObjectView;	
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 @property (assign) IMBResourceAccessibility accessibility;
+@property (assign) BOOL isAccessRevocable;          // will enable us to show a "logout" badge or not
 
 // Observing file system changes...
 
@@ -251,7 +253,14 @@
 - (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
 - (BOOL) isPopulated;
 
+// The normal (non-mouseover), non-loading badge type for this node possibly derived
+// from other properties.
 
+- (IMBBadgeType) badgeTypeNormalNonLoading;
+
+- (BOOL)hasBadgeCallback;
+
+- (void)performBadgeCallback;
 @end
 
 

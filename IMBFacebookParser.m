@@ -9,9 +9,10 @@
 #import "IMBFacebookParser.h"
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
+#import "NSImage+iMedia.h"
 
 #define FACEBOOK_APP_ID_XPC_SERVICE @"325097450927004"
-#define FACEBOOK_APP_ID_APP_PROCESS @"421570721265438"
+#define FACEBOOK_APP_ID_APP_PROCESS @"509673709092685"
 
 @interface IMBFacebookParser ()
 
@@ -24,6 +25,7 @@
 
 @synthesize accountStore=_accountStore;
 @synthesize account=_account;
+@synthesize atomic_facebook=_facebook;
 
 #pragma mark - Objects Lifecycle
 
@@ -31,6 +33,7 @@
 {
     IMBRelease(_account);
     IMBRelease(_accountStore);
+    IMBRelease(_facebook);
     [super dealloc];
 }
 
@@ -163,8 +166,9 @@
     
     //------------------------------------------------------------------
     
-	//	load Facebook icon...
-	NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
+    
+    //	load Facebook icon...
+    NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
     
     // Use method imageForResource: if available to take advantage of
     // possibly additionally available high res representations
@@ -178,25 +182,31 @@
         NSURL *imageURL = [ourBundle URLForImageResource:iconName];
         icon = [[[NSImage alloc] initWithContentsOfURL:imageURL] autorelease];
     }
-	
-    //  create an empty root node (unpopulated and without subnodes)...
-	IMBNode *node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
-	node.groupType = kIMBGroupTypeInternet;
-	node.icon = icon;
-	node.identifier = [self identifierForPath:@""];
-	node.isIncludedInPopup = YES;
-	node.isLeafNode = NO;
-	node.mediaSource = nil;
-	node.accessibility = kIMBResourceNoPermission;      // TODO/JJ: Be more elaborate here
     
-    NSString *nodeName, *myName = nil;
-    if (node.accessibility == kIMBResourceIsAccessible) {
-        nodeName = [NSString stringWithFormat:@"Facebook (%@)", myName];
-    } else {
-        nodeName = @"Facebook";
+    //  create an empty root node (unpopulated and without subnodes)...
+    IMBNode *node = [[[IMBNode alloc] initWithParser:self topLevel:YES] autorelease];
+    node.name = @"Facebook";
+    node.groupType = kIMBGroupTypeInternet;
+    node.icon = icon;
+    node.isIncludedInPopup = YES;
+    node.isLeafNode = NO;
+    node.mediaSource = nil;
+    node.accessibility = [self mediaSourceAccessibility];
+    node.isAccessRevocable = YES;
+	node.identifier = [self identifierForPath:@"/"];
+
+    NSString *myID, *myName = nil;
+    if ([self mediaSourceAccessibility] == kIMBResourceIsAccessible) {
+        NSDictionary *me = [self.facebook sendSynchronousRequest:@"me"];
+        myID = [[me objectForKey:@"resultDict"] objectForKey:@"id"];
+        myName = [[me objectForKey:@"resultDict"] objectForKey:@"name"];
+        if (myID) {
+            node.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                               myID, @"facebookID",
+                               [NSNumber numberWithUnsignedInteger:0], @"nestingLevel", nil];
+            node.name = [NSString stringWithFormat:@"Facebook (%@)", myName];
+        }
     }
-    node.name = nodeName;
-	
 	return node;
 }
 
@@ -208,13 +218,22 @@
 	// because without creating an array we would cause an endless loop...
 	
 	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
-	
-    NSArray *connectionTypes = [NSArray arrayWithObjects:@"albums", @"friends", nil];
+    
+    // For nodes below top-level node do not ask for friends
+    
+    NSUInteger parentNestingLevel = [[inParentNode.attributes objectForKey:@"nestingLevel"] unsignedIntegerValue];
+    NSArray *connectionTypes = nil;
+    if (parentNestingLevel == 0) {
+        connectionTypes = [NSArray arrayWithObjects:@"albums", @"friends", nil];
+    } else {
+        connectionTypes = [NSArray arrayWithObjects:@"albums", nil];
+    }
     
     NSArray *someSubnodes = nil;
     for (NSString *connectionType in connectionTypes)
     {
-        someSubnodes   = [self nodeID:inParentNode.identifier connectedNodesByType:connectionType params:nil error:outError];
+        someSubnodes = [self nodeID:[inParentNode.attributes objectForKey:@"facebookID"]
+               connectedNodesByType:connectionType params:nil error:outError];
         
         if (*outError) {
             return NO;
@@ -239,8 +258,11 @@
             
 			// Keep a ref to the type of the subnode – so when later populating it we know how to deal with it
 			
+            //NSUInteger nestingLevel = [[inParentNode.attributes objectForKey:@"nestingLevel"] unsignedIntegerValue] + 1;
 			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                    connectionType, @"nodeType", nil];
+                                  connectionType, @"nodeType",
+                                  ID, @"facebookID",
+                                  [NSNumber numberWithUnsignedInteger:parentNestingLevel+1], @"nestingLevel", nil];
             [subnodes addObject:subnode];
         }
     }
@@ -266,11 +288,28 @@
             object.parserIdentifier = [self identifier];
             
             NSArray *images = [photoDict objectForKey:@"images"];
+            
+            // Pick image with highest resolution. This should be the first in images.
+            NSString *URLString = nil;
+            NSUInteger width, height = 0;
             if ([images count] > 0) {
-                object.location = [NSURL URLWithString:[[images objectAtIndex:0] objectForKey:@"source"]];
+                NSDictionary *imageDict = [images objectAtIndex:0];
+                width = [imageDict objectForKey:@"width"];
+                height = [imageDict objectForKey:@"height"];
+                URLString = [imageDict objectForKey:@"source"];
             } else {
-                object.location = [NSURL URLWithString:[photoDict objectForKey:@"source"]];
+                URLString = [photoDict objectForKey:@"source"];
+                width = [photoDict objectForKey:@"width"];
+                height = [photoDict objectForKey:@"height"];
             }
+            NSString *createdTime = [photoDict objectForKey:@"created_time"];
+            object.preliminaryMetadata = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          width, @"width",
+                                          height, @"height",
+                                          createdTime, @"dateTime", nil];
+            object.name = [photoDict objectForKey:@"id"];
+            object.location = [NSURL URLWithString:URLString];
+                               
             object.accessibility = [self accessibilityForObject:object];
             object.imageLocation = [NSURL URLWithString:[photoDict objectForKey:@"picture"]];
             object.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
@@ -338,13 +377,18 @@
     return nil;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 //
-//
-- (NSDictionary *)metadataForObject:(IMBObject *)inObject error:(NSError **)outError
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
 {
 	if (outError) *outError = nil;
     
-	return inObject.preliminaryMetadata;
+	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+	
+// We can not afford this call since it must download the full image at
+//    [metadata addEntriesFromDictionary:[NSImage imb_metadataFromImageAtURL:inObject.URL checkSpotlightComments:NO]];
+
+    return metadata;
 }
 
 //
@@ -366,6 +410,45 @@
 }
 
 
+#pragma mark - Access
+
+- (void) setFacebook:(PhFacebook *)facebook
+{
+    [facebook setDelegate:self];
+    self.atomic_facebook = facebook;
+}
+
+- (PhFacebook *)facebook
+{
+    if (![self.atomic_facebook delegate]) {
+        [self.atomic_facebook setDelegate:self];
+    }
+    return self.atomic_facebook;
+}
+
+
+#pragma mark - Access Control
+
+- (IMBResourceAccessibility) mediaSourceAccessibility
+{
+    // JJ/TODO: access token may be expired?
+    return (self.facebook == nil ? kIMBResourceNoPermission : kIMBResourceIsAccessible);
+}
+
+//
+- (void)revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
+{
+    NSString *facebookID = [node.attributes objectForKey:@"facebookID"];
+    if (self.facebook && facebookID)
+    {        
+        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[NSString stringWithFormat:@"%@/permissions", facebookID] HTTPMethod:@"DELETE"];
+        
+        // JJ/TODO: Handle errors!
+        NSLog(@"Response from logging out: %@", responseDict);
+        self.facebook = nil;
+    }
+}
+
 #pragma mark - Utility Methods
 
 - (NSArray *) nodeID:(NSString *)nodeID
@@ -374,33 +457,27 @@ connectedNodesByType:(NSString *)nodeType
                error:(NSError **)outError
 {
     if (!params) params = @{ @"fields" : @"id,name"};
-    
-    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/%@/%@", nodeID, nodeType]];
-    
+    NSArray *nodes = nil;
+
+    NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", nodeID, nodeType]];
+
     NSLog(@"Graph URL: %@", URL);
-    
-    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
-                                            requestMethod:SLRequestMethodGET
-                                                      URL:URL
-                                               parameters:params];
-    request.account = self.account;
-    
-    NSURLResponse *urlResponse = nil;
+
     NSError *error = nil;
-    NSData *responseData = [NSURLConnection sendSynchronousRequest:[request preparedURLRequest]
-                                                 returningResponse:&urlResponse
-                                                             error:&error];
-    if (error) {
-        NSLog(@"%@ Access to %@ failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], nodeType, error);
-        *outError = error;
-        return nil;
+
+    if (self.facebook) {
+        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString]];
+        if (error) {
+            NSLog(@"%@ Access to %@ failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], nodeType, error);
+            *outError = error;
+            return nil;
+        }
+
+        NSLog(@"Facebook returned %@: %@", nodeType, responseDict);
+
+        nodes = [[responseDict objectForKey:@"resultDict"] objectForKey:@"data"];
     }
-    
-    NSDictionary *responseDict = (NSDictionary *) [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
-    NSLog(@"Facebook returned %@: %@", nodeType, responseDict);
-    
-    NSArray *nodes = [responseDict objectForKey:@"data"];
-    
+
     return nodes;
 }
 
