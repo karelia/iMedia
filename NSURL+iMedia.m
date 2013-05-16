@@ -252,30 +252,25 @@
 
 - (IMBResourceAccessibility) imb_accessibility
 {
-
     if (![self isFileURL])
     {
         // TODO/JJ: Deal with non-file URLs more intelligently
         return kIMBResourceIsAccessible;
     }
     
-    BOOL isReadable = access([[self path] cStringUsingEncoding:NSUTF8StringEncoding], R_OK) == 0;
+	const char* path = [[self path] cStringUsingEncoding:NSUTF8StringEncoding];
+    BOOL exists = access(path,F_OK) == 0;
+    BOOL isReadable = access(path,R_OK) == 0;
     
-    if (!isReadable)
+	if (!exists)
+	{
+		return kIMBResourceDoesNotExist;
+	}
+    else if (!isReadable)
     {
-        switch (errno)
-        {
-            case ENOENT:
-                return kIMBResourceDoesNotExist;
-                break;
-            case EPERM:
-                return kIMBResourceNoPermission;
-                break;
-                
-            default:
-                break;
-        }
-    }
+		return kIMBResourceNoPermission;
+	}
+	
     return kIMBResourceIsAccessible;
 }
 
