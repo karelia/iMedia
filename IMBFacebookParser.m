@@ -317,50 +317,7 @@
     }
     
     inParentNode.objects = objects;
-    
-//    IMBFlickrNode* inFlickrNode = (IMBFlickrNode*) inNode;
-//    
-//    if (inFlickrNode.isTopLevelNode) {
-//        //  add subnodes...
-//        NSMutableArray* subnodes = [inNode mutableArrayForPopulatingSubnodes];
-//        [subnodes addObject:[IMBFlickrNode flickrNodeForRecentPhotosForRoot:inFlickrNode parser:self]];
-//        [subnodes addObject:[IMBFlickrNode flickrNodeForInterestingPhotosForRoot:inFlickrNode parser:self]];
-//        
-//        //  add objects...
-//        inFlickrNode.objects = [NSMutableArray array];
-//    } else {
-//        if (SBIsSandboxed()) xpc_transaction_begin ();
-//        
-//        //	lazy initialize the flickr context...
-//        if (_flickrContext == nil) {
-//            //  failing to setup the Flickr API key and shared secret is an implementation error...
-//            NSAssert (self.flickrAPIKey, @"Flickr API key property not set!");
-//            NSAssert (self.flickrSharedSecret, @"Flickr shared secret property not set!");
-//            _flickrContext = [[OFFlickrAPIContext alloc] initWithAPIKey:self.flickrAPIKey sharedSecret:self.flickrSharedSecret];
-//        }
-//        
-//        //  we have no subnodes...
-//        [inFlickrNode mutableArrayForPopulatingSubnodes];
-//        
-//        //  run flickr request...
-//        IMBFlickrSession* session = [[IMBFlickrSession alloc] initWithFlickrContext:_flickrContext];
-//        [session executeFlickRequestForNode:inFlickrNode];
-//        
-//        //  evaluate the response...
-//        if (!session.error) {
-//#ifdef VERBOSE
-//            NSLog (@"RESPONSE: %@", session.response);
-//#endif
-//            NSArray* objects = [session extractPhotosFromFlickrResponseForParserMessenger:(IMBFlickrParserMessenger*)inFlickrNode.parserMessenger];
-//            inFlickrNode.objects = objects;
-//        } else {
-//            if (outError) *outError = [[session.error copy] autorelease];
-//        }
-//        [session release];
-//        
-//        if (SBIsSandboxed()) xpc_transaction_end ();
-//    }
-//    
+
     return YES;
 }
 
