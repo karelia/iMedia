@@ -12,12 +12,8 @@
 
 @interface IMBFacebookAccessController : NSObject <IMBNodeAccessDelegate, PhFacebookDelegate>
 {
-    IMBNode *_node;
     BOOL _loginDialogPending;
 }
-
-// The node this access controller provides access to
-@property (retain) IMBNode *node;
 
 // Says whether the user already started a login dialog but did not complete it yet
 @property (getter = isLoginDialogPending) BOOL loginDialogPending;

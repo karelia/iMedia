@@ -18,8 +18,6 @@
 
 @implementation IMBFacebookAccessController
 
-@synthesize node=_node;
-
 // Returns a singleton instance of the class
 
 + (IMBFacebookAccessController *)sharedInstance
@@ -56,7 +54,6 @@
         @synchronized(self)
         {
             self.loginDialogPending = YES;
-            self.node = node;               // This is only to hand over node to PhFacebook callback
             
             PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
             
@@ -68,9 +65,9 @@
             {
                 if ([[result valueForKey: @"valid"] boolValue])
                 {
-                    self.node.badgeTypeNormal = kIMBBadgeTypeLoading;
-                    self.node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
-                    IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)self.node.parserMessenger;
+                    node.badgeTypeNormal = kIMBBadgeTypeLoading;
+                    node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+                    IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)node.parserMessenger;
                     
                     SBPerformSelectorAsync(messenger.connection,
                                            messenger,
@@ -80,7 +77,6 @@
                                            ^(id nothing,NSError *error)
                                            {
                                                self.loginDialogPending = NO;
-                                               self.node = nil;
                                                if (completion) {
                                                    completion(NO, error);
                                                }
