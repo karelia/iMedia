@@ -145,13 +145,6 @@
 #pragma mark PhFacebookDelegate Protocol
 
 //
-- (void) facebook:(PhFacebook *)facebook tokenResult:(NSDictionary *)result
-{
-}
-
-
-
-//
 -(void)requestResult:(NSDictionary *)result
 {
     
