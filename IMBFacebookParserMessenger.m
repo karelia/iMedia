@@ -111,8 +111,9 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 // Set Facebook accessor object on parser for subsequent use
+// Always returns nil (must match signature required by XPCKit)
 
-- (void) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError
+- (id) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError
 {
     // There is supposed to be only _one_ parser. If that condition no longer holds true
     // we must find other ways to identify the correct parser here.
@@ -121,14 +122,21 @@
     parser.facebook = facebook;
     
 	if (outError) *outError = nil;
+
+    NSLog(@"Cookies left: %@", [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]);
+    
+    return nil;
 }
 
 
-- (void) revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
+//----------------------------------------------------------------------------------------------------------------------
+// Always returns nil (must match signature required by XPCKit)
+
+- (id) revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
 {
     IMBFacebookParser *parser = (IMBFacebookParser *)[self parserWithIdentifier:node.parserIdentifier];
 
-    [parser revokeAccessToNode:node error:pError];
+    return [parser revokeAccessToNode:node error:pError];
 }
 
 

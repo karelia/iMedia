@@ -12,8 +12,8 @@
 
 @interface IMBFacebookParserMessenger : IMBParserMessenger
 
-// Set Facebook accessor object on parser for subsequent use
+// Set Facebook accessor object on parser for subsequent use. Allways returns nil.
 
-- (void) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError;
+- (id) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError;
 
 @end
