@@ -157,7 +157,8 @@
 // subnodes is an empty array, then there really aren't any subnodes...
 
 @property (retain,readonly) NSArray* subnodes;		
-		
+- (void) setSubnodes:(NSArray*)inNodes;
+
 // Designated initializer
 
 - (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel;
