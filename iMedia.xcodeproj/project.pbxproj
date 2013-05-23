@@ -85,8 +85,6 @@
 		3089F94C151C91CE00D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F94D151C91E400D56DC0 /* XPCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3089F94A151C8FDD00D56DC0 /* XPCKit.framework */; };
 		3089F9791520BD6900D56DC0 /* IMBiPhotoEventNodeObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */; };
-		308BF46116F0D2F800D7A11D /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30C8ACCA16F089B5005674CA /* Social.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		308BF46216F0D31300D7A11D /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30C8ACC816F08996005674CA /* Accounts.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		308BF46516F2184400D7A11D /* facebook_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BF46316F2184400D7A11D /* facebook_logo.png */; };
 		308BF46616F2184400D7A11D /* facebook_logo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 308BF46416F2184400D7A11D /* facebook_logo@2x.png */; };
 		308DEF151609C6CE00F889C8 /* IMBTableViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1121,8 +1119,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3094F7161715C0070016E810 /* PhFacebook.framework in Frameworks */,
-				308BF46216F0D31300D7A11D /* Accounts.framework in Frameworks */,
-				308BF46116F0D2F800D7A11D /* Social.framework in Frameworks */,
 				D0DA9AE1102EB7BD008EC9F9 /* Carbon.framework in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				D09930FD1010FF9700C527B7 /* Quartz.framework in Frameworks */,
