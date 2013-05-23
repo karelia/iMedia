@@ -212,9 +212,6 @@
 
 - (BOOL) populateNode:(IMBNode *)inParentNode error:(NSError **)outError
 {
-    // JJ/TODO: This is for debugging only!!!!
-    //    [self.facebook simulateExpiredAccessToken];
-    
     if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
     
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method,
