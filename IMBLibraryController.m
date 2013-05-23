@@ -372,11 +372,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Populate the specified node. This is done by a XPC service on our behalf. Once the service is done, 
 // it will send back a reply with the new node as a result and call the completion block...
 
-- (void) populateNode:(IMBNode*)inNode
+- (void) populateNode:(IMBNode*)inNode errorCompletion:(void(^)(NSError* error))inErrorCompletion
 {
 	if ([inNode isGroupNode]) return;
 	if ([inNode isPopulated]) return;
-	if ([inNode error]) return;
+//	if ([inNode error]) return;
 	
 	// Do not try to populate nodes if the backing library does not exist...
 	
@@ -432,7 +432,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				}
 			}
 			
-			if (inError) NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+			if (inError)
+            {
+                NSLog(@"%s ERROR:\n\n%@",__FUNCTION__,inError);
+            }
 			
 			// If populating was successful we got a new node. Set the parserMessenger, and then  
 			// replace the old with the new node...
@@ -451,14 +454,24 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 			// If populating failed, then we'll have to keep the old node, but we'll clear the loading 
 			// state and store an error instead (which is displayed as an alert badge)...
-			
+
 			else
 			{
-				inNode.isLoading = NO;
+                inNode.isLoading = NO;
 				inNode.badgeTypeNormal = [inNode badgeTypeNormalNonLoading];
 				inNode.error = inError;
+                
+                if (inErrorCompletion) {
+                    inErrorCompletion(inError);
+                }
 			}
 		});		
+}
+
+
+- (void) populateNode:(IMBNode *)inNode
+{
+    [self populateNode:inNode errorCompletion:nil];
 }
 
 
@@ -468,7 +481,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // Reload the specified node. This is done by a XPC service on our behalf. Once the service is done, it 
 // will send back a reply with the new node as a result and call the completion block...
 
-- (void) reloadNodeTree:(IMBNode*)inOldNode
+- (void) reloadNodeTree:(IMBNode*)inOldNode errorCompletion:(void(^)(NSError* error))inErrorCompletion
 {
 	if ([inOldNode isGroupNode]) return;
 
@@ -509,6 +522,10 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					inOldNode.isLoading = NO;
 					inOldNode.badgeTypeNormal = [inOldNode badgeTypeNormalNonLoading];
 					inOldNode.error = inError;
+                    
+                    if (inErrorCompletion) {
+                        inErrorCompletion(inError);
+                    }
 				});
 			}
 			
@@ -533,6 +550,17 @@ static NSMutableDictionary* sLibraryControllers = nil;
 				}
 			}
 		});		
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Reload node tree without executing any error completion handler
+
+- (void) reloadNodeTree:(IMBNode*)inOldNode
+{
+    [self reloadNodeTree:inOldNode errorCompletion:nil];
 }
 
 

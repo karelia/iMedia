@@ -210,7 +210,7 @@
 
 
 // Typed handler on completion of access request to a node
-typedef void (^IMBRequestAccessCompletionHandler)(BOOL mayAffectOtherNodes, NSError *error);
+typedef void (^IMBRequestAccessCompletionHandler)(BOOL requestCanceled, NSArray *affectedNodes, NSError *error);
 
 // Typed handler on completion of access revocation to a node
 typedef void (^IMBRevokeAccessCompletionHandler)(BOOL reloadNode, NSError *error);

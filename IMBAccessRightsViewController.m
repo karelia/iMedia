@@ -634,11 +634,18 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
                  NSArray* mediaTypes = [IMBLibraryController knownMediaTypes];
                  NSString* path = [inGrantedURL path];
                  
+                 // Collect all affected nodes for which bookmarks were provided. Since these bookmarks are sent
+                 // to messengers asynchronously we must use a counter that tells us when the last bookmark
+                 // was provided, so we can then call the completion handler with the list of granted nodes.
+                 
+                 NSMutableArray *grantedNodes = [NSMutableArray array];                 
+                 __block NSUInteger affectedNodesCount = 0;
+                 
                  for (NSString* mediaType in mediaTypes)
                  {
                      IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
                      NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
-                     
+                     affectedNodesCount += [nodes count];
                      for (IMBNode* node in nodes)
                      {
                          if ([node.libraryRootURL.path hasPathPrefix:path])
@@ -652,20 +659,29 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
                                                     ^(NSURL* inReceivedURL,NSError* inError)
                                                     {
                                                         BOOL granted = inError == nil;
-                                                        if (granted) {
-                                                            [libraryController reloadNodeTree:node];
+                                                        @synchronized(grantedNodes) {
+                                                            affectedNodesCount--;
                                                         }
-                                                        inCompletion(granted, YES);
+                                                        if (granted) {
+                                                            [grantedNodes addObject:node];
+                                                        }
+                                                        if (affectedNodesCount == 0) {
+                                                            // The last affected node was provided with a bookmark.
+                                                            // Now we can invoke the completion block with collected nodes.
+                                                            inCompletion(NO, grantedNodes, nil);
+                                                        }
                                                     });
+                         } else {
+                             affectedNodesCount--;
                          }
                      }
                  }
-                 
                  // Also send it to the FSEvents service, so that it can do its job...
                  
                  [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+                 
              } else {
-                 inCompletion(NO, NO);
+                 inCompletion(YES, nil, nil);
              }
          }];
     }

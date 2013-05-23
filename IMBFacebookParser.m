@@ -212,6 +212,9 @@
 
 - (BOOL) populateNode:(IMBNode *)inParentNode error:(NSError **)outError
 {
+    // JJ/TODO: This is for debugging only!!!!
+    //    [self.facebook simulateExpiredAccessToken];
+    
     if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
     
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method,
@@ -236,6 +239,12 @@
                connectedNodesByType:connectionType params:nil error:outError];
         
         if (*outError) {
+            [inParentNode setSubnodes:nil];
+            
+            // Map error code to one known by the framework
+            if ((*outError).code == 190) {      // Session expired
+                *outError = [NSError errorWithDomain:(*outError).domain code:kIMBResourceNoPermission userInfo:(*outError).userInfo];
+            }
             return NO;
         }
         
@@ -328,7 +337,9 @@
 {
     if (inObject.imageLocation) {
 		NSURL* url = (NSURL*)inObject.imageLocation;
+        NSLog(@"Begin loading image: %@", url);
         NSData* data = [NSData dataWithContentsOfURL:url];
+        NSLog(@" End  loading image: %@", url);
         return data;
     }
     return nil;
@@ -432,8 +443,10 @@ connectedNodesByType:(NSString *)nodeType
 
     if (self.facebook) {
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString]];
+        error = [responseDict valueForKey:@"error"];
+        
         if (error) {
-            NSLog(@"%@ Access to %@ failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], nodeType, error);
+            NSLog(@"Access to %@ failed:%@", nodeType, error);
             *outError = error;
             return nil;
         }

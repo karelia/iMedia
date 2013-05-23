@@ -45,11 +45,12 @@
 #pragma mark
 #pragma mark IMBRequestAccessDelegate Protocol
 
+// Note that completion block will only be called if currently no other request to access node is pending
 //
 - (void) requestAccessToNode:(IMBNode *)node completion:(IMBRequestAccessCompletionHandler)completion
 {
-    if (self.isLoginDialogPending) {
-//        completion(NO, NO);
+    if (self.isLoginDialogPending && completion) {
+        completion(YES, nil, nil);
     } else {
         @synchronized(self)
         {
@@ -60,8 +61,7 @@
             // JJ/TODO: Do we need all these permisstions?
             [facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"read_stream", @"export_stream", @"user_photos", @"friends_photos", nil]
                                             cached: NO
-                                        completion:
-             ^(NSDictionary *result)
+                                        completion:^(NSDictionary *result)
             {
                 if ([[result valueForKey: @"valid"] boolValue])
                 {
@@ -78,7 +78,7 @@
                                            {
                                                self.loginDialogPending = NO;
                                                if (completion) {
-                                                   completion(NO, error);
+                                                   completion(NO, [NSArray arrayWithObject:node], error);
                                                }
                                            });
                 }
@@ -86,7 +86,7 @@
                 {
                     self.loginDialogPending = NO;
                     if (completion) {
-                        completion(NO, [result valueForKey: @"error"]);
+                        completion(NO, nil, [result valueForKey: @"error"]);
                     }
                 }
             }];

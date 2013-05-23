@@ -121,7 +121,9 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 - (void) reload;
 
 - (void) createTopLevelNodesWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void) populateNode:(IMBNode*)inNode errorCompletion:(void(^)(NSError* error))errorCompletion;
 - (void) populateNode:(IMBNode*)inNode;
+- (void) reloadNodeTree:(IMBNode*)inOldNode errorCompletion:(void(^)(NSError* error))inErrorCompletion;
 - (void) reloadNodeTree:(IMBNode*)inOldNode;
 
 // Try to reload any top-level nodes that do not have access rights and which might benefit from the newly

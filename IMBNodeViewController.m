@@ -709,14 +709,25 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+    NSOutlineView *outlineView = [inNotification object];
 	IMBNode* node = (IMBNode*)item;
 	
 	if (node.accessibility == kIMBResourceIsAccessible)
 	{
-        [self.libraryController populateNode:node];
+        [self.libraryController populateNode:node errorCompletion:^(NSError *error)
+        {
+            if (error) {
+                if (error.code == kIMBResourceNoPermission)
+                {
+                    // Try again after requesting access (e.g. session may have expired).
+                    [self performSelector:@selector(populateNode:) withAccessRequestedToNode:node];
+                } else {
+                    [outlineView collapseItem:item];
+                }
+            }
+        }];
 	}
 }
-
 
 // When nodes were expanded or collapsed, then store the current state of the user interface. Also cancel any
 // pending populate operation for the nodes that were just collapsed...
@@ -786,7 +797,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
-                [self.libraryController populateNode:newNode];
+                [self.libraryController populateNode:newNode errorCompletion:^(NSError *error)
+                 {
+                     if (error.code == kIMBResourceNoPermission)
+                     {
+                         // Try again after requesting access (e.g. session may have expired).
+                         
+                         [self performSelector:@selector(populateNode:) withAccessRequestedToNode:newNode];
+                     }
+                 }];
 				[ibNodeOutlineView showProgressWheels];
 			}
 			else if (newNode.accessibility == kIMBResourceDoesNotExist)
@@ -1013,20 +1032,41 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 #pragma mark
 #pragma mark Access Control
 
-- (void) requestAccessToNode:(IMBNode*)inNode
+- (void) requestAccessToNode:(IMBNode*)inNode completion:(void(^)(BOOL requestCanceled, NSArray* affectedNodes, NSError* error))inCompletion
 {
     [[[inNode.parserMessenger class] nodeAccessDelegate] requestAccessToNode:inNode completion:
-     ^(BOOL inMayAffectOtherNodes, NSError *error)
+     ^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error)
     {
-        if (!error) {
-            [self reloadNode:inNode];
+        inNode.error = error;
+        if (inCompletion) {
+            inCompletion(requestCanceled, affectedNodes, error);
         }
-         
-//         [self.nodeOutlineView expandItem:inNode];
-//         [self _setExpandedNodeIdentifiers];
      }];
 }
 
+
+- (void) requestAccessToNode:(IMBNode*)inNode
+{
+    [self requestAccessToNode:inNode completion:^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error) {
+        for (IMBNode *node in affectedNodes) {
+            [self.libraryController reloadNodeTree:node];
+        }
+    }];
+}
+
+// Selector will be performed with node after requesting access to this node
+
+- (void) performSelector:(SEL)inSelector withAccessRequestedToNode:(IMBNode*)inNode
+{
+    [self requestAccessToNode:inNode completion:^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error)
+     {
+         if (!requestCanceled && !error) {
+             for (IMBNode *affectedNode in affectedNodes) {
+                 [self.libraryController performSelector:inSelector withObject:inNode];
+             }
+         }
+     }];
+}
 
 - (void) revokeAccessToNode:(IMBNode*)inNode errorRect:(NSRect)inRect
 {
@@ -1511,7 +1551,15 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (IBAction) reloadNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
-	[self.libraryController reloadNodeTree:node];
+	[self.libraryController reloadNodeTree:node errorCompletion:^(NSError *error)
+    {
+        if (error.code == kIMBResourceNoPermission)
+        {
+            // Try again after requesting access (e.g. session may have expired).
+            
+            [self performSelector:@selector(reloadNodeTree:) withAccessRequestedToNode:node];
+        }
+    }];
 }
 
 
