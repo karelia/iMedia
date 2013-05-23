@@ -337,9 +337,15 @@
 {
     if (inObject.imageLocation) {
 		NSURL* url = (NSURL*)inObject.imageLocation;
-        NSLog(@"Begin loading image: %@", url);
-        NSData* data = [NSData dataWithContentsOfURL:url];
-        NSLog(@" End  loading image: %@", url);
+        NSDate *startTime = [NSDate date];
+        NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
+        
+        if (outError && *outError) {
+            NSLog(@"Error loading thumbnail %@: %@", url, *outError);
+        } else {
+            // JJ/TODO: For performance analysis only
+            NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
+        }
         return data;
     }
     return nil;
