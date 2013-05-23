@@ -911,7 +911,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 	else 
 	{
-		NSLog(@"%s ERROR trying to insert node at illegal index!",__FUNCTION__);
+		NSLog(@"%s ERROR trying to insert node at illegal index %lu!",__FUNCTION__, (unsigned long)inIndex);
 	}
 }
 
@@ -924,7 +924,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	}
 	else 
 	{
-		NSLog(@"%s ERROR trying to remove node at illegal index!",__FUNCTION__);
+		NSLog(@"%s ERROR trying to remove node at illegal index %lu!",__FUNCTION__, (unsigned long)inIndex);
 	}
 }
 
