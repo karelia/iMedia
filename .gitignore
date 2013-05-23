@@ -15,3 +15,5 @@ xcuserdata/
 
 # Backup files
 *~.nib
+
+/.idea/
