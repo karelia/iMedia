@@ -392,8 +392,9 @@
     return (self.facebook == nil ? kIMBResourceNoPermission : kIMBResourceIsAccessible);
 }
 
+// Always returns nil (must match signature required by XPCKit)
 //
-- (void)revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
+- (id) revokeAccessToNode:(IMBNode *)node error:(NSError **)pError
 {
     NSString *facebookID = [node.attributes objectForKey:@"facebookID"];
     if (self.facebook && facebookID)
@@ -410,6 +411,7 @@
             self.facebook = nil;
         }
     }
+    return nil;
 }
 
 #pragma mark - Utility Methods

@@ -22,5 +22,5 @@
 @property (retain) PhFacebook *atomic_facebook;
 @property (retain) PhFacebook *facebook;    // Also sets myself as delegate
 
-- (void)revokeAccessToNode:(IMBNode *)node error:(NSError **)pError;
+- (id) revokeAccessToNode:(IMBNode *)node error:(NSError **)pError;
 @end
