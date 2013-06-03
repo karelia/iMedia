@@ -11,8 +11,10 @@
 #import <Social/Social.h>
 #import "NSImage+iMedia.h"
 
-#define FACEBOOK_APP_ID_XPC_SERVICE @"325097450927004"
-#define FACEBOOK_APP_ID_APP_PROCESS @"509673709092685"
+// Limit of Facebook elements to retrieve in one request response
+// Note that there is no "Load More" mechanism implemented
+//
+static NSUInteger sFacebookElementLimit = 5000;
 
 @interface IMBFacebookParser ()
 
@@ -230,10 +232,11 @@
     }
     
     NSArray *someSubnodes = nil;
+    NSDictionary *params = @{ @"limit" : [NSNumber numberWithUnsignedInteger:sFacebookElementLimit]};
     for (NSString *connectionType in connectionTypes)
     {
         someSubnodes = [self nodeID:[inParentNode.attributes objectForKey:@"facebookID"]
-               connectedNodesByType:connectionType params:nil error:outError];
+               connectedNodesByType:connectionType params:params error:outError];
         
         if (*outError) {
             [inParentNode setSubnodes:nil];
@@ -281,8 +284,12 @@
     if (inParentNode.attributes && [[inParentNode.attributes objectForKey:@"nodeType"] isEqual:@"albums"])
     {
         // Get all photos from this album
-        
-        NSArray *photoDicts = [self nodeID:inParentNode.identifier connectedNodesByType:@"photos" params:@{ @"fields" : @"id,picture,images,source"} error:outError];
+        NSDictionary *params = @{ @"fields" : @"id,picture,images,source",
+                                  @"limit"  : [NSNumber numberWithUnsignedInteger:sFacebookElementLimit]};
+        NSArray *photoDicts = [self nodeID:inParentNode.identifier
+                      connectedNodesByType:@"photos"
+                                    params:params
+                                     error:outError];
         
         IMBObject *object = nil;
         for (NSDictionary *photoDict in photoDicts)
@@ -332,16 +339,17 @@
 //
 - (id)thumbnailForObject:(IMBObject *)inObject error:(NSError **)outError
 {
+//    NSLog(@"%@", [NSThread currentThread]);
+    
     if (inObject.imageLocation) {
 		NSURL* url = (NSURL*)inObject.imageLocation;
-        NSDate *startTime = [NSDate date];
+//        NSDate *startTime = [NSDate date];
         NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
         
         if (outError && *outError) {
             NSLog(@"Error loading thumbnail %@: %@", url, *outError);
         } else {
-            // JJ/TODO: For performance analysis only
-            NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
+//            NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
         }
         return data;
     }
@@ -413,7 +421,7 @@
     NSString *facebookID = [node.attributes objectForKey:@"facebookID"];
     if (self.facebook && facebookID)
     {        
-        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[NSString stringWithFormat:@"%@/permissions", facebookID] HTTPMethod:@"DELETE"];
+        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[NSString stringWithFormat:@"%@/permissions", facebookID] HTTPMethod:@"DELETE" params:nil];
         
 //        NSLog(@"Response from logging out: %@", responseDict);
 
@@ -445,7 +453,7 @@ connectedNodesByType:(NSString *)nodeType
     NSError *error = nil;
 
     if (self.facebook) {
-        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString]];
+        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString] params:params];
         error = [responseDict valueForKey:@"error"];
         
         if (error) {
