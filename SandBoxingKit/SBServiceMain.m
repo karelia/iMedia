@@ -81,25 +81,28 @@ int main(int argc, const char *argv[])
 	{
 		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inReplyConnection)
 		{
-			NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-
-			@try
-			{
-				XPCMessage* reply = [inMessage invoke];
-				if (reply) [inReplyConnection sendMessage:reply];
-			}
-			@catch (NSException* inException)
-			{
-				NSString* text = [NSString stringWithFormat:@"Uncaught exception %@: %@\n\n%@\n\n",
-					inException.name,
-					inException.reason,
-					[[inException callStackSymbols] componentsJoinedByString:@"\n"]];
-				
-				NSLog(@"%@",text);
-				[inReplyConnection sendLog:text];
-			}
-			
-			[pool2 drain];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+            ^{
+                NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
+                
+                @try
+                {
+                    XPCMessage* reply = [inMessage invoke];
+                    if (reply) [inReplyConnection sendMessage:reply];
+                }
+                @catch (NSException* inException)
+                {
+                    NSString* text = [NSString stringWithFormat:@"Uncaught exception %@: %@\n\n%@\n\n",
+                                      inException.name,
+                                      inException.reason,
+                                      [[inException callStackSymbols] componentsJoinedByString:@"\n"]];
+                    
+                    NSLog(@"%@",text);
+                    [inReplyConnection sendLog:text];
+                }
+                
+                [pool2 drain];
+            });
 		}];
 	}];
 	
