@@ -85,6 +85,8 @@
 
 #pragma mark CONSTANTS
 
+NSString* kIMBObjectBadgesDidChangeNotification = @"IMBObjectBadgesDidChange";
+
 static NSString* kArrangedObjectsKey = @"arrangedObjects";
 static NSString* kImageRepresentationKeyPath = @"arrangedObjects.imageRepresentation";
 static NSString* kIMBObjectImageRepresentationKey = @"imageRepresentation";
@@ -461,6 +463,16 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 		[IMBConfig addObserver:self forKeyPath:kGlobalViewTypeKey options:0 context:(void*)kGlobalViewTypeKey];
 	}
 	
+    // If a badge filter is active on our object array controller we need to know when object badges change
+    // so we can refresh our view accordingly.
+    
+	[[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(objectBadgesDidChange:)
+     name:kIMBObjectBadgesDidChangeNotification
+     object:nil];
+	
+    
 	// After all has been said and done delegate may do additional setup on selected (sub)views
 	
 	if ([self.delegate respondsToSelector:@selector(objectViewController:didLoadViews:)])
@@ -978,6 +990,12 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 - (void) iconViewVisibleItemsChanged:(NSNotification*)inNotification
 {
 	[self _updateTooltips];
+}
+
+- (void) objectBadgesDidChange:(NSNotification*)inNotification
+{
+	[self.objectArrayController rearrangeObjects];
+	[self.view setNeedsDisplay:YES];
 }
 
 
