@@ -84,6 +84,7 @@
 @interface NSPasteboard (iMediaInternal)
 
 - (void) imb_setParserMessenger:(IMBParserMessenger*)inParserMessenger;
++ (void) imb_setIMBObjects:(NSArray*)inObjects;
 
 @end
 

@@ -685,8 +685,7 @@
             [self.usedObjects setObject:object forKey:object.persistentResourceIdentifier];
         }
 	}
-	IMBNodeViewController* controller = [[IMBPanelController sharedPanelController] currentNodeViewController];
-	[controller setObjectContainerViewNeedsDisplay:YES];
+	[[NSNotificationCenter defaultCenter] postNotificationName:kIMBObjectBadgesDidChangeNotification object:self];
 }
 
 

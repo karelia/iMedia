@@ -98,6 +98,11 @@ typedef enum
 } 
 IMBObjectFilter;
 
+extern NSString* kIMBObjectBadgesDidChangeNotification;
+
+
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 

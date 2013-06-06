@@ -60,6 +60,7 @@
 #import "IMBButtonObject.h"
 #import "IMBQLPreviewPanel.h"
 #import "IMBTableViewAppearance+iMediaPrivate.h"
+#import "NSPasteboard+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -341,6 +342,17 @@ enum IMBMouseOperation
 }
 
 			
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Once a drag has finished, release the global array of IMBObjects, so that we don't leak anything...
+
+- (void) draggingSession:(NSDraggingSession*)inSession endedAtPoint:(NSPoint)inScreenPoint operation:(NSDragOperation)inOperation
+{
+	[NSPasteboard imb_setIMBObjects:nil];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

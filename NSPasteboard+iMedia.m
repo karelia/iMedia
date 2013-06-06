@@ -65,6 +65,7 @@
 #pragma mark GLOBALS
 
 static IMBParserMessenger* sDraggingParserMessenger = nil;
+static NSArray* sDraggingIMBObjects = nil;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -83,6 +84,14 @@ static IMBParserMessenger* sDraggingParserMessenger = nil;
 	sDraggingParserMessenger = inParserMessenger;
 }
 
+// Sets a globals array that speeds up application internal drag & drop...
+
++ (void) imb_setIMBObjects:(NSArray*)inObjects
+{
+	NSArray* old = sDraggingIMBObjects;
+	sDraggingIMBObjects = [inObjects retain];
+	[old release];
+}
 
 @end
 
@@ -114,6 +123,16 @@ static IMBParserMessenger* sDraggingParserMessenger = nil;
 
 - (NSArray*) imb_IMBObjects
 {
+	// If the global array is set, then use this fast path. Please note that we are going to restrict this to
+	// the main thread to avoid threading issues with the global variable...
+	
+	if (sDraggingIMBObjects != nil && [NSThread isMainThread])
+	{
+		return sDraggingIMBObjects;
+	}
+	
+	// Otherwise go the standard route via the archived IMBObjects in the NSPasteboard (slow path)...
+	
 	NSArray* items = self.pasteboardItems;
 	NSMutableArray* objects = [NSMutableArray arrayWithCapacity:items.count];
 	
