@@ -680,6 +680,9 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 				if (inError)
 				{
 					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
+                    
+                    self.accessibility = kIMBResourceDoesNotExist;
+                    self.error = inError;
 				}
 				else
 				{

@@ -482,13 +482,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"Media File is Missing",
 			@"Alert title");
 
-		NSString* format = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.missingObjectMessage",
-			nil,
-			IMBBundle(),
-			@"The file %@ cannot be used because it is missing. It may have been deleted, moved, or renamed.",
-			@"Alert message");
-			
 		NSString* ok = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.missingObjectButton",
 			nil,
@@ -496,7 +489,26 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"   OK   ",
 			@"Alert button");
 
-		NSString* message = [NSString stringWithFormat:format,name];
+        NSError* error = inObject.error;
+        NSString* message;
+        
+        if (error)
+        {
+            message = [error localizedDescription];
+            
+            if ([[error userInfo] valueForKey:@"title"]) {
+                title = [[error userInfo] valueForKey:@"title"];
+            }
+        } else {
+            NSString* format = NSLocalizedStringWithDefaultValue(
+                @"IMBAccessRightsViewController.missingObjectMessage",
+                nil,
+                IMBBundle(),
+                @"The file %@ cannot be used because it is missing. It may have been deleted, moved, or renamed.",
+                @"Alert message");
+			
+            message = [NSString stringWithFormat:format,name];
+        }
 		
 		if (IMBRunningOnLionOrNewer() && inView.window != nil)
 		{
