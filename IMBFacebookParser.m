@@ -343,13 +343,43 @@ static NSUInteger sFacebookElementLimit = 5000;
     
     if (inObject.imageLocation) {
 		NSURL* url = (NSURL*)inObject.imageLocation;
+//        NSURL* url = [NSURL URLWithString:@"https://hallo.com/ballo.jpg"];
 //        NSDate *startTime = [NSDate date];
-        NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
+//        NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
         
-        if (outError && *outError) {
-            NSLog(@"Error loading thumbnail %@: %@", url, *outError);
+        NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+        NSHTTPURLResponse *response = nil;
+        NSData* data = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:outError];
+        
+        if (data)
+        {
+            NSInteger statusCode = [response statusCode];
+            NSString *mimeType = [response MIMEType];
+            if ( statusCode != 200 || ![[mimeType lowercaseString] hasPrefix:@"image"])
+            {
+                // We got a response but did not receive the expected thumbnail
+                
+                NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with code: %ld, mime type: %@ and response data: %@", url, (long)statusCode, mimeType, data];
+                NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          errorString, NSLocalizedDescriptionKey, nil];
+                NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                if (outError) {
+                    *outError = error;
+                }
+                NSLog(@"%@", error);
+                
+            } else {
+                // Everything is ok
+                
+//                NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
+            }
         } else {
-//            NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
+            // Server did not respond
+            if (outError && *outError) {
+                NSLog(@"Error loading thumbnail %@: %@", url, *outError);
+            } else {
+                NSLog(@"Error loading thumbnail %@: No data received but error unknown", url);
+            }
         }
         return data;
     }
