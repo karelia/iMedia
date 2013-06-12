@@ -10,6 +10,7 @@
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
 #import "NSImage+iMedia.h"
+#import "IMBIconCache.h"
 
 // Limit of Facebook elements to retrieve in one request response
 // Note that there is no "Load More" mechanism implemented
@@ -260,8 +261,8 @@ static NSUInteger sFacebookElementLimit = 5000;
             subnode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
             
             subnode.isLeafNode = [connectionType isEqualToString:@"albums"];
-            //        albumNode.icon = [self iconForAlbumType:albumType highlight:NO];
-            //        albumNode.highlightIcon = [self iconForAlbumType:albumType highlight:YES];
+            subnode.icon = [self iconForConnectionType:connectionType highlight:NO];
+            subnode.highlightIcon = [self iconForConnectionType:connectionType highlight:YES];
             subnode.name = name;
             subnode.identifier = ID;
             
@@ -526,4 +527,12 @@ connectedNodesByType:(NSString *)nodeType
     return NO;
 }
 
+- (NSImage*) iconForConnectionType:(NSString*)inConnectionType highlight:(BOOL)inHighlight
+{
+    NSDictionary *iconTypeMapping = @{@"albums": @"album",
+                                      @"friends": @"person"};
+    
+	return [[IMBIconCache sharedIconCache] iconForType:[iconTypeMapping objectForKey:inConnectionType]
+                                             highlight:inHighlight];
+}
 @end
