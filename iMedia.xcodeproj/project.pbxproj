@@ -53,6 +53,8 @@
 		3010BE4416A85D2600798D2E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D02CD4CB1224F78E00C773A2 /* Localizable.strings */; };
 		3016792913B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
 		3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */ = {isa = PBXBuildFile; fileRef = 3016792813B225B9000E57D2 /* badge_checkbox.png */; };
+		30231595176890F900A38B24 /* IMBFacebookObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30231593176890F900A38B24 /* IMBFacebookObject.h */; };
+		30231596176890F900A38B24 /* IMBFacebookObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 30231594176890F900A38B24 /* IMBFacebookObject.m */; };
 		3025E5631306877700706DB2 /* IMBiPhotoEventObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30394AC812DC665000ACA531 /* IMBSkimmableObjectViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		303FFD6A152CBC3B0026B8CF /* IMBSkimmableObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 303FFD68152CBC3B0026B8CF /* IMBSkimmableObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -623,6 +625,8 @@
 		3010BE0116A843EC00798D2E /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = TestApp/main.m; sourceTree = "<group>"; };
 		3010BE0216A843EC00798D2E /* TestApp-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "TestApp-Info.plist"; path = "TestApp/TestApp-Info.plist"; sourceTree = "<group>"; };
 		3016792813B225B9000E57D2 /* badge_checkbox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = badge_checkbox.png; sourceTree = "<group>"; };
+		30231593176890F900A38B24 /* IMBFacebookObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFacebookObject.h; sourceTree = "<group>"; };
+		30231594176890F900A38B24 /* IMBFacebookObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFacebookObject.m; sourceTree = "<group>"; };
 		3025E5611306877700706DB2 /* IMBiPhotoEventObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventObjectViewController.h; sourceTree = "<group>"; };
 		3025E5621306877700706DB2 /* IMBiPhotoEventObjectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventObjectViewController.m; sourceTree = "<group>"; };
 		30394AC612DC665000ACA531 /* IMBSkimmableObjectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBSkimmableObjectViewController.h; sourceTree = "<group>"; };
@@ -1348,6 +1352,8 @@
 				306D987A16EF75C5004BE4EA /* IMBFacebookParser.h */,
 				306D987B16EF75C5004BE4EA /* IMBFacebookParser.m */,
 				30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */,
+				30231593176890F900A38B24 /* IMBFacebookObject.h */,
+				30231594176890F900A38B24 /* IMBFacebookObject.m */,
 			);
 			name = Facebook;
 			sourceTree = "<group>";
@@ -2237,6 +2243,7 @@
 				306D987C16EF75C5004BE4EA /* IMBFacebookParser.h in Headers */,
 				306D988116EF7680004BE4EA /* IMBFacebookParserMessenger.h in Headers */,
 				3092C3191712F14100E52444 /* IMBFacebookAccessController.h in Headers */,
+				30231595176890F900A38B24 /* IMBFacebookObject.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2964,6 +2971,7 @@
 				306D987D16EF75C5004BE4EA /* IMBFacebookParser.m in Sources */,
 				306D988216EF7680004BE4EA /* IMBFacebookParserMessenger.m in Sources */,
 				3092C31A1712F14100E52444 /* IMBFacebookAccessController.m in Sources */,
+				30231596176890F900A38B24 /* IMBFacebookObject.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

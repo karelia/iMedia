@@ -7,6 +7,7 @@
 //
 
 #import "IMBFacebookParser.h"
+#import "IMBFacebookObject.h"
 #import <Accounts/Accounts.h>
 #import <Social/Social.h>
 #import "NSImage+iMedia.h"
@@ -292,10 +293,10 @@ static NSUInteger sFacebookElementLimit = 5000;
                                     params:params
                                      error:outError];
         
-        IMBObject *object = nil;
+        IMBFacebookObject *object = nil;
         for (NSDictionary *photoDict in photoDicts)
         {
-            object = [[IMBObject alloc] init];
+            object = [[IMBFacebookObject alloc] init];
 			[objects addObject:object];
 			[object release];
             
@@ -303,6 +304,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             
             NSArray *images = [photoDict objectForKey:@"images"];
             
+            object.alternateImageLocations = images;
             // Pick image with highest resolution. This should be the first in images.
             NSString *URLString = nil;
             NSUInteger width, height = 0;
@@ -342,47 +344,79 @@ static NSUInteger sFacebookElementLimit = 5000;
 {
 //    NSLog(@"%@", [NSThread currentThread]);
     
-    if (inObject.imageLocation) {
-		NSURL* url = (NSURL*)inObject.imageLocation;
-//        NSURL* url = [NSURL URLWithString:@"https://hallo.com/ballo.jpg"];
-//        NSDate *startTime = [NSDate date];
-//        NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
-        
-        NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
-        NSHTTPURLResponse *response = nil;
-        NSData* data = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:outError];
-        
-        if (data)
-        {
-            NSInteger statusCode = [response statusCode];
-            NSString *mimeType = [response MIMEType];
-            if ( statusCode != 200 || ![[mimeType lowercaseString] hasPrefix:@"image"])
+    IMBFacebookObject *object = (IMBFacebookObject *)inObject;
+    
+    NSData *responseData = nil;
+    for (NSDictionary *imageDict in [object.alternateImageLocations reverseObjectEnumerator])
+    {
+        NSString *urlString = [imageDict objectForKey:@"source"];
+        if (urlString) {
+            NSURL* url = [NSURL URLWithString:urlString];
+            //        NSDate *startTime = [NSDate date];
+            //        NSData* data = [NSData dataWithContentsOfURL:url options:0 error:outError];
+            
+            NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
+            NSHTTPURLResponse *response = nil;
+            responseData = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:outError];
+            
+            if (responseData)
             {
-                // We got a response but did not receive the expected thumbnail
-                
-                NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with code: %ld, mime type: %@ and response data: %@", url, (long)statusCode, mimeType, data];
-                NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                          errorString, NSLocalizedDescriptionKey, nil];
-                NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
-                if (outError) {
-                    *outError = error;
+                NSInteger statusCode = [response statusCode];
+                NSString *mimeType = [response MIMEType];
+                if ( statusCode != 200 || ![[mimeType lowercaseString] hasPrefix:@"image/"])
+                {
+                    // We got a response but did not receive the expected thumbnail
+                    
+                    NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with code: %ld, mime type: %@ and response data: %@", url, (long)statusCode, mimeType, responseData];
+                    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                              errorString, NSLocalizedDescriptionKey, nil];
+                    NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                    if (outError) {
+                        *outError = error;
+                    }
+                    NSLog(@"%@", error);
+                    
+                } else {
+                    // Sadly enough, Facebook might return an error page instead of an image despite responding with
+                    // a 200 status code and a mime type image/...
+                    
+                    BOOL responseDataIsImage = NO;
+                    static const char *nonImageResponse = "<html>";
+                    static NSUInteger bytesToInspect;
+                    bytesToInspect = (NSUInteger)strlen(nonImageResponse);
+                    if ([responseData length] >= bytesToInspect){
+                        responseDataIsImage = strncmp([responseData bytes], nonImageResponse, bytesToInspect) != 0;
+                    }
+                    if (!responseDataIsImage) {
+                        // We were told we got an image but this is no image but an html (error) page!
+                        
+                        NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with HTML:  %@", url, responseData];
+                        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                  errorString, NSLocalizedDescriptionKey, nil];
+                        NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                        if (outError) {
+                            *outError = error;
+                        }
+                        NSLog(@"%@", error);
+                    } else {
+                        // Response data is ok (should be an image)
+                        
+//                        NSLog(@"Picked thumbnail of size: %@x%@", [imageDict objectForKey:@"width"], [imageDict objectForKey:@"height"]);
+                        if (outError) *outError = nil;
+                        return responseData;
+                        
+//                        NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
+                    }
                 }
-                NSLog(@"%@", error);
-                
             } else {
-                // Everything is ok
-                
-//                NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
-            }
-        } else {
-            // Server did not respond
-            if (outError && *outError) {
-                NSLog(@"Error loading thumbnail %@: %@", url, *outError);
-            } else {
-                NSLog(@"Error loading thumbnail %@: No data received but error unknown", url);
+                // Server did not respond
+                if (outError && *outError) {
+                    NSLog(@"Error loading thumbnail %@: %@", url, *outError);
+                } else {
+                    NSLog(@"Error loading thumbnail %@: No data received but error unknown", url);
+                }
             }
         }
-        return data;
     }
     return nil;
 }
@@ -493,7 +527,7 @@ connectedNodesByType:(NSString *)nodeType
             return nil;
         }
 
-        NSLog(@"Facebook returned %@: %@", nodeType, responseDict);
+//        NSLog(@"Facebook returned %@: %@", nodeType, responseDict);
 
         nodes = [[responseDict objectForKey:@"resultDict"] objectForKey:@"data"];
     }
