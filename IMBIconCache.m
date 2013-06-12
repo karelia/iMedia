@@ -172,6 +172,42 @@ static IMBIconCache* sSharedIconCache;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+- (NSImage*) iconForType:(NSString*)inType highlight:(BOOL)inHighlight
+{
+	NSImage* image = nil;
+    NSString* bundleID = @"iMedia";
+    
+	if (inType != nil)
+	{
+		@synchronized(self)
+		{
+            NSString* typeKey = inType;
+            if (inHighlight)
+            {
+                typeKey = [inType stringByAppendingString:@"_sel"];
+            }
+            
+			NSMutableDictionary* bundleCache = [_iconCache objectForKey:bundleID];
+			
+			if (bundleCache == nil)
+			{
+				bundleCache = [NSMutableDictionary dictionary];
+				[_iconCache setObject:bundleCache forKey:bundleID];
+			}
+            
+			image = [bundleCache objectForKey:typeKey];
+			
+			if (image == nil)
+			{
+				image = [NSImage imb_imageNamed:[NSString stringWithFormat:@"%@.tiff", typeKey]];
+                
+				if (image) [bundleCache setObject:image forKey:typeKey];
+			}
+		}
+    }
+    return image;
+}
+
 
 - (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable highlight:(BOOL)inHighlight
 {

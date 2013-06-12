@@ -88,6 +88,7 @@ IMBIconTypeMapping;
 }
 
 + (IMBIconCache*) sharedIconCache;
+- (NSImage*) iconForType:(NSString*)inType highlight:(BOOL)inHighlight;
 - (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable highlight:(BOOL)inHighlight;
 
 @end
