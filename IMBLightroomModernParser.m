@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2005-2013 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -55,8 +55,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom3or4Parser.h"
-#import "IMBLightroomObject.h"
+#import "IMBLightroomModernParser.h"
 #import "FMDatabase.h"
 #import "IMBNode.h"
 #import "IMBFolderObject.h"
@@ -75,7 +74,7 @@
 
 #pragma mark
 
-@interface IMBLightroom3or4Parser ()
+@interface IMBLightroomModernParser ()
 
 - (NSNumber*) databaseVersion;
 
@@ -87,7 +86,7 @@
 
 #pragma mark
 
-@implementation IMBLightroom3or4Parser
+@implementation IMBLightroomModernParser
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,7 +127,7 @@
 		NSArray* libraryPaths = [self libraryPaths];
 		
 		for (NSString* libraryPath in libraryPaths) {
-			IMBLightroom3or4Parser* parser = [[[[self class] alloc] init] autorelease];
+			IMBLightroomModernParser* parser = [[[[self class] alloc] init] autorelease];
 			parser.identifier = [NSString stringWithFormat:@"%@:/%@",[[self class] identifier],libraryPath];
 			parser.mediaSource = [NSURL fileURLWithPath:libraryPath];
 			parser.mediaType = inMediaType;
@@ -195,7 +194,7 @@
 	IMBNode* foldersNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
+	foldersNode.icon = [[self class] folderIcon];
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
                                                    rootPath:nil
@@ -213,7 +212,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self largeFolderIcon];
+	foldersObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:foldersObject];
 	
@@ -232,7 +231,7 @@
 	IMBNode* collectionsNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
-	collectionsNode.icon = [self groupIcon];
+	collectionsNode.icon = [[self class] groupIcon];
 	collectionsNode.isLeafNode = NO;
 	collectionsNode.attributes = collectionsAttributes;
 
@@ -246,15 +245,156 @@
 	collectionsObject.index = 1;
 	collectionsObject.imageLocation = (id)self.mediaSource;
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	collectionsObject.imageRepresentation = [self largeFolderIcon];
+	collectionsObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:collectionsObject];
 	
 	inRootNode.objects = objects;
 }
 
+- (NSString*) pyramidPathForImage:(NSNumber*)idLocal
+{
+	FMDatabase *database = [self database];
+	NSString *uuid = nil;
+	NSString *digest = nil;
 
-- (NSString*) rootFolderQuery
+	if (database != nil) {
+		NSString* query =	@" SELECT alf.id_global uuid, ids.digest"
+		@" FROM Adobe_imageDevelopSettings ids"
+		@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
+		@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
+		@" WHERE ids.image = ?"
+		@" ORDER BY alf.id_global ASC";
+
+		FMResultSet* results = [database executeQuery:query, idLocal];
+
+        // JJ/2012-10-02: For some reason we may get multiple rows with some of them not properly filled. Try best we can.
+
+        while ([results next] && (uuid == nil || digest == nil || [uuid isEqualToString:@""] || [digest isEqualToString:@""]))
+        {
+			uuid = [results stringForColumn:@"uuid"];
+			digest = [results stringForColumn:@"digest"];
+        }
+
+		[results close];
+	}
+
+	if ((uuid != nil) && (digest != nil)) {
+		NSString* prefixOne = [uuid substringToIndex:1];
+		NSString* prefixFour = [uuid substringToIndex:4];
+		NSString* fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
+
+		return [[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
+	}
+
+	return nil;
+}
+
+- (NSData*) previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize
+{
+	if ([inObject isKindOfClass:[IMBLightroomObject class]]) {
+		return [[self class] previewDataForLightroomObject:(IMBLightroomObject *)inObject maximumSize:maximumSize];
+	}
+
+	return nil;
+}
+
++ (NSData*) previewDataForLightroomObject:(IMBLightroomObject*)lightroomObject maximumSize:(NSNumber*)maximumSize
+{
+	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
+
+	if (absolutePyramidPath != nil) {
+		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+
+		//		'AgHg'					-- a magic marker
+		//		header length			-- 2 bytes, big endian includes marker and length
+		//		version					-- 1 byte, zero for now
+		//		kind					-- 1 bytes, 0 == string, 1 == blob
+		//		data length				-- 8 bytes, big endian
+		//		data padding length		-- 8 bytes, big endian
+		//		name					-- zero terminated
+		//		< padding for rest of header >
+		//		< data >
+		//		< data padding >
+
+		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
+
+		NSUInteger index = NSNotFound;
+
+		if (maximumSize == nil) {
+			index = [data lastIndexOfBytes:pattern length:4];
+		}
+		else {
+			index = [data indexOfBytes:pattern length:4];
+		}
+
+		NSData* previousData = nil;
+		CGFloat maximumSizeFloat = [maximumSize floatValue];
+
+		while (index != NSNotFound) {
+			unsigned short headerLengthValue; // size 2
+			unsigned long long dataLengthValue; // size 8
+
+			[data getBytes:&headerLengthValue range:NSMakeRange(index + 4, 2)];
+			[data getBytes:&dataLengthValue range:NSMakeRange(index + 4 + 2 + 1 + 1, 8)];
+
+			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
+			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
+
+			NSData* jpegData = nil;
+
+            if ((index + headerLengthValue + dataLengthValue) < [data length]) {
+                jpegData = [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
+            }
+
+			if (maximumSize == nil) {
+				return jpegData;
+			}
+
+			if (jpegData != nil) {
+				CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
+
+				if (source != NULL) {
+					CGImageRef imageRepresentation = CGImageSourceCreateImageAtIndex(source, 0, NULL);
+
+					CFRelease(source);
+
+					if (imageRepresentation != NULL) {
+						CGFloat width = CGImageGetWidth(imageRepresentation);
+						CGFloat height = CGImageGetHeight(imageRepresentation);
+
+						CFRelease(imageRepresentation);
+
+						if ((width > maximumSizeFloat) || (height > maximumSizeFloat)) {
+							if (previousData == nil) {
+								previousData = jpegData;
+							}
+
+							break;
+						}
+					}
+
+					previousData = jpegData;
+					index = [data indexOfBytes:pattern length:4 options:0 range:NSMakeRange(index + 4, [data length] - index - 4)];
+
+					continue;
+				}
+			}
+
+			return jpegData;
+		}
+
+		return previousData;
+	}
+
+	return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (NSString*) rootFolderQuery
 {
 	NSString* query =
 		@" SELECT id_local, absolutePath, name"
@@ -264,7 +404,7 @@
 	return query;
 }
 
-- (NSString*) folderNodesQuery
++ (NSString*) folderNodesQuery
 {
 	NSString* query =
 		@" SELECT id_local, pathFromRoot"
@@ -276,7 +416,7 @@
 	return query;
 }
 
-- (NSString*) rootCollectionNodesQuery
++ (NSString*) rootCollectionNodesQuery
 {
 	NSString* query =
 		@" SELECT alc.id_local, alc.parent, alc.name"
@@ -287,8 +427,7 @@
 	return query;
 }
 
-
-- (NSString*) collectionNodesQuery
++ (NSString*) collectionNodesQuery
 {
 	NSString* query =
 		@" SELECT alc.id_local, alc.parent, alc.name"
@@ -299,8 +438,7 @@
 	return query;
 }
 
-
-- (NSString*) folderObjectsQuery
++ (NSString*) folderObjectsQuery
 {
 	NSString* query =
 		@" SELECT	alf.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation,"
@@ -319,7 +457,7 @@
 	return query;
 }
 
-- (NSString*) collectionObjectsQuery
++ (NSString*) collectionObjectsQuery
 {
 	NSString* query = 
 		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
@@ -341,7 +479,10 @@
 	return query;
 }
 
-- (NSImage*) folderIcon
+
+//----------------------------------------------------------------------------------------------------------------------
+
++ (NSImage*) folderIcon
 {
 	static NSImage* folderIcon = nil;
 	
@@ -363,7 +504,7 @@
 	return folderIcon;
 }
 
-- (NSImage*) groupIcon;
++ (NSImage*) groupIcon;
 {
 	static NSImage* groupIcon = nil;
 	
@@ -385,7 +526,7 @@
 	return groupIcon;
 }
 
-- (NSImage*) collectionIcon;
++ (NSImage*) collectionIcon;
 {
 	static NSImage* collectionIcon = nil;
 	
@@ -407,136 +548,6 @@
 	return collectionIcon;
 }
 
-- (NSString*)pyramidPathForImage:(NSNumber*)idLocal
-{
-	FMDatabase *database = [self database];
-	NSString *uuid = nil;
-	NSString *digest = nil;
-	
-	if (database != nil) {	
-		NSString* query =	@" SELECT alf.id_global uuid, ids.digest"
-		@" FROM Adobe_imageDevelopSettings ids"
-		@" INNER JOIN Adobe_images ai ON ai.id_local = ids.image"
-		@" INNER JOIN AgLibraryFile alf on alf.id_local = ai.rootFile"
-		@" WHERE ids.image = ?"
-		@" ORDER BY alf.id_global ASC";
-		
-		FMResultSet* results = [database executeQuery:query, idLocal];
-		
-        // JJ/2012-10-02: For some reason we may get multiple rows with some of them not properly filled. Try best we can.
-        
-        while ([results next] && (uuid == nil || digest == nil || [uuid isEqualToString:@""] || [digest isEqualToString:@""]))
-        {
-			uuid = [results stringForColumn:@"uuid"];
-			digest = [results stringForColumn:@"digest"];
-        }
-		
-		[results close];
-	}
-	
-	if ((uuid != nil) && (digest != nil)) {
-		NSString* prefixOne = [uuid substringToIndex:1];
-		NSString* prefixFour = [uuid substringToIndex:4];
-		NSString* fileName = [[NSString stringWithFormat:@"%@-%@", uuid, digest] stringByAppendingPathExtension:@"lrprev"];
-		
-		return [[prefixOne stringByAppendingPathComponent:prefixFour] stringByAppendingPathComponent:fileName];
-	}
-	
-	return nil;
-}
-
-- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize
-{	
-	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
-	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
-	
-	if (absolutePyramidPath != nil) {
-		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
-		
-		//		'AgHg'					-- a magic marker
-		//		header length			-- 2 bytes, big endian includes marker and length
-		//		version					-- 1 byte, zero for now
-		//		kind					-- 1 bytes, 0 == string, 1 == blob
-		//		data length				-- 8 bytes, big endian
-		//		data padding length		-- 8 bytes, big endian
-		//		name					-- zero terminated
-		//		< padding for rest of header >
-		//		< data >
-		//		< data padding >
-		
-		const char pattern[4] = { 0x41, 0x67, 0x48, 0x67 };
-		
-		NSUInteger index = NSNotFound;
-		
-		if (maximumSize == nil) {
-			index = [data lastIndexOfBytes:pattern length:4];
-		}
-		else {
-			index = [data indexOfBytes:pattern length:4];
-		}
-
-		NSData* previousData = nil;
-		CGFloat maximumSizeFloat = [maximumSize floatValue];
-		
-		while (index != NSNotFound) {
-			unsigned short headerLengthValue; // size 2
-			unsigned long long dataLengthValue; // size 8
-			
-			[data getBytes:&headerLengthValue range:NSMakeRange(index + 4, 2)];
-			[data getBytes:&dataLengthValue range:NSMakeRange(index + 4 + 2 + 1 + 1, 8)];
-			
-			headerLengthValue = NSSwapBigShortToHost(headerLengthValue);
-			dataLengthValue = NSSwapBigLongLongToHost(dataLengthValue);
-			
-			NSData* jpegData = nil;
-			
-            if ((index + headerLengthValue + dataLengthValue) < [data length]) {
-                jpegData = [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
-            }
-            
-			if (maximumSize == nil) {
-				return jpegData;
-			}
-			
-			if (jpegData != nil) {
-				CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
-				
-				if (source != NULL) {
-					CGImageRef imageRepresentation = CGImageSourceCreateImageAtIndex(source, 0, NULL);
-					
-					CFRelease(source);
-					
-					if (imageRepresentation != NULL) {
-						CGFloat width = CGImageGetWidth(imageRepresentation);
-						CGFloat height = CGImageGetHeight(imageRepresentation);
-						
-						CFRelease(imageRepresentation);
-						
-						if ((width > maximumSizeFloat) || (height > maximumSizeFloat)) {
-							if (previousData == nil) {
-								previousData = jpegData;
-							}
-							
-							break;
-						}
-					}
-					
-					previousData = jpegData;
-					index = [data indexOfBytes:pattern length:4 options:0 range:NSMakeRange(index + 4, [data length] - index - 4)];
-					
-					continue;
-				}
-			}
-			
-			return jpegData;
-		}
-		
-		return previousData;
-	}
-	
-	return nil;
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -553,19 +564,6 @@
 	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
-}
-
-
-// This method must return an appropriate prefix for IMBObject identifiers. Refer to the method
-// -[IMBParser iMedia2PersistentResourceIdentifierForObject:] to see how it is used. Historically we used class names as the prefix. 
-// However, during the evolution of iMedia class names can change and identifier string would thus also change. 
-// This is undesirable, as things that depend of the immutability of identifier strings would break. One such 
-// example are the object badges, which use object identifiers. To guarrantee backward compatibilty, a parser 
-// class must override this method to return a prefix that matches the historic class name...
-
-- (NSString*) iMedia2PersistentResourceIdentifierPrefix
-{
-	return @"IMBLightroom3Parser";
 }
 
 

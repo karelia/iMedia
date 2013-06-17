@@ -55,7 +55,7 @@
 #import "IMBLightroomParser.h"
 
 
-@interface IMBLightroom1Parser : IMBLightroomParser
+@interface IMBLightroom1Parser : IMBLightroomParser <IMBLightroomParser>
 {
 	
 }
