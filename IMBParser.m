@@ -449,7 +449,7 @@
 	{
         [self populateNode:inNewNode options:inOptions error:&error];
 		
-		for (IMBNode* oldSubNode in inOldNode.subNodes)
+		for (IMBNode* oldSubNode in [[inOldNode.subNodes copy] autorelease])
 		{
 			NSString* identifier = oldSubNode.identifier;
 			IMBNode* newSubNode = [inNewNode subNodeWithIdentifier:identifier];
