@@ -870,8 +870,6 @@ static NSArray* sSupportedUTIs = nil;
 	
 	FMDatabase *database = self.database;
 
-	database.logsErrors = YES;
-
 	if (database != nil) {
 		NSDictionary* attributes = inParentNode.attributes;
 		NSNumber* collectionId = [self idLocalFromAttributes:attributes];
@@ -895,7 +893,7 @@ static NSArray* sSupportedUTIs = nil;
 			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* idParentLocal = [NSNumber numberWithLong:[results longForColumn:@"parent"]];
 			NSString* name = [results stringForColumn:@"name"];
-			NSString* creationId = [results stringForColumn:@"creationid"];
+			NSString* creationId = [results hasColumnWithName:@"creationid"] ? [results stringForColumn:@"creationid"] : nil;
 			BOOL isGroup = NO;
 			
 			if (name == nil)

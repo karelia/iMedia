@@ -528,7 +528,7 @@
 	NSString *query =
 	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationid"
 	@" FROM AgLibraryCollection alc"
-	@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group' OR creationId = 'com.adobe.ag.library.smart_collection') "
+	@" WHERE (alc.creationId = 'com.adobe.ag.library.collection' OR alc.creationId = 'com.adobe.ag.library.group' OR alc.creationId = 'com.adobe.ag.library.smart_collection') "
 	@" AND alc.parent IS NULL";
 
 	return query;
@@ -539,7 +539,7 @@
 	NSString *query =
 	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationid"
 	@" FROM AgLibraryCollection alc"
-	@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group' OR creationId = 'com.adobe.ag.library.smart_collection') "
+	@" WHERE (alc.creationId = 'com.adobe.ag.library.collection' OR alc.creationId = 'com.adobe.ag.library.group' OR alc.creationId = 'com.adobe.ag.library.smart_collection') "
 	@" AND alc.parent = ?";
 
 	return query;

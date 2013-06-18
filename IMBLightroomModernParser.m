@@ -146,7 +146,7 @@
 
 - (BOOL) checkDatabaseVersion
 {	
-	return YES;
+	return NO;
 }
 
 - (NSNumber*) databaseVersion
@@ -419,7 +419,7 @@
 + (NSString*) rootCollectionNodesQuery
 {
 	NSString* query =
-		@" SELECT alc.id_local, alc.parent, alc.name"
+		@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
 		@" FROM AgLibraryCollection alc"
 		@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
 		@" AND alc.parent IS NULL";
@@ -430,9 +430,9 @@
 + (NSString*) collectionNodesQuery
 {
 	NSString* query =
-		@" SELECT alc.id_local, alc.parent, alc.name"
+		@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
 		@" FROM AgLibraryCollection alc"
-		@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
+		@" WHERE (alc.creationId = 'com.adobe.ag.library.collection' OR alc.creationId = 'com.adobe.ag.library.group') "
 		@" AND alc.parent = ?";
 	
 	return query;
