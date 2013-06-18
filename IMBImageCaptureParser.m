@@ -674,9 +674,9 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 					 nil];
 				[_loadingDevices setObject:deviceDict forKey:deviceID];
 			}
-			else 
+			else if (objectID != nil)
 			{
-				[_loadingDevices setObject:nil forKey:objectID];
+				[_loadingDevices removeObjectForKey:objectID];
 			}
 		}  // end  lock
 	}
