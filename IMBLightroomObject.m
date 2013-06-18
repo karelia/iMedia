@@ -44,6 +44,9 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Pierre Bernard
 
 
@@ -52,17 +55,111 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroomModernParser.h"
+#import "IMBLightroomObject.h"
 
 
-// SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlment (provided user hasn't moved their photos elsewhere). Also com.apple.security.temporary-exception.shared-preference.read-only for com.adobe.Lightroom3
+//----------------------------------------------------------------------------------------------------------------------
 
-@interface IMBLightroom3Parser : IMBLightroomModernParser <IMBLightroomParser>
+
+#pragma mark 
+
+@implementation IMBLightroomObject
+
+@synthesize absolutePyramidPath = _absolutePyramidPath;
+@synthesize idLocal = _idLocal;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
 {
+	if ((self = [super init]))
+	{
+		_absolutePyramidPath = nil;
+		_idLocal = nil;
+		}
 	
+	return self;
 }
+
+
+- (void) dealloc
+{
+	IMBRelease(_absolutePyramidPath);
+	IMBRelease(_idLocal);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]) != nil)
+	{
+		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
+		self.idLocal = [inCoder decodeObjectForKey:@"idLocal"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
+	[inCoder encodeObject:self.idLocal forKey:@"idLocal"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBLightroomObject* copy = [super copyWithZone:inZone];
+	copy.absolutePyramidPath = self.absolutePyramidPath;
+	copy.idLocal = self.idLocal;
+	return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark IKImageBrowserItem Protocol
+
+// Use the path or URL as the unique identifier...
+
+- (NSString*) identifier
+{
+	/*
+	 NSString* absolutePyramidPath = self.absolutePyramidPath;
+
+	 if (absolutePyramidPath != nil) {
+	 NSString* parserName = self.parserClassName;
+
+	 return [NSString stringWithFormat:@"%@:/%@", parserName, absolutePyramidPath];
+	 }
+
+	 return [super identifier];
+	 */
+
+	NSString* identifier = [super identifier];
+
+	// Account for virtual copies
+	return [NSString stringWithFormat:@"%@/%@", identifier, self.idLocal];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
 
 
-//----------------------------------------------------------------------------------------------------------------------

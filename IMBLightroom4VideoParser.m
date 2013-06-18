@@ -77,10 +77,10 @@
 
 @implementation IMBLightroom4VideoParser
 
-- (NSString*) folderObjectsQuery
++ (NSString*) folderObjectsQuery
 {
 	NSString* query =
-	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 	@"			iptc.caption"
 	@" FROM Adobe_images ai"
 	@" LEFT JOIN AgLibraryFile alf ON ai.rootFile = alf.id_local"
@@ -96,11 +96,11 @@
 	return query;
 }
 
-- (NSString*) collectionObjectsQuery
++ (NSString*) collectionObjectsQuery
 {
 	NSString* query = 
 	@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-	@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, "
+	@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 	@"        iptc.caption"
 	@" FROM Adobe_images ai"
 	@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"

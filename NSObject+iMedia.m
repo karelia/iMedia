@@ -44,7 +44,10 @@
  */
 
 
-// Author: Pierre Bernard
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,96 +55,74 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4Parser.h"
+#import "NSObject+iMedia.h"
 
-#import <Quartz/Quartz.h>
-
-#import "FMDatabase.h"
-#import "IMBNode.h"
-#import "IMBNodeObject.h"
-#import "IMBObject.h"
-#import "NSFileManager+iMedia.h"
-#import "NSImage+iMedia.h"
-#import "NSWorkspace+iMedia.h"
-
-
-@interface IMBLightroom4Parser ()
-
-@end
-
-
-@implementation IMBLightroom4Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Unique identifier for this parser...
+#pragma mark
 
-+ (NSString*) identifier
+@implementation NSObject (iMedia)
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason
 {
-	return @"com.karelia.imedia.Lightroom4";
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:inReason userInfo:nil] raise];
 }
 
-// The bundle identifier of the Lightroom app this parser is based upon
 
-+ (NSString*) lightroomAppBundleIdentifier
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Throws a "must subclass" exception.
+// Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
+
++ (void) imb_throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
 {
-    return @"com.adobe.Lightroom4";
+	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
 
-// Key in Ligthroom app user defaults: which library to load
 
-+ (NSString*) preferencesLibraryToLoadKey
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector
 {
-    return @"libraryToLoad20";
+	[self imb_performCoalescedSelector:inSelector withObject:nil];
 }
 
-// Key in Ligthroom app user defaults: which libraries have been loaded recently
 
-+ (NSString*) preferencesRecentLibrariesKey
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject
 {
-    return @"recentLibraries20";
+	[self imb_performCoalescedSelector:inSelector withObject:inObject afterDelay:0.0];
 }
 
-- (BOOL) checkDatabaseVersion
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay
 {
-	NSNumber *databaseVersion = [self databaseVersion];
-	
-	if (databaseVersion != nil) {
-		long databaseVersionLong = [databaseVersion longValue];
-		
-		if (databaseVersionLong < 400020) {
-			return NO;
-		}
-		else if (databaseVersionLong >= 500000) {
-			return NO;
-		}
-	}
-	
-	return YES;
+	[self imb_cancelCoalescedSelector:inSelector withObject:inObject];
+	[self performSelector:inSelector withObject:inObject afterDelay:inDelay];
 }
 
-- (FMDatabase*) libraryDatabase
+
++ (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject
 {
-	NSString* databasePath = (NSString*)self.mediaSource;
-	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:inSelector object:inObject];
 }
 
-- (FMDatabase*) previewsDatabase
+
++ (void) imb_cancelAllCoalescedSelectors
 {
-	NSString* mainDatabasePath = (NSString*)self.mediaSource;
-	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
-	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
-	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];
-	FMDatabase* database = [FMDatabase databaseWithPath:previewDatabasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
 
 @end
