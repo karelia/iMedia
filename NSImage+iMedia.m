@@ -52,6 +52,12 @@
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
 
+@interface NSBundle (SDK_10_7)
+
+- (NSImage *)imageForResource:(NSString *)name;
+
+@end
+
 @implementation NSImage (iMedia)
 
 // Actually ignore the mime type, but maybe later we can use it as a hint
