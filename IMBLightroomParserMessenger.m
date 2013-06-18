@@ -63,6 +63,7 @@
 #import "IMBLightroom5Parser.h"
 #import "IMBLightroom3VideoParser.h"
 #import "IMBLightroom4VideoParser.h"
+#import "IMBLightroom5VideoParser.h"
 #import "IMBParserController.h"
 #import "NSFileManager+iMedia.h"
 #import "NSDictionary+iMedia.h"
@@ -219,6 +220,7 @@ static dispatch_once_t sOnceToken = 0;
 			{
 				[parsers addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:mediaType]];
 				[parsers addObjectsFromArray:[IMBLightroom4VideoParser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom5VideoParser concreteParserInstancesForMediaType:mediaType]];
 			}
 		}
 	});
@@ -315,6 +317,10 @@ static dispatch_once_t sOnceToken = 0;
 + (NSString*) parserClassName
 {
 	if ([IMBLightroom4Parser lightroomPath])
+	{
+		return @"IMBLightroom5VideoParser";
+	}
+	else if ([IMBLightroom4Parser lightroomPath])
 	{
 		return @"IMBLightroom4VideoParser";
 	}
