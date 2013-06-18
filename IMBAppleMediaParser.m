@@ -94,6 +94,13 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 @synthesize modificationDate = _modificationDate;
 
 
+- (void) dealloc
+{
+	IMBRelease(_plist);
+	IMBRelease(_modificationDate);
+	[super dealloc];
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 
 #pragma mark -
