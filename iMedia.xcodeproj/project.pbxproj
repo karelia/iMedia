@@ -1107,8 +1107,6 @@
 				8FF314C415063F6900A76AA2 /* IMBLightroom4Parser.m */,
 				8F76F854177094B9007B56FC /* IMBLightroom5Parser.h */,
 				8F76F855177094B9007B56FC /* IMBLightroom5Parser.m */,
-				8F76F856177094B9007B56FC /* IMBLightroom5VideoParser.h */,
-				8F76F857177094B9007B56FC /* IMBLightroom5VideoParser.m */,
 				8FA4275C154EB93C00F75E13 /* IMBLightroomModernParser.h */,
 				8FA4275D154EB93C00F75E13 /* IMBLightroomModernParser.m */,
 				8F76F84E177091DB007B56FC /* IMBLightroomObject.h */,
@@ -1420,18 +1418,20 @@
 		D0B6FAA31043228C00280DDC /* Movie */ = {
 			isa = PBXGroup;
 			children = (
-				D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */,
-				D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */,
-				D0FC9516108213A800973FEE /* IMBiTunesVideoParser.h */,
-				D0FC9517108213A800973FEE /* IMBiTunesVideoParser.m */,
-				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
-				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
 				D0467BB2112C223600C1AA4E /* IMBApertureVideoParser.h */,
 				D0467BB3112C223600C1AA4E /* IMBApertureVideoParser.m */,
+				D03C283E108265C300BD55CF /* IMBiPhotoVideoParser.h */,
+				D03C283F108265C300BD55CF /* IMBiPhotoVideoParser.m */,
+				D0FC9516108213A800973FEE /* IMBiTunesVideoParser.h */,
+				D0FC9517108213A800973FEE /* IMBiTunesVideoParser.m */,
 				8FC2089B11C29E1C0083EAB3 /* IMBLightroom3VideoParser.h */,
 				8FC2089C11C29E1C0083EAB3 /* IMBLightroom3VideoParser.m */,
 				8FF314CA15064BC700A76AA2 /* IMBLightroom4VideoParser.h */,
 				8FF314CB15064BC700A76AA2 /* IMBLightroom4VideoParser.m */,
+				8F76F856177094B9007B56FC /* IMBLightroom5VideoParser.h */,
+				8F76F857177094B9007B56FC /* IMBLightroom5VideoParser.m */,
+				D0B6FABD1043246800280DDC /* IMBMovieFolderParser.h */,
+				D0B6FABE1043246800280DDC /* IMBMovieFolderParser.m */,
 			);
 			name = Movie;
 			sourceTree = "<group>";

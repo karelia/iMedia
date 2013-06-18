@@ -117,7 +117,7 @@
 	return parserInstances;
 }
 
-+ (NSString*) rootFolderQuery
+- (NSString*) rootFolderQuery
 {
 	NSString* query =	@" SELECT id_local, absolutePath, name"
 						@" FROM AgLibraryRootFolder"
@@ -126,7 +126,7 @@
 	return query;
 }
 
-+ (NSString*) folderNodesQuery
+- (NSString*) folderNodesQuery
 {
 	NSString* query =	@" SELECT id_local, pathFromRoot"
 						@" FROM AgLibraryFolder"
@@ -138,7 +138,7 @@
 	return query;
 }
 
-+ (NSString*) rootCollectionNodesQuery
+- (NSString*) rootCollectionNodesQuery
 {
 	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
 						@" FROM AgLibraryTag alt"
@@ -153,7 +153,7 @@
 	return query;
 }
 
-+ (NSString*) collectionNodesQuery
+- (NSString*) collectionNodesQuery
 {
 	NSString* query =	@" SELECT alt.id_local, alt.parent, alt.name"
 						@" FROM AgLibraryTag alt"
@@ -168,7 +168,7 @@
 	return query;
 }
 
-+ (NSString*) folderObjectsQuery
+- (NSString*) folderObjectsQuery
 {
 	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 						@"			caption, apcp.relativeDataPath pyramidPath"
@@ -192,7 +192,7 @@
 	return query;
 }
 
-+ (NSString*) collectionObjectsQuery
+- (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	aif.absolutePath, aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 						@"			caption, apcp.relativeDataPath pyramidPath"
