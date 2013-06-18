@@ -73,7 +73,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSString*) folderObjectsQuery
++ (NSString*) folderObjectsQuery
 {
 	NSString* query =
 		@" SELECT	alf.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation,"
@@ -92,7 +92,7 @@
 	return query;
 }
 
-- (NSString*) collectionObjectsQuery
++ (NSString*) collectionObjectsQuery
 {
 	NSString* query = 
 		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
