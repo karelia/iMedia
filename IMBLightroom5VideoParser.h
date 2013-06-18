@@ -44,7 +44,7 @@
  */
 
 
-// Author: Pierre Bernard
+// Author: Peter Baumgartner
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,96 +52,17 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
 
-#import <Quartz/Quartz.h>
-
-#import "FMDatabase.h"
-#import "IMBNode.h"
-#import "IMBNodeObject.h"
-#import "IMBObject.h"
-#import "NSFileManager+iMedia.h"
-#import "NSImage+iMedia.h"
-#import "NSWorkspace+iMedia.h"
-
-
-@interface IMBLightroom4Parser ()
-
-@end
-
-
-@implementation IMBLightroom4Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Unique identifier for this parser...
+#pragma mark 
 
-+ (NSString*) identifier
-{
-	return @"com.karelia.imedia.Lightroom4";
-}
-
-// The bundle identifier of the Lightroom app this parser is based upon
-
-+ (NSString*) lightroomAppBundleIdentifier
-{
-    return @"com.adobe.Lightroom4";
-}
-
-// Key in Ligthroom app user defaults: which library to load
-
-+ (NSString*) preferencesLibraryToLoadKey
-{
-    return @"libraryToLoad20";
-}
-
-// Key in Ligthroom app user defaults: which libraries have been loaded recently
-
-+ (NSString*) preferencesRecentLibrariesKey
-{
-    return @"recentLibraries20";
-}
-
-- (BOOL) checkDatabaseVersion
-{
-	NSNumber *databaseVersion = [self databaseVersion];
-	
-	if (databaseVersion != nil) {
-		long databaseVersionLong = [databaseVersion longValue];
-		
-		if (databaseVersionLong < 400020) {
-			return NO;
-		}
-		else if (databaseVersionLong >= 500000) {
-			return NO;
-		}
-	}
-	
-	return YES;
-}
-
-- (FMDatabase*) libraryDatabase
-{
-	NSString* databasePath = (NSString*)self.mediaSource;
-	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
-}
-
-- (FMDatabase*) previewsDatabase
-{
-	NSString* mainDatabasePath = (NSString*)self.mediaSource;
-	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
-	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
-	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];
-	FMDatabase* database = [FMDatabase databaseWithPath:previewDatabasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
-}
+@interface IMBLightroom5VideoParser : IMBLightroom5Parser <IMBLightroomParser>
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
