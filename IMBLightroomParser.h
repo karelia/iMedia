@@ -149,14 +149,14 @@ IMBLightroomNodeType;
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
 
-+ (NSString*) rootFolderQuery;
-+ (NSString*) folderNodesQuery;
+- (NSString*) rootFolderQuery;
+- (NSString*) folderNodesQuery;
 
-+ (NSString*) rootCollectionNodesQuery;
-+ (NSString*) collectionNodesQuery;
+- (NSString*) rootCollectionNodesQuery;
+- (NSString*) collectionNodesQuery;
 
-+ (NSString*) folderObjectsQuery;
-+ (NSString*) collectionObjectsQuery;
+- (NSString*) folderObjectsQuery;
+- (NSString*) collectionObjectsQuery;
 
 + (NSImage*) folderIcon;
 + (NSImage*) groupIcon;

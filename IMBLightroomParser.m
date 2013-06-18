@@ -554,7 +554,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query = [[self class] rootFolderQuery];
+		NSString* query = [(id<IMBLightroomParser>)self rootFolderQuery];
 		FMResultSet* results = [database executeQuery:query];
 		NSInteger index = 0;
 		
@@ -633,7 +633,7 @@ static NSArray* sSupportedUTIs = nil;
 		NSString* parentPathFromRoot = [self pathFromRootFromAttributes:attributes];	
 		NSNumber* parentRootFolder = [self rootFolderFromAttributes:attributes];
 		NSString* parentRootPath = [self rootPathFromAttributes:inParentNode.attributes];
-		NSString* query = [[self class] folderNodesQuery];
+		NSString* query = [(id<IMBLightroomParser>)self folderNodesQuery];
 		NSString* pathFromRootAccept = nil;
 		NSString* pathFromRootReject = nil;
 		
@@ -731,11 +731,11 @@ static NSArray* sSupportedUTIs = nil;
 		FMResultSet* results = nil;
 		
 		if ([collectionId longValue] == 0) {
-			query = [[self class] rootCollectionNodesQuery];
+			query = [(id<IMBLightroomParser>)self rootCollectionNodesQuery];
 			results = [database executeQuery:query];
 		}
 		else {
-			query = [[self class] collectionNodesQuery];
+			query = [(id<IMBLightroomParser>)self collectionNodesQuery];
 			results = [database executeQuery:query, collectionId];
 		}
 
@@ -857,7 +857,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (database != nil) {
 		NSMutableArray* objects = [NSMutableArray array];
-		NSString* query = [[self class] folderObjectsQuery];
+		NSString* query = [(id<IMBLightroomParser>)self folderObjectsQuery];
 		
 		NSDictionary* attributes = inNode.attributes;
 		NSString* folderPath = [self absolutePathFromAttributes:attributes];
@@ -943,7 +943,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query = [[self class] collectionObjectsQuery];
+		NSString* query = [(id<IMBLightroomParser>)self collectionObjectsQuery];
 		NSNumber* collectionId = [self idLocalFromAttributes:inNode.attributes];
 		FMResultSet* results = [database executeQuery:query, collectionId];
 		NSUInteger index = 0;
