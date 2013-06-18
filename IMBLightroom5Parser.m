@@ -151,7 +151,7 @@
 
 	NSNumber	*collectionId			= [self idLocalFromAttributes:inNode.attributes];
 
-	NSString	*rulesQuery				= [[self class] smartCollectionRulesQuery];
+	NSString	*rulesQuery				= [self smartCollectionRulesQuery];
 	FMResultSet *rulesResults			= [database executeQuery:rulesQuery, collectionId];
 	NSString	*rulesString			= nil;
 
@@ -183,7 +183,7 @@
 	}
 
 	NSArray		*objectMatchArguments	= nil;
-	NSString	*objectMatchClause		= [[self class] smartCollectionObjectMatchClause:s arguments:&objectMatchArguments];
+	NSString	*objectMatchClause		= [self smartCollectionObjectMatchClause:s arguments:&objectMatchArguments];
 
 	if (objectMatchClause == nil) {
 		return;
@@ -193,7 +193,7 @@
 		objectMatchArguments = [NSArray array];
 	}
 
-	NSString	*sortTypeQuery			= [[self class] smartCollectionSortTypeQuery];
+	NSString	*sortTypeQuery			= [self smartCollectionSortTypeQuery];
 	FMResultSet *sortTypeResults		= [database executeQuery:sortTypeQuery, collectionId];
 	NSString	*sortTypeString			= nil;
 
@@ -204,7 +204,7 @@
 	[sortTypeResults close];
 
 
-	NSString	*sortDirectionQuery		= [[self class] smartCollectionSortDirectionQuery];
+	NSString	*sortDirectionQuery		= [self smartCollectionSortDirectionQuery];
 	FMResultSet *sortDirectionResults	= [database executeQuery:sortDirectionQuery, collectionId];
 	NSString	*sortDirectionString	= nil;
 
@@ -215,9 +215,9 @@
 	[sortDirectionResults close];
 
 
-	NSString	*objectQuery			= [[self class] smartCollectionObjectsQuery:objectMatchClause
-														 sortTypeString:sortTypeString
-													sortDirectionString:sortDirectionString];
+	NSString	*objectQuery			= [self smartCollectionObjectsQuery:objectMatchClause
+												 sortTypeString:sortTypeString
+											sortDirectionString:sortDirectionString];
 
 	if (objectQuery == nil) {
 		return;
@@ -271,7 +271,7 @@
 	[results close];
 }
 
-+ (NSString *)smartCollectionObjectMatchClause:(NSArray *)rules arguments:(NSArray **)outArguments
+- (NSString *)smartCollectionObjectMatchClause:(NSArray *)rules arguments:(NSArray **)outArguments
 {
 	NSString		*combine	= @"union";
 	NSMutableArray	*arguments	= [NSMutableArray array];
@@ -478,20 +478,40 @@
 	return nil;
 }
 
-+ (NSString *)smartCollectionObjectsQuery:(NSString *)objectMatchClause sortTypeString:(NSString *)sortTypeString sortDirectionString:(NSString *)sortDirectionString
+- (NSString *)smartCollectionObjectsQuery:(NSString *)objectMatchClause sortTypeString:(NSString *)sortTypeString sortDirectionString:(NSString *)sortDirectionString
 {
-	NSString	*queryFormat	=
-	@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-	@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
-	@"        iptc.caption"
-	@" FROM Adobe_images ai"
-	@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
-	@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
-	@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
-	@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
-	@" WHERE ai.fileFormat <> 'VIDEO'"
-	@" AND ( %@ )"
-	@" ORDER BY ai.%@ %@";
+	NSString* queryFormat = nil;
+
+	if ([self.mediaType isEqualTo:kIMBMediaTypeMovie])
+	{
+		queryFormat	=
+		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+		@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
+		@"        iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
+		@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+		@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE ai.fileFormat == 'VIDEO'"
+		@" AND ( %@ )"
+		@" ORDER BY ai.%@ %@";
+	}
+	else
+	{
+		queryFormat	=
+		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+		@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
+		@"        iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
+		@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+		@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE ai.fileFormat <> 'VIDEO'"
+		@" AND ( %@ )"
+		@" ORDER BY ai.%@ %@";
+	}
 
 	NSString	*sortAttribute	= sortTypeString;
 
@@ -523,7 +543,7 @@
 
 #if LOAD_SMART_COLLECTIONS
 
-+ (NSString *)rootCollectionNodesQuery
+- (NSString *)rootCollectionNodesQuery
 {
 	NSString *query =
 	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationid"
@@ -534,7 +554,7 @@
 	return query;
 }
 
-+ (NSString *)collectionNodesQuery
+- (NSString *)collectionNodesQuery
 {
 	NSString *query =
 	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationid"
@@ -545,7 +565,7 @@
 	return query;
 }
 
-+ (NSString *)smartCollectionRulesQuery
+- (NSString *)smartCollectionRulesQuery
 {
 	NSString *query =
 	@" SELECT alcc.content"
@@ -556,7 +576,7 @@
 	return query;
 }
 
-+ (NSString *)smartCollectionSortTypeQuery
+- (NSString *)smartCollectionSortTypeQuery
 {
 	NSString *query =
 	@" SELECT alcc.content"
@@ -567,7 +587,7 @@
 	return query;
 }
 
-+ (NSString *)smartCollectionSortDirectionQuery
+- (NSString *)smartCollectionSortDirectionQuery
 {
 	NSString *query =
 	@" SELECT alcc.content"

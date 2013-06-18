@@ -394,7 +394,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-+ (NSString*) rootFolderQuery
+- (NSString*) rootFolderQuery
 {
 	NSString* query =
 		@" SELECT id_local, absolutePath, name"
@@ -404,7 +404,7 @@
 	return query;
 }
 
-+ (NSString*) folderNodesQuery
+- (NSString*) folderNodesQuery
 {
 	NSString* query =
 		@" SELECT id_local, pathFromRoot"
@@ -416,7 +416,7 @@
 	return query;
 }
 
-+ (NSString*) rootCollectionNodesQuery
+- (NSString*) rootCollectionNodesQuery
 {
 	NSString* query =
 		@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
@@ -427,7 +427,7 @@
 	return query;
 }
 
-+ (NSString*) collectionNodesQuery
+- (NSString*) collectionNodesQuery
 {
 	NSString* query =
 		@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
@@ -438,9 +438,28 @@
 	return query;
 }
 
-+ (NSString*) folderObjectsQuery
+- (NSString*) folderObjectsQuery
 {
-	NSString* query =
+	NSString* query = nil;
+
+	if ([self.mediaType isEqualTo:kIMBMediaTypeMovie]) {
+		query =
+		@" SELECT	alf.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation,"
+		@"			iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile alf ON ai.rootFile = alf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE alf.folder in ( "
+		@"		SELECT id_local"
+		@"		FROM AgLibraryFolder"
+		@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+		@" )"
+		@" AND ai.fileFormat == 'VIDEO'"
+		@" ORDER BY ai.captureTime ASC";
+	}
+	else
+	{
+		query =
 		@" SELECT	alf.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation,"
 		@"			iptc.caption"
 		@" FROM Adobe_images ai"
@@ -453,13 +472,37 @@
 		@" )"
 		@" AND ai.fileFormat <> 'VIDEO'"
 		@" ORDER BY ai.captureTime ASC";
-	
+	}
+
 	return query;
 }
 
-+ (NSString*) collectionObjectsQuery
+- (NSString*) collectionObjectsQuery
 {
-	NSString* query = 
+	NSString* query = nil;
+
+	if ([self.mediaType isEqualTo:kIMBMediaTypeMovie])
+	{
+		query =
+		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+		@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
+		@"        iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
+		@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+		@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE IFNULL(ai.masterImage, ai.id_local) in ( "
+		@"		SELECT image"
+		@"		FROM AgLibraryCollectionImage alci"
+		@"		WHERE alci.collection = ?"
+		@" )"
+		@" AND ai.fileFormat == 'VIDEO'"
+		@" ORDER BY ai.captureTime ASC";
+	}
+	else
+	{
+		query =
 		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
 		@"        aif.idx_filename, ai.id_local, ai.captureTime, ai.fileHeight, ai.fileWidth, ai.orientation, "
 		@"        iptc.caption"
@@ -475,7 +518,8 @@
 		@" )"
 		@" AND ai.fileFormat <> 'VIDEO'"
 		@" ORDER BY ai.captureTime ASC";
-	
+	}
+
 	return query;
 }
 
