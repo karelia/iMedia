@@ -267,7 +267,12 @@ NSString* const kIMBiPhotoNodeObjectTypeFace  = @"faces";
 									mutabilityOption:0					// Apple doc: The opt parameter is currently unused and should be set to 0.
 									format:NULL errorDescription:&eString];
 							[xmlDoc release];
-							
+
+							if (dict == nil )
+							{
+								NSLog (@"%s %@", __FUNCTION__, eString);
+							}
+
 							// the assignment to 'dict' in the code above yields
 							// a mutable dictionary as this code snippet would reveal:
 							// Class dictClass = [dict classForCoder];
