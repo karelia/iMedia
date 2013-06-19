@@ -457,6 +457,43 @@
 }
 
 
+- (NSImage*) badgeIcon
+{
+    NSImage* badgeIcon = nil;
+    
+	if (self.accessibility == kIMBResourceDoesNotExist)
+	{
+		badgeIcon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+	}
+	else if (self.accessibility == kIMBResourceNoPermission)
+	{
+		badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+	}
+	else if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable)
+	{
+		badgeIcon = [NSImage imb_imageNamed:@"logout.tiff"];
+	}
+	else if (self.error)
+	{
+		badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+	}
+    return badgeIcon;
+}
+
+
+- (NSImage*) badgeHighlightIcon
+{
+    NSImage* badgeIcon = nil;
+    
+    if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable) {
+		badgeIcon = [NSImage imb_imageNamed:@"logout_sel.tiff"];
+    } else {
+        badgeIcon = [self badgeIcon];
+    }
+    return badgeIcon;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 

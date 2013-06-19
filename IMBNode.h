@@ -148,6 +148,10 @@
 @property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
 @property (retain) NSError* error;					// Per node error
 
+// Badges
+
+- (NSImage*) badgeIcon;
+- (NSImage*) badgeHighlightIcon;
 
 //----------------------------------------------------------------------------------------------------------------------
 
