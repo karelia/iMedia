@@ -46,7 +46,7 @@
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		8F47B39110C416050013ED25 /* IMBOrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F47B38F10C416050013ED25 /* IMBOrderedDictionary.h */; };
 		8F47B39210C416050013ED25 /* IMBOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F47B39010C416050013ED25 /* IMBOrderedDictionary.m */; };
-		8F76F850177091DB007B56FC /* IMBLightroomObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F76F84E177091DB007B56FC /* IMBLightroomObject.h */; };
+		8F76F850177091DB007B56FC /* IMBLightroomObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F76F84E177091DB007B56FC /* IMBLightroomObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8F76F851177091DB007B56FC /* IMBLightroomObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F76F84F177091DB007B56FC /* IMBLightroomObject.m */; };
 		8F76F858177094B9007B56FC /* IMBLightroom5Parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F76F854177094B9007B56FC /* IMBLightroom5Parser.h */; };
 		8F76F859177094B9007B56FC /* IMBLightroom5Parser.m in Sources */ = {isa = PBXBuildFile; fileRef = 8F76F855177094B9007B56FC /* IMBLightroom5Parser.m */; };

@@ -60,6 +60,7 @@
 #import <iMedia/IMBObject.h>
 #import <iMedia/IMBObjectsPromise.h>
 #import <iMedia/IMBFlickrNode.h>
+#import <iMedia/IMBLightroomObject.h>
 
 // Parsers...
 
