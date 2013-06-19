@@ -43,7 +43,7 @@
 }
 
 #pragma mark
-#pragma mark IMBRequestAccessDelegate Protocol
+#pragma mark IMBNodeAccessDelegate Protocol
 
 // Note that completion block will only be called if currently no other request to access node is pending
 //
