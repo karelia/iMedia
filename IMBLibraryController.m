@@ -1159,7 +1159,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
                 switch (inNode.accessibility)
                 {
                     case kIMBResourceIsAccessible:
-                        iconName = @"IMBLogout.tiff";
+                        iconName = @"logout.tiff";
                         break;
                     case kIMBResourceDoesNotExist:
                         iconName = @"IMBStopIcon.icns";

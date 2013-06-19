@@ -104,8 +104,6 @@
 		3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; };
 		3092C3191712F14100E52444 /* IMBFacebookAccessController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3092C3161712F14100E52444 /* IMBFacebookAccessController.h */; };
 		3092C31A1712F14100E52444 /* IMBFacebookAccessController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3092C3171712F14100E52444 /* IMBFacebookAccessController.m */; };
-		3094AD551720479400619F9F /* IMBLogout.png in Resources */ = {isa = PBXBuildFile; fileRef = 3094AD531720479400619F9F /* IMBLogout.png */; };
-		3094AD561720479400619F9F /* IMBLogout@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3094AD541720479400619F9F /* IMBLogout@2x.png */; };
 		3094F7161715C0070016E810 /* PhFacebook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3094F7151715C0070016E810 /* PhFacebook.framework */; };
 		3094F7171715C0980016E810 /* PhFacebook.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 3094F7151715C0070016E810 /* PhFacebook.framework */; };
 		3099018E16637B93006C1212 /* NSBundle+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3099018C16637B93006C1212 /* NSBundle+iMedia.h */; };
@@ -671,8 +669,6 @@
 		3091F6B415C9508E005019A1 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3092C3161712F14100E52444 /* IMBFacebookAccessController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFacebookAccessController.h; sourceTree = "<group>"; };
 		3092C3171712F14100E52444 /* IMBFacebookAccessController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFacebookAccessController.m; sourceTree = "<group>"; };
-		3094AD531720479400619F9F /* IMBLogout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = IMBLogout.png; sourceTree = "<group>"; };
-		3094AD541720479400619F9F /* IMBLogout@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "IMBLogout@2x.png"; sourceTree = "<group>"; };
 		3094F7151715C0070016E810 /* PhFacebook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhFacebook.framework; path = "../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug/PhFacebook.framework"; sourceTree = "<group>"; };
 		3099018C16637B93006C1212 /* NSBundle+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+iMedia.h"; sourceTree = "<group>"; };
 		3099018D16637B93006C1212 /* NSBundle+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+iMedia.m"; sourceTree = "<group>"; };
@@ -1439,8 +1435,6 @@
 				30ED4E00175E140F0096376D /* person_sel.png */,
 				30ED4E01175E140F0096376D /* person_sel@2x.png */,
 				30ED4E02175E140F0096376D /* person.png */,
-				3094AD531720479400619F9F /* IMBLogout.png */,
-				3094AD541720479400619F9F /* IMBLogout@2x.png */,
 				3016792813B225B9000E57D2 /* badge_checkbox.png */,
 				CE394AC11371A1F700EF0D1E /* cork-background.jpg */,
 				CEAF1FE4125A8B6A001C3EBB /* Credits.html */,
@@ -2682,8 +2676,6 @@
 				308BF46516F2184400D7A11D /* facebook_logo.png in Resources */,
 				308BF46616F2184400D7A11D /* facebook_logo@2x.png in Resources */,
 				30B83ADF1701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */,
-				3094AD551720479400619F9F /* IMBLogout.png in Resources */,
-				3094AD561720479400619F9F /* IMBLogout@2x.png in Resources */,
 				30ED4E03175E140F0096376D /* album@2x.png in Resources */,
 				30ED4E04175E140F0096376D /* album_sel.png in Resources */,
 				30ED4E05175E140F0096376D /* album_sel@2x.png in Resources */,
