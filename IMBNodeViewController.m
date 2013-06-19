@@ -884,25 +884,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	if (node.accessibility == kIMBResourceDoesNotExist)
 	{
 		cell.badgeType = kIMBBadgeTypeResourceMissing;
-		cell.badgeIcon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
 		cell.badgeError = nil;
 	}
 	else if (node.accessibility == kIMBResourceNoPermission)
 	{
 		cell.badgeType = kIMBBadgeTypeNoAccessRights;
-		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
 		cell.badgeError = nil;
 	}
 	else if (node.accessibility == kIMBResourceIsAccessible && node.isAccessRevocable)
 	{
 		cell.badgeType = kIMBBadgeTypeEject;
-		cell.badgeIcon = [NSImage imb_imageNamed:@"IMBLogout.tiff"];
 		cell.badgeError = nil;
 	}
 	else if (node.error)
 	{
 		cell.badgeType = kIMBBadgeTypeWarning;
-		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
 		cell.badgeError = node.error;
 	}
 	else if ([node respondsToSelector:@selector(license)])

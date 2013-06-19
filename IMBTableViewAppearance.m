@@ -54,6 +54,7 @@
 #import "IMBNodeCell.h"
 #import "IMBTextFieldCell.h"
 #import "NSCell+iMedia.h"
+#import "NSImage+iMedia.h"
 
 @implementation IMBTableViewAppearance
 
@@ -104,7 +105,9 @@
 	if ([inCell isKindOfClass:[IMBNodeCell class]])
 	{
         IMBNodeCell *theCell = (IMBNodeCell *) inCell;
+        
         theCell.icon = theCell.node.icon;
+        theCell.badgeIcon = [theCell.node badgeIcon];
         
         if ([theCell isGroupCell])
         {
@@ -114,15 +117,20 @@
         }
         if ([theCell isHighlighted])
         {
+            theCell.badgeIcon = [theCell.node badgeHighlightIcon];
             if (theCell.node.highlightIcon) {
                 theCell.icon = theCell.node.highlightIcon;
             }
             if (self.swapIconAndHighlightIcon) {
                 theCell.icon = theCell.node.icon;
+                theCell.badgeIcon = [theCell.node badgeIcon];
             }
         } else {    // Non-highlighted cell
-            if (theCell.node.highlightIcon && self.swapIconAndHighlightIcon) {
-                theCell.icon = theCell.node.highlightIcon;
+            if (self.swapIconAndHighlightIcon) {
+                theCell.badgeIcon = [theCell.node badgeHighlightIcon];
+                if (theCell.node.highlightIcon) {
+                    theCell.icon = theCell.node.highlightIcon;
+                }
             }
         }
     }
