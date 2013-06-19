@@ -200,7 +200,12 @@ static NSUInteger sFacebookElementLimit = 5000;
 	node.identifier = [self identifierForPath:@"/"];
 
     NSString *myID, *myName = nil;
-    if ([self mediaSourceAccessibility] == kIMBResourceIsAccessible) {
+    if ([self mediaSourceAccessibility] == kIMBResourceIsAccessible)
+    {
+        // Add a dummy watched path to ensure that file system observer does not trigger unwanted reloads
+        // (seems to trigger reloads meant for other pahts when watchedPath is nil)
+        node.watchedPath = @"https://graph.facebook.com";
+        
         NSDictionary *me = [self.facebook sendSynchronousRequest:@"me"];
         myID = [[me objectForKey:@"resultDict"] objectForKey:@"id"];
         myName = [[me objectForKey:@"resultDict"] objectForKey:@"name"];
