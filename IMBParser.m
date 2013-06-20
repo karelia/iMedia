@@ -86,7 +86,6 @@
 @synthesize mediaSource = _mediaSource;
 @synthesize mediaType = _mediaType;
 @synthesize custom = _custom;
-@synthesize bookmarkData = _bookmark;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -125,7 +124,6 @@
 {
 	IMBRelease(_mediaSource);
 	IMBRelease(_mediaType);
-    [_bookmark release];
 
 	[super dealloc];
 }

@@ -359,30 +359,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 			{
 				if (parser.isCustom)
 				{
-          if (parser.bookmarkData == nil)
-          {
-            // Create URL bookmark
-            NSError* error = nil;
-            NSURL* mediaSourceURL = [NSURL fileURLWithPath:parser.mediaSource isDirectory:YES];
-              
-              parser.bookmarkData = [mediaSourceURL bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope|NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
-                                             includingResourceValuesForKeys:nil
-                                                              relativeToURL:nil
-                                                                      error:&error];
-              
-            if (!parser.bookmarkData)
-            {
-              NSLog(NSLocalizedString(@"Could not create a bookmark for URL. Error: %@", @"URL bookmark creation failed."),
-                    [error localizedFailureReason]);
-            }
-          }
-          
-          // Create a dictionary with the information required for restoring the custom parser:
 					NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
 						NSStringFromClass([parser class]),@"className",
 						parser.mediaSource,@"mediaSource",
 						parser.mediaType,@"mediaType",
-            parser.bookmarkData,@"bookmark",
 						nil];
 						
 					[customParsers addObject:info];	
@@ -441,7 +421,6 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 		NSString* mediaType = [info objectForKey:@"mediaType"];
 		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
 		
-		parser.bookmarkData = bookmark;
         parser.mediaSource = [folderURL path];
 		parser.custom = YES;
     
