@@ -8,8 +8,6 @@
 
 #import "IMBFacebookParser.h"
 #import "IMBFacebookObject.h"
-#import <Accounts/Accounts.h>
-#import <Social/Social.h>
 #import "NSImage+iMedia.h"
 #import "IMBIconCache.h"
 
@@ -20,23 +18,17 @@ static NSUInteger sFacebookElementLimit = 5000;
 
 @interface IMBFacebookParser ()
 
-@property (retain) ACAccountStore *accountStore;
-@property (retain) ACAccount *account;
 
 @end
 
 @implementation IMBFacebookParser
 
-@synthesize accountStore=_accountStore;
-@synthesize account=_account;
 @synthesize atomic_facebook=_facebook;
 
 #pragma mark - Objects Lifecycle
 
 - (void)dealloc
 {
-    IMBRelease(_account);
-    IMBRelease(_accountStore);
     IMBRelease(_facebook);
     [super dealloc];
 }

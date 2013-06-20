@@ -14,7 +14,6 @@
 
 @interface IMBFacebookParser : IMBParser
 {
-    ACAccountStore *_accountStore;
     PhFacebook *_facebook;
 }
 
