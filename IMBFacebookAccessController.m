@@ -47,7 +47,9 @@
 
 // Note that completion block will only be called if currently no other request to access node is pending
 //
-- (void) requestAccessToNode:(IMBNode *)node completion:(IMBRequestAccessCompletionHandler)completion
+- (void) nodeViewController:(IMBNodeViewController *)nodeViewController
+        requestAccessToNode:(IMBNode *)node
+                 completion:(IMBRequestAccessCompletionHandler)completion
 {
     if (self.isLoginDialogPending && completion) {
         completion(YES, nil, nil);
@@ -58,9 +60,22 @@
             
             PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
             
+            NSRect rect = NSMakeRect(0.0, 0.0, 0.0, 0.0);
+            NSView *rectParentView = nil;
+            
+            if (nodeViewController)
+            {
+                IMBOutlineView *outlineView = nodeViewController.nodeOutlineView;
+                NSInteger row = [outlineView rowForItem:node];
+                rect = [outlineView badgeRectForRow:row];
+                rectParentView = outlineView;
+            }
+            
             // JJ/TODO: Do we need all these permisstions?
             [facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"read_stream", @"export_stream", @"user_photos", @"friends_photos", nil]
                                             cached: NO
+                                    relativeToRect:rect
+                                            ofView:rectParentView
                                         completion:^(NSDictionary *result)
             {
                 if ([[result valueForKey: @"valid"] boolValue])
@@ -92,6 +107,11 @@
             }];
         }
     }
+}
+
+- (void) requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
+{
+    [self nodeViewController:nil requestAccessToNode:inNode completion:inCompletion];
 }
 
 // Log out from Facebook

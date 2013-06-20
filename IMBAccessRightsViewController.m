@@ -619,7 +619,9 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 // to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
 // Note that this is an empty operation if not sandboxed.
 
-- (void) requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
+-(void)nodeViewController:(IMBNodeViewController *)inNodeViewController
+      requestAccessToNode:(IMBNode *)inNode
+               completion:(IMBRequestAccessCompletionHandler)inCompletion
 {
     if (SBIsSandboxed())
     {
@@ -699,6 +701,10 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
     }
 }
 
+-(void)requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
+{
+    [self nodeViewController:nil requestAccessToNode:inNode completion:inCompletion];
+}
 
 // Doesn't do anything but invoke completion handler
 

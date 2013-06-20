@@ -1030,7 +1030,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (void) requestAccessToNode:(IMBNode*)inNode completion:(void(^)(BOOL requestCanceled, NSArray* affectedNodes, NSError* error))inCompletion
 {
-    [[[inNode.parserMessenger class] nodeAccessDelegate] requestAccessToNode:inNode completion:
+    [[[inNode.parserMessenger class] nodeAccessDelegate] nodeViewController:self requestAccessToNode:inNode completion:
      ^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error)
     {
         inNode.error = error;

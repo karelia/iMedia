@@ -63,6 +63,7 @@
 @class IMBNode;
 @class IMBObject;
 @class IMBParser;
+@class IMBNodeViewController;
 @protocol IMBNodeAccessDelegate;
 //@class XPCConnection;
 
@@ -225,6 +226,9 @@ typedef void (^IMBRevokeAccessCompletionHandler)(BOOL reloadNode, NSError *error
 
 // Request access to node and call completion handler with success or failure indication and
 // with indication whether access granted may affect other nodes (i.e. grant access to those nodes as well)
+- (void) nodeViewController:(IMBNodeViewController*)inNodeViewController requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
+
+// Same as the above except that a node view controller (sender) may not be provided
 - (void) requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
 
 // Revoke access to node and call completion handler with indication whether node should be reloaded
