@@ -389,39 +389,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 	
 	for (NSDictionary* info in customParsers)
 	{
-		// Restore access from bookmark of mediaSource. If can't get access to the folder, it's better to just pretend we've forgotten about the folder than to try and explain we know it but need to go via an Open Panel to gain access again
-        NSData *bookmark = [info objectForKey:@"bookmark"];
-        
-        NSURL *folderURL = nil;
-        if (bookmark)
-        {
-            folderURL = [NSURL URLByResolvingBookmarkData:bookmark options:NSURLBookmarkResolutionWithSecurityScope relativeToURL:nil bookmarkDataIsStale:NULL error:NULL];
-        }
-        if (!folderURL)
-        {
-            NSString *path = [info objectForKey:@"mediaSource"];
-            if (path) folderURL = [NSURL fileURLWithPath:path isDirectory:YES];
-        }
-        
-        if ([folderURL respondsToSelector:@selector(startAccessingSecurityScopedResource)])
-        {
-            if ([folderURL startAccessingSecurityScopedResource])
-            {
-                [folderURL stopAccessingSecurityScopedResource];
-            }
-            else
-            {
-                NSLog(@"iMedia: Unable to access custom folder: %@", [folderURL path]);
-                continue;
-            }
-        }
-        
-        // Create the parser and set it up again
 		Class parserClass = NSClassFromString([info objectForKey:@"className"]);
 		NSString* mediaType = [info objectForKey:@"mediaType"];
 		IMBParser* parser = [[parserClass alloc] initWithMediaType:mediaType];
 		
-        parser.mediaSource = [folderURL path];
+		parser.mediaSource = [info objectForKey:@"mediaSource"];
 		parser.custom = YES;
     
 		[self addCustomParser:parser forMediaType:parser.mediaType];
