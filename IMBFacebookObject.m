@@ -10,6 +10,8 @@
 
 @implementation IMBFacebookObject
 
+@synthesize alternateImageLocations=_alternateImageLocations;
+
 - (void) dealloc
 {
     IMBRelease(_alternateImageLocations);

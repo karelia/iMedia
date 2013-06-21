@@ -198,9 +198,19 @@ static NSUInteger sFacebookElementLimit = 5000;
         // (seems to trigger reloads meant for other pahts when watchedPath is nil)
         node.watchedPath = @"https://graph.facebook.com";
         
-        NSDictionary *me = [self.facebook sendSynchronousRequest:@"me"];
-        myID = [[me objectForKey:@"resultDict"] objectForKey:@"id"];
-        myName = [[me objectForKey:@"resultDict"] objectForKey:@"name"];
+        NSError *error = nil;
+        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:@"me"];
+        error = [self iMediaErrorFromFacebookResponse:responseDict];
+
+//        NSLog(@"%@", responseDict);
+        
+        if (error) {
+            NSLog(@"Facebook: Access to /me failed:%@", error);
+            *outError = error;
+            return nil;
+        }
+        myID = [[responseDict objectForKey:@"resultDict"] objectForKey:@"id"];
+        myName = [[responseDict objectForKey:@"resultDict"] objectForKey:@"name"];
         if (myID) {
             node.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                myID, @"facebookID",
@@ -487,7 +497,7 @@ static NSUInteger sFacebookElementLimit = 5000;
         
 //        NSLog(@"Response from logging out: %@", responseDict);
 
-        NSError *error = [responseDict valueForKey:@"error"];
+        NSError *error = [self iMediaErrorFromFacebookResponse:responseDict];
         if (pError && error) {
             *pError = error;
         }
@@ -516,7 +526,7 @@ connectedNodesByType:(NSString *)nodeType
 
     if (self.facebook) {
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString] params:params];
-        error = [responseDict valueForKey:@"error"];
+        error = [self iMediaErrorFromFacebookResponse:responseDict];
         
         if (error) {
             NSLog(@"Access to %@ failed:%@", nodeType, error);
@@ -558,12 +568,35 @@ connectedNodesByType:(NSString *)nodeType
     return NO;
 }
 
-- (NSImage*) iconForConnectionType:(NSString*)inConnectionType highlight:(BOOL)inHighlight
+- (NSImage *)iconForConnectionType:(NSString *)inConnectionType highlight:(BOOL)inHighlight
 {
     NSDictionary *iconTypeMapping = @{@"albums": @"album",
                                       @"friends": @"person"};
     
 	return [[IMBIconCache sharedIconCache] iconForType:[iconTypeMapping objectForKey:inConnectionType]
                                              highlight:inHighlight];
+}
+
+- (NSError *) iMediaErrorFromFacebookError:(NSDictionary *)facebookError
+{
+    if (!facebookError) return nil;
+
+    IMBResourceAccessibility iMediaErrorCode;
+    NSUInteger errorCode = [[facebookError valueForKey:@"code"] unsignedIntegerValue];
+    switch (errorCode) {
+        case 190:
+            iMediaErrorCode = kIMBResourceNoPermission;
+            break;
+            
+        default:
+            iMediaErrorCode = kIMBResourceNoPermission;
+    }
+    NSDictionary *userInfo = @{NSLocalizedDescriptionKey: [facebookError valueForKey:@"message"]};
+    return [NSError errorWithDomain:@"IMBAccessibilityError" code:iMediaErrorCode userInfo:userInfo];
+}
+
+- (NSError *)iMediaErrorFromFacebookResponse:(NSDictionary *)facebookResponse
+{
+    return [self iMediaErrorFromFacebookError:[facebookResponse valueForKey:@"error"]];
 }
 @end

@@ -18,6 +18,8 @@
 
 @implementation IMBFacebookAccessController
 
+@synthesize loginDialogPending=_loginDialogPending;
+
 // Returns a singleton instance of the class
 
 + (IMBFacebookAccessController *)sharedInstance
