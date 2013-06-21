@@ -123,7 +123,7 @@
     
 	if (outError) *outError = nil;
 
-    NSLog(@"Cookies left: %@", [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]);
+//    NSLog(@"Cookies left: %@", [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]);
     
     return nil;
 }
