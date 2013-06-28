@@ -22,4 +22,6 @@
 //
 - (BOOL) supportsXPCServiceWithIdentifier:(NSString *)inIdentifier;
 
+- (id) imb_imageRepresentationForImageNamed:(NSString*)inName representationType:(NSString*)inRepresentationType;
+
 @end
