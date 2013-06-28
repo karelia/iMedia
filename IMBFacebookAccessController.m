@@ -59,6 +59,7 @@
         @synchronized(self)
         {
             self.loginDialogPending = YES;
+            node.badgeTypeNormal = kIMBBadgeTypeLoading;
             
             PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
             
@@ -80,9 +81,11 @@
                                             ofView:rectParentView
                                         completion:^(NSDictionary *result)
             {
+				node.badgeTypeNormal = [node badgeTypeNormalNonLoading];
+                self.loginDialogPending = NO;
                 if ([[result valueForKey: @"valid"] boolValue])
                 {
-                    node.badgeTypeNormal = kIMBBadgeTypeLoading;
+//                    node.badgeTypeNormal = kIMBBadgeTypeLoading;
                     node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
                     IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)node.parserMessenger;
                     
@@ -93,7 +96,6 @@
                                            
                                            ^(id nothing,NSError *error)
                                            {
-                                               self.loginDialogPending = NO;
                                                if (completion) {
                                                    completion(NO, [NSArray arrayWithObject:node], error);
                                                }
@@ -101,7 +103,6 @@
                 }
                 else
                 {
-                    self.loginDialogPending = NO;
                     if (completion) {
                         completion(NO, nil, [result valueForKey: @"error"]);
                     }
@@ -121,6 +122,8 @@
 //
 - (void) revokeAccessToNode:(IMBNode *)node completion:(IMBRevokeAccessCompletionHandler) completion
 {
+    node.badgeTypeNormal = kIMBBadgeTypeLoading;
+
     // Delete Facebook cookies so user can later login with a different id
     [self deleteFacebookCookies];
     
@@ -132,6 +135,7 @@
                                if (completion) {
                                    completion(error == nil, error);
                                }
+                               node.badgeTypeNormal = [node badgeTypeNormalNonLoading];
                            });
 }
 
