@@ -1616,6 +1616,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			else
 			{
 				title = NSLocalizedStringWithDefaultValue(
+                          @"IMBObjectViewController.menuItem.reload",
+                          nil,IMBBundle(),
+                          @"Reload",
+                          @"Menu item in context menu of IMBObjectViewController");
+				
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(reload:) keyEquivalent:@""];
+				[item setRepresentedObject:inObject];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
+				
+				title = NSLocalizedStringWithDefaultValue(
 					@"IMBObjectViewController.menuItem.download",
 					nil,IMBBundle(),
 					@"Download",
@@ -1807,13 +1819,21 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
-- (IBAction) download:(id)inSender
-{
+//- (IBAction) download:(id)inSender
+//{
 //	IMBParser* parser = self.currentNode.parser;
 //	NSArray* objects = [ibObjectArrayController selectedObjects];
 //	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 //	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
 //    [promise start];
+//}
+
+
+- (IBAction) reload:(id)inSender
+{
+	IMBObject* object = (IMBObject*)[inSender representedObject];
+    object.needsImageRepresentation = YES;
+	[object loadThumbnail];
 }
 
 

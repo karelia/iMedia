@@ -642,23 +642,29 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 // Store the imageRepresentation and add this object to the fifo cache. Older objects get bumped out off cache 
-// and are thus unloaded. Please note that missing thumbnails will be replaced with a generic image...
+// and are thus unloaded. Please note that missing thumbnails will be replaced with a generic image
+// (which will possibly change the object's image representation type!).
 
 - (void) storeReceivedImageRepresentation:(id)inImageRepresentation
 {
+    NSString* defaultThumbnailName = @"missing-thumbnail.jpg";
+
 	self.imageRepresentation = inImageRepresentation;
-	self.imageVersion = _imageVersion + 1;
 	
 	if (inImageRepresentation)
 	{
-		self.needsImageRepresentation = NO;
 		[IMBObjectFifoCache addObject:self];
 	}
 	else
 	{
 		self.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-		self.imageRepresentation = [NSImage imageNamed:@"missing-thumbnail"];
+		self.imageRepresentation = [NSImage imb_imageNamed:defaultThumbnailName];
 	}
+//    NSAssert(self.imageRepresentation != nil, @"Thumbnail not set on media object. Must be at least set to \"%@\"", defaultThumbnailName);
+    
+    // Getting here the image representation must have been updated
+    self.imageVersion = _imageVersion + 1;
+    self.needsImageRepresentation = NO;
 }
 
 
@@ -682,15 +688,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 					NSLog(@"%s Error trying to load thumbnail of IMBObject %@ (%@)",__FUNCTION__,self.name,inError);
                     
                     self.accessibility = kIMBResourceDoesNotExist;
-                    self.error = inError;
 				}
-				else
-				{
-					[self storeReceivedImageRepresentation:inPopulatedObject.atomic_imageRepresentation];
-					if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
-					if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
-					_isLoadingThumbnail = NO;
-				}
+                self.error = inError;
+                self.accessibility = inPopulatedObject.accessibility;
+                self.imageRepresentationType = inPopulatedObject.imageRepresentationType;
+                [self storeReceivedImageRepresentation:inPopulatedObject.atomic_imageRepresentation];
+                if (self.metadata == nil) self.metadata = inPopulatedObject.metadata;
+                if (self.metadataDescription == nil) self.metadataDescription = inPopulatedObject.metadataDescription;
+                _isLoadingThumbnail = NO;
 			});
 	}
 }
