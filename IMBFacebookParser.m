@@ -410,6 +410,9 @@ static NSUInteger sFacebookElementLimit = 5000;
                         
 //                        NSLog(@"Picked thumbnail of size: %@x%@", [imageDict objectForKey:@"width"], [imageDict objectForKey:@"height"]);
                         if (outError) *outError = nil;
+                        inObject.accessibility = kIMBResourceIsAccessible;
+                        inObject.error = nil;
+                        inObject.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
                         return responseData;
                         
 //                        NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
@@ -425,6 +428,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             }
         }
     }
+    inObject.accessibility = kIMBResourceDoesNotExist;
     return nil;
 }
 
