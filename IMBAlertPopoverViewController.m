@@ -100,7 +100,7 @@
 			inTextField.stringValue = line;
 			lineSize = [inTextField intrinsicContentSize];
 			
-			if (lineSize.width > inProposedWidth)
+			if ((lineSize.width > inProposedWidth) && ([words2 count] > 1))
 			{
 				n -= i2 - i1;
 				i1 = i2--;
