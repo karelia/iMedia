@@ -248,6 +248,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 //---------------------------------------------------------------------------------
 - (CALayer *) layerForType:(NSString*) type
 {
+    IMBObject* item = (IMBObject*) [self representedItem];
 	CGColorRef color;
 	
 	//retrieve some usefull rects
@@ -292,31 +293,36 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
             [layer addSublayer:badgeLayer];
         }
         
-        CATextLayer *stampLayer = [CATextLayer layer];
-        [placeHolderLayer addSublayer:stampLayer];
-        if ([stampLayer respondsToSelector:@selector(setContentsScale:)])
+        // Stamp placeholder layer with text "Loading..." if resource is accessible
+        
+        if (item.accessibility == kIMBResourceIsAccessible)
         {
-            stampLayer.contentsScale = [[[self imageBrowserView] window] backingScaleFactor];
+            CATextLayer *stampLayer = [CATextLayer layer];
+            [placeHolderLayer addSublayer:stampLayer];
+            if ([stampLayer respondsToSelector:@selector(setContentsScale:)])
+            {
+                stampLayer.contentsScale = [[[self imageBrowserView] window] backingScaleFactor];
+            }
+            NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMB.ObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
+            stampLayer.string = stampText;
+            stampLayer.fontSize = 13.0;
+            //        stampLayer.alignmentMode = kCAAlignmentCenter;
+            CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 1.0};   // gray
+            color = CGColorCreate(colorSpace, fontColorComponents);
+            stampLayer.foregroundColor = color;
+            CGColorRelease(color);
+            //stampLayer.delegate = self;
+            
+            //stampLayer.backgroundColor = [[NSColor yellowColor] CGColor];
+            placeHolderLayer.layoutManager = [CAConstraintLayoutManager layoutManager];
+            [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidX relativeTo:@"superlayer" attribute:kCAConstraintMidX]];
+            [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidY relativeTo:@"superlayer" attribute:kCAConstraintMidY]];
+            [stampLayer setNeedsLayout];
+            
+            //stampLayer.contentsGravity = kCAGravityCenter;
+            stampLayer.name = type; // a way to refer to the layer location type during drawing if need be
+                                    //[stampLayer setNeedsDisplay];
         }
-        NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMB.ObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
-        stampLayer.string = stampText;
-        stampLayer.fontSize = 13.0;
-//        stampLayer.alignmentMode = kCAAlignmentCenter;
-		CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 1.0};   // gray
-		color = CGColorCreate(colorSpace, fontColorComponents);
-        stampLayer.foregroundColor = color;
-        CGColorRelease(color);
-        //stampLayer.delegate = self;
-        
-        //stampLayer.backgroundColor = [[NSColor yellowColor] CGColor];
-        placeHolderLayer.layoutManager = [CAConstraintLayoutManager layoutManager];
-        [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidX relativeTo:@"superlayer" attribute:kCAConstraintMidX]];
-        [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidY relativeTo:@"superlayer" attribute:kCAConstraintMidY]];
-        [stampLayer setNeedsLayout];
-        
-        //stampLayer.contentsGravity = kCAGravityCenter;
-        stampLayer.name = type; // a way to refer to the layer location type during drawing if need be
-        //[stampLayer setNeedsDisplay];
 		return layer;
 	}
 	
@@ -440,8 +446,6 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
     NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
     [attrs setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
     [attrs setObject:[NSFont systemFontOfSize:12.0f] forKey:NSFontAttributeName];
-    
-    CGFloat padding = 4.0f;
     
     NSRect drawRect = NSMakeRect(20,
                                  20, //-(self.imageFrame.size.height + padding),
