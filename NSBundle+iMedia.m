@@ -15,8 +15,7 @@
 //
 - (NSBundle *) XPCServiceBundleWithIdentifier:(NSString *)inIdentifier
 {
-    NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
-    NSURL *servicesDirURL = [mainBundleURL URLByAppendingPathComponent:@"Contents/XPCServices" isDirectory:YES];
+    NSURL *servicesDirURL = [[self bundleURL] URLByAppendingPathComponent:@"Contents/XPCServices" isDirectory:YES];
     NSString *serviceDirName = [inIdentifier stringByAppendingPathExtension:@"xpc"];
     NSURL *serviceURL = [servicesDirURL URLByAppendingPathComponent:serviceDirName];
     NSBundle *serviceBundle = nil;
