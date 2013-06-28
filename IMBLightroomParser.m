@@ -61,8 +61,10 @@
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
 #import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
 #import "IMBLightroom3VideoParser.h"
 #import "IMBLightroom4VideoParser.h"
+#import "IMBLightroom5VideoParser.h"
 #import "IMBIconCache.h"
 #import "IMBNode.h"
 #import "IMBFolderObject.h"
@@ -99,13 +101,6 @@ static NSArray* sSupportedUTIs = nil;
 
 - (NSString*) libraryName;
 
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
-- (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode;
-- (void) populateSubnodesForFolderNode:(IMBNode*)inParentNode;
-- (void) populateSubnodesForCollectionNode:(IMBNode*)inRootNode;
-- (void) populateObjectsForFolderNode:(IMBNode*)inNode;
-- (void) populateObjectsForCollectionNode:(IMBNode*)inNode;
-
 - (NSArray*) supportedUTIs;
 - (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
 - (IMBObject*) objectWithPath:(NSString*)inPath
@@ -118,9 +113,6 @@ static NSArray* sSupportedUTIs = nil;
 - (NSString*) rootNodeIdentifier;
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
-- (BOOL) isFolderNode:(IMBNode*)inNode;
-- (BOOL) isCollectionNode:(IMBNode*)inNode;
-- (BOOL) isRootCollectionNode:(IMBNode*)inNode;
 
 - (NSNumber*) rootFolderFromAttributes:(NSDictionary*)inAttributes;
 - (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
@@ -390,44 +382,66 @@ static NSArray* sSupportedUTIs = nil;
 	{
 		[self populateSubnodesForRootNode:inNode];
 	}
-	
-	// Create subnodes for the Folders node as needed...
-	
-	else if ([self isFolderNode:inNode])
-	{
-		NSString* rootFoldersIdentifier = [self identifierWithFolderId:[NSNumber numberWithInt:-1]];
-		
-		if ([inNode.identifier isEqualToString:rootFoldersIdentifier])
-		{
-			[self populateSubnodesForRootFoldersNode:inNode];
-		}
-		else
-		{
-			[self populateSubnodesForFolderNode:inNode];
-		}
-		
-		[self populateObjectsForFolderNode:inNode];
-	}
-	
-	// Create subnodes for the Collections node as needed...
-	
-	else if ([self isCollectionNode:inNode])
-	{
-		[self populateSubnodesForCollectionNode:inNode];
-		[self populateObjectsForCollectionNode:inNode];
-	}
-	
-	else if ([self isRootCollectionNode:inNode])
-	{
-		[self populateSubnodesForCollectionNode:inNode];
-	}
-	
-    else
-    {
-		[inNode mutableArrayForPopulatingSubnodes];
-        inNode.objects = [NSArray array];
-    }
+	else {
+		NSDictionary* attributes = inNode.attributes;
+		IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
 
+		switch (nodeType) {
+
+			// Create subnodes for the Folders node as needed...
+			case IMBLightroomNodeTypeFolder:
+			{
+				NSString* rootFoldersIdentifier = [self identifierWithFolderId:[NSNumber numberWithInt:-1]];
+
+				if ([inNode.identifier isEqualToString:rootFoldersIdentifier])
+				{
+					[self populateSubnodesForRootFoldersNode:inNode];
+				}
+				else
+				{
+					[self populateSubnodesForFolderNode:inNode];
+				}
+
+				[self populateObjectsForFolderNode:inNode];
+
+				break;
+			}
+
+			// Create subnodes for the Collections node as needed...
+			case IMBLightroomNodeTypeCollection:
+			{
+				[self populateSubnodesForCollectionNode:inNode];
+				[self populateObjectsForCollectionNode:inNode];
+
+				break;
+			}
+
+			case IMBLightroomNodeTypeRootCollection:
+			{
+				[self populateSubnodesForCollectionNode:inNode];
+
+				break;
+			}
+
+			case IMBLightroomNodeTypeSmartCollection:
+			{
+				[self populateSubnodesForSmartCollectionNode:inNode];
+				[self populateObjectsForSmartCollectionNode:inNode];
+
+				break;
+			}
+
+			default:
+			{
+				[inNode mutableArrayForPopulatingSubnodes];
+				inNode.objects = [NSArray array];
+
+				break;
+			}
+
+		}
+	}
+	
 	return YES;
 }
 
@@ -694,7 +708,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query = [self rootFolderQuery];
+		NSString* query = [(id<IMBLightroomParser>)self rootFolderQuery];
 		FMResultSet* results = [database executeQuery:query];
 		NSInteger index = 0;
 		
@@ -714,7 +728,7 @@ static NSArray* sSupportedUTIs = nil;
 			
 			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.name = name;
-			node.icon = [self folderIcon];
+			node.icon = [[self class] folderIcon];
 			node.identifier = [self identifierWithFolderId:id_local];
 			node.attributes = [self attributesWithRootFolder:id_local
 													 idLocal:id_local
@@ -770,7 +784,7 @@ static NSArray* sSupportedUTIs = nil;
 		NSString* parentPathFromRoot = [self pathFromRootFromAttributes:attributes];	
 		NSNumber* parentRootFolder = [self rootFolderFromAttributes:attributes];
 		NSString* parentRootPath = [self rootPathFromAttributes:inParentNode.attributes];
-		NSString* query = [self folderNodesQuery];
+		NSString* query = [(id<IMBLightroomParser>)self folderNodesQuery];
 		NSString* pathFromRootAccept = nil;
 		NSString* pathFromRootReject = nil;
 		
@@ -799,7 +813,7 @@ static NSArray* sSupportedUTIs = nil;
 			if ([pathFromRoot length] > 0) {
 				node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 				
-				node.icon = [self folderIcon];
+				node.icon = [[self class] folderIcon];
 				node.name = [pathFromRoot lastPathComponent];
 				node.isLeafNode = NO;
 
@@ -840,7 +854,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method Collection subnodes for the specified parent node. Even though the query returns all Collections,
+// This method populates collection subnodes for the specified parent node. Even though the query returns all Collections,
 // only create nodes that are immediate children of our parent node. This is necessary, because the returned 
 // results from the query are not ordered in a way that would let us build the whole node tree in one single
 // step...
@@ -856,7 +870,7 @@ static NSArray* sSupportedUTIs = nil;
 	// Now query the database for subnodes to the specified parent node...
 	
 	FMDatabase *database = self.database;
-	
+
 	if (database != nil) {
 		NSDictionary* attributes = inParentNode.attributes;
 		NSNumber* collectionId = [self idLocalFromAttributes:attributes];
@@ -864,22 +878,23 @@ static NSArray* sSupportedUTIs = nil;
 		FMResultSet* results = nil;
 		
 		if ([collectionId longValue] == 0) {
-			query = [self rootCollectionNodesQuery];
+			query = [(id<IMBLightroomParser>)self rootCollectionNodesQuery];
 			results = [database executeQuery:query];
 		}
 		else {
-			query = [self collectionNodesQuery];
+			query = [(id<IMBLightroomParser>)self collectionNodesQuery];
 			results = [database executeQuery:query, collectionId];
 		}
-		
+
 		NSInteger index = 0;
 		
 		while ([results next]) {
 			// Get properties for next collection. Also substitute missing names...
 			
-			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]]; 
+			NSNumber* idLocal = [NSNumber numberWithLong:[results longForColumn:@"id_local"]];
 			NSNumber* idParentLocal = [NSNumber numberWithLong:[results longForColumn:@"parent"]];
 			NSString* name = [results stringForColumn:@"name"];
+			NSString* creationId = [results hasColumnWithName:@"creationid"] ? [results stringForColumn:@"creationid"] : nil;
 			BOOL isGroup = NO;
 			
 			if (name == nil)
@@ -902,16 +917,18 @@ static NSArray* sSupportedUTIs = nil;
 															 @"Name of unnamed node in IMBLightroomParser");
 				}
 			}
+
+			IMBLightroomNodeType nodeType = [[self class] nodeTypeForCreationId:creationId];
 			
 			IMBNode* node = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 			node.identifier = [self identifierWithCollectionId:idLocal];
 			node.name = name;
-			node.icon = isGroup ? [self groupIcon] : [self collectionIcon];
+			node.icon = isGroup ? [[self class] groupIcon] : [[self class] collectionIcon];
 			node.attributes = [self attributesWithRootFolder:nil
 													 idLocal:idLocal
 													rootPath:nil
 												pathFromRoot:nil
-                                                    nodeType:IMBLightroomNodeTypeCollection];
+                                                    nodeType:nodeType];
 
 			node.isLeafNode = NO;
 			
@@ -925,7 +942,7 @@ static NSArray* sSupportedUTIs = nil;
 			object.index = index++;
 			object.imageLocation = (id)self.mediaSource;
 			object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-			object.imageRepresentation = [self largeFolderIcon];
+			object.imageRepresentation = [[self class] largeFolderIcon];
 			
 			[objects addObject:object];
 		}
@@ -936,11 +953,20 @@ static NSArray* sSupportedUTIs = nil;
 	inParentNode.objects = objects;
 }
 
+- (void) populateSubnodesForSmartCollectionNode:(IMBNode*)inParentNode
+{
+	[self populateSubnodesForCollectionNode:inParentNode];
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-- (NSImage*) largeFolderIcon
++ (IMBLightroomNodeType) nodeTypeForCreationId:(NSString *)creationId;
+{
+	return IMBLightroomNodeTypeCollection;
+}
+
++ (NSImage*) largeFolderIcon
 {
 	NSImage* icon = [NSImage imb_genericFolderIcon];
 	[icon setScalesWhenResized:YES];
@@ -975,7 +1001,7 @@ static NSArray* sSupportedUTIs = nil;
 	
 	if (database != nil) {
 		NSMutableArray* objects = [NSMutableArray array];
-		NSString* query = [self folderObjectsQuery];
+		NSString* query = [(id<IMBLightroomParser>)self  folderObjectsQuery];
 		
 		NSDictionary* attributes = inNode.attributes;
 		NSString* folderPath = [self absolutePathFromAttributes:attributes];
@@ -1044,7 +1070,7 @@ static NSArray* sSupportedUTIs = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// This method populates an existing folder node with objects (image files). The essential part is id_local stored
+// This method populates an existing collection node with objects (image files). The essential part is id_local stored
 // in the attributes dictionary. It determines the correct database query...
 
 - (void) populateObjectsForCollectionNode:(IMBNode*)inNode
@@ -1061,7 +1087,7 @@ static NSArray* sSupportedUTIs = nil;
 	FMDatabase *database = self.database;
 	
 	if (database != nil) {
-		NSString* query = [self collectionObjectsQuery];
+		NSString* query = [(id<IMBLightroomParser>)self collectionObjectsQuery];
 		NSNumber* collectionId = [self idLocalFromAttributes:inNode.attributes];
 		FMResultSet* results = [database executeQuery:query, collectionId];
 		NSUInteger index = 0;
@@ -1109,6 +1135,22 @@ static NSArray* sSupportedUTIs = nil;
 		
 		[results close];
 	}
+}
+
+
+// This method populates an existing smart collection node with objects (image files). The essential part is id_local stored
+// in the attributes dictionary. It determines the correct database query...
+
+- (void) populateObjectsForSmartCollectionNode:(IMBNode*)inNode
+{
+	// Add object array, even if nothing is found in database, so that we do not cause endless loop...
+
+	if (inNode.objects == nil) {
+		inNode.objects = [NSMutableArray array];
+		inNode.displayedObjectCount = 0;
+	}
+
+	// Not implemented for legacy libraries
 }
 
 
@@ -1474,34 +1516,6 @@ static NSArray* sSupportedUTIs = nil;
 	NSString* identifierPrefix = [self pathPrefixWithType:@"collection"];
 	NSString* path = [identifierPrefix stringByAppendingString:[inIdLocal description]];
 	return [self identifierForPath:path];
-}
-
-
-// Node types...
-
-- (BOOL) isFolderNode:(IMBNode*)inNode
-{
-    NSDictionary* attributes = inNode.attributes;
-    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
-    
-    return (nodeType == IMBLightroomNodeTypeFolder);
-}
-
-
-- (BOOL) isCollectionNode:(IMBNode*)inNode
-{
-    NSDictionary* attributes = inNode.attributes;
-    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
-    
-    return (nodeType == IMBLightroomNodeTypeCollection);
-}
-
-- (BOOL) isRootCollectionNode:(IMBNode*)inNode
-{
-    NSDictionary* attributes = inNode.attributes;
-    IMBLightroomNodeType nodeType = [self nodeTypeFromAttributes:attributes];
-    
-    return (nodeType == IMBLightroomNodeTypeRootCollection);
 }
 
 

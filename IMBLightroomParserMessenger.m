@@ -60,8 +60,10 @@
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
 #import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
 #import "IMBLightroom3VideoParser.h"
 #import "IMBLightroom4VideoParser.h"
+#import "IMBLightroom5VideoParser.h"
 #import "IMBParserController.h"
 #import "NSFileManager+iMedia.h"
 #import "NSDictionary+iMedia.h"
@@ -131,6 +133,7 @@ static dispatch_once_t sOnceToken = 0;
 {
 	NSString* path = nil;
 	
+	if (path == nil) path = [IMBLightroom5Parser lightroomPath];
 	if (path == nil) path = [IMBLightroom4Parser lightroomPath];
 	if (path == nil) path = [IMBLightroom3Parser lightroomPath];
 	if (path == nil) path = [IMBLightroom2Parser lightroomPath];
@@ -153,7 +156,11 @@ static dispatch_once_t sOnceToken = 0;
 
 + (NSString*) identifier
 {
-	if ([IMBLightroom4Parser lightroomPath])
+	if ([IMBLightroom5Parser lightroomPath])
+	{
+		return [IMBLightroom5Parser identifier];
+	}
+	else if ([IMBLightroom4Parser lightroomPath])
 	{
 		return [IMBLightroom4Parser identifier];
 	}
@@ -207,11 +214,13 @@ static dispatch_once_t sOnceToken = 0;
 				[parsers addObjectsFromArray:[IMBLightroom2Parser concreteParserInstancesForMediaType:mediaType]];
 				[parsers addObjectsFromArray:[IMBLightroom3Parser concreteParserInstancesForMediaType:mediaType]];
 				[parsers addObjectsFromArray:[IMBLightroom4Parser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom5Parser concreteParserInstancesForMediaType:mediaType]];
 			}
 			else if ([mediaType isEqualTo:kIMBMediaTypeMovie])
 			{
 				[parsers addObjectsFromArray:[IMBLightroom3VideoParser concreteParserInstancesForMediaType:mediaType]];
 				[parsers addObjectsFromArray:[IMBLightroom4VideoParser concreteParserInstancesForMediaType:mediaType]];
+				[parsers addObjectsFromArray:[IMBLightroom5VideoParser concreteParserInstancesForMediaType:mediaType]];
 			}
 		}
 	});
@@ -257,7 +266,11 @@ static dispatch_once_t sOnceToken = 0;
 
 + (NSString*) parserClassName
 {
-	if ([IMBLightroom4Parser lightroomPath])
+	if ([IMBLightroom5Parser lightroomPath])
+	{
+		return @"IMBLightroom5Parser";
+	}
+	else if ([IMBLightroom4Parser lightroomPath])
 	{
 		return @"IMBLightroom4Parser";
 	}
@@ -304,6 +317,10 @@ static dispatch_once_t sOnceToken = 0;
 + (NSString*) parserClassName
 {
 	if ([IMBLightroom4Parser lightroomPath])
+	{
+		return @"IMBLightroom5VideoParser";
+	}
+	else if ([IMBLightroom4Parser lightroomPath])
 	{
 		return @"IMBLightroom4VideoParser";
 	}
