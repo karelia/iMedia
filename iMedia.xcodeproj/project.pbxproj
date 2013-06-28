@@ -119,6 +119,7 @@
 		30B83ADF1701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */; };
 		30B83AE01701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */; };
 		30B83AE11701B1C8000EC74E /* im.edia.Facebook.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = 30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */; };
+		30D700B0177A2928003CB6FE /* missing-thumbnail.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 30D700AF177A2928003CB6FE /* missing-thumbnail.jpg */; };
 		30E4D4FE130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771E1511055900413AEF /* SBUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E7771C1511055800413AEF /* SBUtilities.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		30E7771F1511055900413AEF /* SBUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 30E7771D1511055800413AEF /* SBUtilities.m */; };
@@ -416,7 +417,6 @@
 		D0A00A9A15F47A7100596789 /* IMBAccessRightsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */; };
 		D0A13A9F152F29C9005513CD /* IMBFolderObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0A13A9D152F29C8005513CD /* IMBFolderObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0A13AA0152F29C9005513CD /* IMBFolderObject.m in Sources */ = {isa = PBXBuildFile; fileRef = D0A13A9E152F29C8005513CD /* IMBFolderObject.m */; };
-		D0A13AA715301E8A005513CD /* missing-thumbnail.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D0A13AA615301E89005513CD /* missing-thumbnail.jpg */; };
 		D0AD4C9F10CCF36F00204318 /* IMBButtonObject.h in Headers */ = {isa = PBXBuildFile; fileRef = D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0B31375151CA58A003CB231 /* IMBFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D099320D1011158400C527B7 /* IMBFolderParser.m */; };
 		D0B31376151CA58A003CB231 /* IMBImageFolderParser.m in Sources */ = {isa = PBXBuildFile; fileRef = D09932901011227100C527B7 /* IMBImageFolderParser.m */; };
@@ -676,6 +676,7 @@
 		30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = im.edia.Facebook.entitlements; sourceTree = "<group>"; };
 		30C8ACC816F08996005674CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		30C8ACCA16F089B5005674CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		30D700AF177A2928003CB6FE /* missing-thumbnail.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "missing-thumbnail.jpg"; sourceTree = "<group>"; };
 		30E4D4FC130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBiPhotoEventNodeObject.h; sourceTree = "<group>"; };
 		30E4D4FD130BCEAF00FDFBF2 /* IMBiPhotoEventNodeObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBiPhotoEventNodeObject.m; sourceTree = "<group>"; };
 		30E7771C1511055800413AEF /* SBUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBUtilities.h; path = SandBoxingKit/SBUtilities.h; sourceTree = SOURCE_ROOT; };
@@ -971,7 +972,6 @@
 		D0A00A9815F47A7100596789 /* IMBAccessRightsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBAccessRightsViewController.m; sourceTree = "<group>"; };
 		D0A13A9D152F29C8005513CD /* IMBFolderObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFolderObject.h; sourceTree = "<group>"; };
 		D0A13A9E152F29C8005513CD /* IMBFolderObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFolderObject.m; sourceTree = "<group>"; };
-		D0A13AA615301E89005513CD /* missing-thumbnail.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "missing-thumbnail.jpg"; sourceTree = "<group>"; };
 		D0AD4C9D10CCF36F00204318 /* IMBButtonObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBButtonObject.h; sourceTree = "<group>"; };
 		D0AD4C9E10CCF36F00204318 /* IMBButtonObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBButtonObject.m; sourceTree = "<group>"; };
 		D0B6FAB91043243800280DDC /* IMBAudioFolderParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBAudioFolderParser.h; sourceTree = "<group>"; };
@@ -1423,6 +1423,7 @@
 		CEAF1F13125A7D8C001C3EBB /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				30D700AF177A2928003CB6FE /* missing-thumbnail.jpg */,
 				30ED4DF7175E140F0096376D /* album@2x.png */,
 				30ED4DF8175E140F0096376D /* album_sel.png */,
 				30ED4DF9175E140F0096376D /* album_sel@2x.png */,
@@ -1735,7 +1736,6 @@
 				303FFD69152CBC3B0026B8CF /* IMBSkimmableObject.m */,
 				D01038E21071E111007C88D7 /* IMBObjectFifoCache.h */,
 				D01038E31071E111007C88D7 /* IMBObjectFifoCache.m */,
-				D0A13AA615301E89005513CD /* missing-thumbnail.jpg */,
 				D0CB9178150F82E7007716FA /* Old */,
 			);
 			name = Model;
@@ -2642,7 +2642,6 @@
 				CEF7A22412B1B71800DBE412 /* url_icon.tiff in Resources */,
 				CE394AC21371A1F700EF0D1E /* cork-background.jpg in Resources */,
 				3016792A13B225B9000E57D2 /* badge_checkbox.png in Resources */,
-				D0A13AA715301E8A005513CD /* missing-thumbnail.jpg in Resources */,
 				D024A32015319CB4005B6C0A /* IMBAlertPopoverViewController.xib in Resources */,
 				D006CFF115331CC900C53C23 /* IMBNoteIcon.icns in Resources */,
 				D006CFF41533502200C53C23 /* IMBStopIcon.icns in Resources */,
@@ -2688,6 +2687,7 @@
 				30ED4E0C175E140F0096376D /* person_sel.png in Resources */,
 				30ED4E0D175E140F0096376D /* person_sel@2x.png in Resources */,
 				30ED4E0E175E140F0096376D /* person.png in Resources */,
+				30D700B0177A2928003CB6FE /* missing-thumbnail.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
