@@ -92,6 +92,8 @@ static NSMutableDictionary* sRegisteredViewControllerClasses = nil;
 
 @interface IMBPanelController ()
 - (void)setupInfoWindow;
+- (void)saveSelectedMedaiaTypeToPreferences;
+- (void)saveWindowStateToPreferences;
 @end
 
 @implementation IMBPanelController

@@ -121,6 +121,10 @@ static NSArray* sSupportedUTIs = nil;
 - (NSString*) absolutePathFromAttributes:(NSDictionary*)inAttributes;
 - (IMBLightroomNodeType) nodeTypeFromAttributes:(NSDictionary*)inAttributes;
 
+- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+
++ (NSString*) lightroomAppBundleIdentifier;
+
 @end
 
 
