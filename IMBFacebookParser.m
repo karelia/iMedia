@@ -11,6 +11,8 @@
 #import "NSImage+iMedia.h"
 #import "IMBIconCache.h"
 
+#define DEBUG_SIMULATE_MISSING_THUMBNAILS 0
+
 // Limit of Facebook elements to retrieve in one request response
 // Note that there is no "Load More" mechanism implemented
 //
@@ -349,9 +351,16 @@ static NSUInteger sFacebookElementLimit = 5000;
 //
 - (id)thumbnailForObject:(IMBObject *)inObject error:(NSError **)outError
 {
-//    NSLog(@"%@", [NSThread currentThread]);
+#if DEBUG_SIMULATE_MISSING_THUMBNAILS
+    BOOL doNotLoad = arc4random() & 7;      // Will be YES for about 12.5 % of thumbnails
+#endif
     
     IMBFacebookObject *object = (IMBFacebookObject *)inObject;
+    
+//    // Object might currently have an NSImage representation type if its previous thumbnail load failed
+//    // and the generic thumbnail placeholder image was set as its image representation. But here we are
+//    // returning NSDATA representations
+//    object.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
     
     NSData *responseData = nil;
     for (NSDictionary *imageDict in [object.alternateImageLocations reverseObjectEnumerator])
@@ -392,15 +401,25 @@ static NSUInteger sFacebookElementLimit = 5000;
                     static NSUInteger bytesToInspect;
                     bytesToInspect = (NSUInteger)strlen(nonImageResponse);
                     if ([responseData length] >= bytesToInspect){
-                        responseDataIsImage = strncmp([responseData bytes], nonImageResponse, bytesToInspect) != 0;
+                        responseDataIsImage =
+#if DEBUG_SIMULATE_MISSING_THUMBNAILS
+                        doNotLoad;
+#else
+                        strncmp([responseData bytes], nonImageResponse, bytesToInspect) != 0;
+#endif
                     }
                     if (!responseDataIsImage) {
                         // We were told we got an image but this is no image but an html (error) page!
                         
-                        NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with HTML:  %@", url, responseData];
+                        NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with data:  %@", url,
+#if DEBUG_SIMULATE_MISSING_THUMBNAILS
+                                             @"Simulating missing thumbnail"];
+#else
+                                             responseData];
+#endif
                         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                                   errorString, NSLocalizedDescriptionKey, nil];
-                        NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                        NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:kIMBResourceDoesNotExist userInfo:userInfo];
                         if (outError) {
                             *outError = error;
                         }
