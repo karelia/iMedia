@@ -102,6 +102,8 @@ static NSString* kIMBSelectNodeWithIdentifierNotification = @"IMBSelectNodeWithI
 - (void) _syncPopupMenuSelection;
 - (void) __syncPopupMenuSelection;
 
+- (NSArray*) _expandedNodeIdentifiers;
+
 - (CGFloat) minimumNodeViewWidth;
 - (CGFloat) minimumLibraryViewHeight;
 - (CGFloat) minimumObjectViewHeight;
