@@ -30,7 +30,7 @@
 "IMB.iPhotoParser.photostream" = "Compartilhar Fotos";
 
 /* HTML style text shown on credits for iMedia */
-"IMB.licenseIntro" = "A iMedia Browser Framework está licenciado sob os seguintes termos:";
+"IMB.licenseIntro" = "O iMedia Browser Framework está licenciado sob os seguintes termos:";
 
 /* HTML style text shown on credits for iMedia, to introduct who did localization */
 "IMB.localization" = "Traduções:";
@@ -48,10 +48,10 @@
 "IMB.option.toolbar" = "Barra de Ferramentas:";
 
 /* back of window toolbar popup menu item */
-"IMB.option.toolbarSize.iconAndText" = "Icone e Texto";
+"IMB.option.toolbarSize.iconAndText" = "Ícone e Texto";
 
 /* back of window toolbar popup menu item */
-"IMB.option.toolbarSize.iconOnly" = "Somente Icone";
+"IMB.option.toolbarSize.iconOnly" = "Somente Ícone";
 
 /* back of window toolbar popup menu item */
 "IMB.option.toolbarSize.textOnly" = "Somente Texto";
@@ -66,10 +66,10 @@
 "IMBApertureParser.header.placeholderTitle" = "Por favor, ative o compartilhamento de visualização";
 
 /* Format string for object count in plural */
-"IMBAudioViewController.countFormatPlural" = "%d trilhas";
+"IMBAudioViewController.countFormatPlural" = "%d faixas";
 
 /* Format string for object count in singluar */
-"IMBAudioViewController.countFormatSingular" = "%d trilha";
+"IMBAudioViewController.countFormatSingular" = "%d faixa";
 
 /* mediaType display name */
 "IMBAudioViewController.displayName" = "Áudio";
@@ -81,7 +81,7 @@
 "IMBAudioViewController.tableColumn.name" = "Nome";
 
 /* Column title - should be a short word */
-"IMBAudioViewController.tableColumn.time" = "Tempo";
+"IMBAudioViewController.tableColumn.time" = "Duração";
 
 /* Format string for object count in plural */
 "IMBFaceObjectViewController.countFormatPlural" = "%d Rostos";
@@ -143,7 +143,7 @@
 "IMBFlickrParser.menu.loadmore" = "Carregar Mais";
 
 /* Flickr parser node context menu title. */
-"IMBFlickrParser.menu.openflickrpage" = "Abriar Página do Flickr";
+"IMBFlickrParser.menu.openflickrpage" = "Abrir Página do Flickr";
 
 /* Menu item in Flickr options popup */
 "IMBFlickrParser.menu.relevance" = "Importância";
@@ -152,7 +152,7 @@
 "IMBFlickrParser.menu.remove" = "Remover '%@'";
 
 /* Menu item in Flickr options popup */
-"IMBFlickrParser.menu.searchIn" = "Procurar em";
+"IMBFlickrParser.menu.searchIn" = "Buscar em";
 
 /* Menu item in Flickr options popup */
 "IMBFlickrParser.menu.tag" = "Tag";
@@ -161,7 +161,7 @@
 "IMBFlickrParser.menu.text" = "Texto";
 
 /* Flickr parser standard node name. */
-"IMBFlickrParser.node.mostinteresting" = "Nais Interessante";
+"IMBFlickrParser.node.mostinteresting" = "Mais Interessante";
 
 /* Flickr parser standard node name. */
 "IMBFlickrParser.node.recent" = "Recente";
@@ -209,7 +209,7 @@
 "IMBLibraryController.groupnode.libraries" = "BIBLIOTECAS";
 
 /* group node display name */
-"IMBLibraryController.groupnode.searches" = "PESQUISAS";
+"IMBLibraryController.groupnode.searches" = "BUSCAS";
 
 /* Name of Collections node in IMBLightroomParser */
 "IMBLightroomParser.collectionsName" = "Coleções";
@@ -218,7 +218,7 @@
 "IMBLightroomParser.foldersName" = "Pastas";
 
 /* Name of unnamed node in IMBLightroomParser */
-"IMBLightroomParser.Unnamed" = "Sem Nome";
+"IMBLightroomParser.Unnamed" = "Sem nome";
 
 /* Format string for object count in plural */
 "IMBLinkViewController.countFormatPlural" = "%d URLs";
@@ -230,7 +230,7 @@
 "IMBLinkViewController.displayName" = "Links";
 
 /* Error when loading a object file synchronously has failed. */
-"IMBLocalObjectsPromise.error" = "O arquivo de mídia %@ não pode ser carregado (arquivo não localizado)";
+"IMBLocalObjectsPromise.error" = "O arquivo de mídia %@ não pôde ser carregado (arquivo não localizado)";
 
 /* Format string for object count in plural */
 "IMBMovieViewController.countFormatPlural" = "%d filmes";
@@ -251,7 +251,7 @@
 "IMBNodeViewController.menuItem.remove" = "Remover";
 
 /* placeholder for untitled image */
-"IMBObject.untitled" = "sem nome";
+"IMBObject.untitled" = "sem título";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.download" = "Transferir";
@@ -263,19 +263,19 @@
 "IMBObjectViewController.menuItem.openInBrowser" = "Abrir com o Navegador";
 
 /* Menu item in context menu of IMBLightroomParser */
-"IMBObjectViewController.menuItem.openPreviewInApp.Lightroom" = "Abrir Imagem Processada em %@";
+"IMBObjectViewController.menuItem.openPreviewInApp.Lightroom" = "Abrir Imagem Processada no %@";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.openWithApp" = "Abrir Com %@";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.openWithApp.Lightroom" = "Abrir Imagem Padrão Com %@";
+"IMBObjectViewController.menuItem.openWithApp.Lightroom" = "Abrir Imagem Principal Com %@";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.openWithFinder" = "Abrir com o Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Abrir Imagem Padrão com o Finder";
+"IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Abrir Imagem Principal com o Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.quickLook" = "Visualização Rápida";
@@ -290,10 +290,10 @@
 "IMBObjectViewController.menuItem.showAll" = "Mostrar Tudo";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.showBadgedOnly" = "Mostrar Somente com Crachá";
+"IMBObjectViewController.menuItem.showBadgedOnly" = "Mostrar Somente Sinalizadas";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.showUnbadgedOnly" = "Mostrar Somente sem Crachá";
+"IMBObjectViewController.menuItem.showUnbadgedOnly" = "Mostrar Somente não Sinalizadas";
 
 /* Text message in progress panel of IMBObjectViewController */
 "IMBObjectViewController.progress.message.preparing" = "Preparando…";
@@ -335,4 +335,4 @@
 "Tags" = "Tags";
 
 /* Time label in metadataDescription */
-"Time" = "Tempo";
+"Time" = "Hora";
