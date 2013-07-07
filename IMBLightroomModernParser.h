@@ -41,70 +41,28 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
+
+
+// Author: Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
+#pragma mark HEADERS
 
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
+#import "IMBLightroomParser.h"
 
-// Model...
 
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-#import <iMedia/IMBLightroomObject.h>
+@interface IMBLightroomModernParser : IMBLightroomParser <IMBLightroomParser>
+{
+	
+}
 
-// Parsers...
+- (NSNumber*) databaseVersion;
 
-#import <iMedia/IMBParser.h>
-#import <iMedia/IMBFolderParser.h>
-#import <iMedia/IMBImageFolderParser.h>
-#import <iMedia/IMBiPhotoParser.h>
-#import <iMedia/IMBiTunesParser.h>
-#import <iMedia/IMBApertureParser.h>
-#import <iMedia/IMBLightroomParser.h>
-#import <iMedia/IMBImageCaptureParser.h>
-#import <iMedia/IMBFlickrParser.h>
-#import <iMedia/IMBGarageBandParser.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
+@end
 
 
 //----------------------------------------------------------------------------------------------------------------------
-
-

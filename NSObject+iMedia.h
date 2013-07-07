@@ -44,104 +44,40 @@
  */
 
 
-// Author: Pierre Bernard
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
+#import <Foundation/Foundation.h>
 
-#import "IMBLightroom4Parser.h"
-
-#import <Quartz/Quartz.h>
-
-#import "FMDatabase.h"
-#import "IMBNode.h"
-#import "IMBNodeObject.h"
-#import "IMBObject.h"
-#import "NSFileManager+iMedia.h"
-#import "NSImage+iMedia.h"
-#import "NSWorkspace+iMedia.h"
-
-
-@interface IMBLightroom4Parser ()
-
-@end
-
-
-@implementation IMBLightroom4Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Unique identifier for this parser...
+@interface NSObject (iMedia)
 
-+ (NSString*) identifier
-{
-	return @"com.karelia.imedia.Lightroom4";
-}
++ (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason;
 
-// The bundle identifier of the Lightroom app this parser is based upon
+// Throws a "must subclass" exception.
+// Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
 
-+ (NSString*) lightroomAppBundleIdentifier
-{
-    return @"com.adobe.Lightroom4";
-}
++ (void) imb_throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
 
-// Key in Ligthroom app user defaults: which library to load
+// Convenience methods for coalesced delayed perfoming...
 
-+ (NSString*) preferencesLibraryToLoadKey
-{
-    return @"libraryToLoad20";
-}
-
-// Key in Ligthroom app user defaults: which libraries have been loaded recently
-
-+ (NSString*) preferencesRecentLibrariesKey
-{
-    return @"recentLibraries20";
-}
-
-- (BOOL) checkDatabaseVersion
-{
-	NSNumber *databaseVersion = [self databaseVersion];
-	
-	if (databaseVersion != nil) {
-		long databaseVersionLong = [databaseVersion longValue];
-		
-		if (databaseVersionLong < 400020) {
-			return NO;
-		}
-		else if (databaseVersionLong >= 500000) {
-			return NO;
-		}
-	}
-	
-	return YES;
-}
-
-- (FMDatabase*) libraryDatabase
-{
-	NSString* databasePath = (NSString*)self.mediaSource;
-	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
-}
-
-- (FMDatabase*) previewsDatabase
-{
-	NSString* mainDatabasePath = (NSString*)self.mediaSource;
-	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
-	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
-	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];
-	FMDatabase* database = [FMDatabase databaseWithPath:previewDatabasePath];
-	
-	[database setLogsErrors:YES];
-	
-	return database;
-}
++ (void) imb_performCoalescedSelector:(SEL)inSelector;
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay;
++ (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
++ (void) imb_cancelAllCoalescedSelectors;
 
 @end
+
+
+//----------------------------------------------------------------------------------------------------------------------
+

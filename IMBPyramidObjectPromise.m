@@ -56,6 +56,9 @@
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
+#import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
+#import "IMBLightroomObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -284,7 +287,9 @@
 	[[NSColor colorWithDeviceRed:0.1 green:0.1 blue:0.1 alpha:1.0] set];
 	NSRectFill(imageBounds);
 	
-	NSString* lightroomPath = [IMBLightroom3Parser lightroomPath];
+	NSString* lightroomPath = [IMBLightroom5Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom4Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom3Parser lightroomPath];
 	if (lightroomPath == nil) lightroomPath = [IMBLightroom2Parser lightroomPath];
 	if (lightroomPath == nil) lightroomPath = [IMBLightroom1Parser lightroomPath];
 	if (lightroomPath)

@@ -70,59 +70,44 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
+// Unique identifier for this parser...
 
-+ (NSString*) lightroomPath
++ (NSString*) identifier
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom2"];
+	return @"com.karelia.imedia.Lightroom2";
 }
 
+// The bundle identifier of the Lightroom app this parser is based upon
 
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
++ (NSString*) lightroomAppBundleIdentifier
 {
-	NSMutableArray* libraryPaths = [NSMutableArray array];
-    
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom2");
-	
-	if (recentLibrariesList) {
-        [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-        CFRelease(recentLibrariesList);
-	}
-	
-    if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom2");
-		
-		if (activeLibraryPath) {
-			CFRelease(activeLibraryPath);
-		}
-    }
-    
-	return libraryPaths;
+    return @"com.adobe.Lightroom2";
+}
+
+// Key in Ligthroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+    return @"libraryToLoad20";
+}
+
+// Key in Ligthroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+    return @"recentLibraries20";
 }
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
-	if ([self isInstalled]) {
+	if ([self lightroomPath] != nil) {
 		NSArray* libraryPaths = [self libraryPaths];
 		
-		for (NSString* libraryPath in libraryPaths) {
-			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
-								   stringByAppendingString:@" Previews"]
-								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
-			
-			BOOL isDirectory;
-			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
-				dataPath = nil;
-			}
-			
+		for (NSString* libraryPath in libraryPaths) {			
 			IMBLightroom2Parser* parser = [[[self class] alloc] initWithMediaType:inMediaType];
 			parser.mediaSource = libraryPath;
-			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
 			[parserInstances addObject:parser];
@@ -157,7 +142,7 @@
 	foldersNode.mediaSource = self.mediaSource;
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
+	foldersNode.icon = [[self class] folderIcon];
 	foldersNode.parser = self;
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
@@ -176,7 +161,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self largeFolderIcon];
+	foldersObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:foldersObject];
 
@@ -242,7 +227,7 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+	NSString* query =	@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 						@"			caption, apcp.relativeDataPath pyramidPath"
 						@" FROM AgLibraryFile alf"
 						@" INNER JOIN Adobe_images ai ON alf.id_local = ai.rootFile"
@@ -267,7 +252,7 @@
 - (NSString*) collectionObjectsQuery
 {
 	NSString* query =	@" SELECT	arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+						@"			aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 						@"			caption, apcp.relativeDataPath pyramidPath"
 						@" FROM AgLibraryFile aif"
 						@" INNER JOIN Adobe_images ai ON aif.id_local = ai.rootFile"
@@ -287,7 +272,7 @@
 	return query;
 }
 
-- (NSImage*) folderIcon
++ (NSImage*) folderIcon
 {
 	static NSImage* folderIcon = nil;
 	
@@ -309,7 +294,7 @@
 	return folderIcon;
 }
 
-- (NSImage*) groupIcon;
++ (NSImage*) groupIcon;
 {
 	static NSImage* groupIcon = nil;
 	
@@ -331,7 +316,7 @@
 	return groupIcon;
 }
 
-- (NSImage*) collectionIcon;
++ (NSImage*) collectionIcon;
 {
 	static NSImage* collectionIcon = nil;
 	

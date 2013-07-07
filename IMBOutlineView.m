@@ -201,7 +201,7 @@
 	{
 		id item = [self itemAtRow:i];
 		IMBNode* node = [item representedObject];
-		NSNumber* row = @(i);
+		NSNumber* row = [NSNumber numberWithInt:i];
 		NSProgressIndicator* wheel = [_subviewsInVisibleRows objectForKey:row];
 		
 		if (node != nil && node.badgeTypeNormal == kIMBBadgeTypeLoading)

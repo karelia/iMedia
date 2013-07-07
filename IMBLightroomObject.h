@@ -41,7 +41,10 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
- */
+*/
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 // Author: Pierre Bernard
@@ -52,17 +55,27 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroomParser.h"
+#import "IMBObject.h"
 
 
-@interface IMBLightroom3or4Parser : IMBLightroomParser
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// This subclass adds the addition absolutePyramidPath property, which stores the path to the pyramid 
+// containing image previews...
+
+@interface IMBLightroomObject : IMBObject
 {
-	
+	NSString* _absolutePyramidPath;
+	NSNumber* _idLocal;
+	BOOL _isLoadingQuicklookPreview;
 }
 
-- (NSNumber*) databaseVersion;
+@property (retain) NSString* absolutePyramidPath;
+@property (retain) NSNumber* idLocal;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
+

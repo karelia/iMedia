@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
 
 #import <Quartz/Quartz.h>
 
@@ -65,12 +65,12 @@
 #import "NSWorkspace+iMedia.h"
 
 
-@interface IMBLightroom4Parser ()
+@interface IMBLightroom5Parser ()
 
 @end
 
 
-@implementation IMBLightroom4Parser
+@implementation IMBLightroom5Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -79,14 +79,14 @@
 
 + (NSString*) identifier
 {
-	return @"com.karelia.imedia.Lightroom4";
+	return @"com.karelia.imedia.Lightroom5";
 }
 
 // The bundle identifier of the Lightroom app this parser is based upon
 
 + (NSString*) lightroomAppBundleIdentifier
 {
-    return @"com.adobe.Lightroom4";
+	return @"com.adobe.Lightroom5";
 }
 
 // Key in Ligthroom app user defaults: which library to load
@@ -110,10 +110,10 @@
 	if (databaseVersion != nil) {
 		long databaseVersionLong = [databaseVersion longValue];
 		
-		if (databaseVersionLong < 400020) {
+		if (databaseVersionLong < 500006) {
 			return NO;
 		}
-		else if (databaseVersionLong >= 500000) {
+		else if (databaseVersionLong >= 600000) {
 			return NO;
 		}
 	}
