@@ -52,6 +52,12 @@
 #import "NSWorkspace+iMedia.h"
 #import "IMBNode.h"
 
+@interface NSBundle (SDK_10_7)
+
+- (NSImage *)imageForResource:(NSString *)name;
+
+@end
+
 @implementation NSImage (iMedia)
 
 // Actually ignore the mime type, but maybe later we can use it as a hint
@@ -113,33 +119,37 @@
 		
 		if (source)
 		{
-			CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
-			if (propsCF)
-			{
-				NSDictionary *props = (NSDictionary *)propsCF;
-				NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
-				NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
-				NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
-				NSString *model = [props objectForKey:(NSString *)kCGImagePropertyColorModel];
-				NSString *filetype = [[aPath pathExtension] uppercaseString];
-				if (width) [md setObject:width forKey:@"width"];
-				if (height) [md setObject:height forKey:@"height"];
-				if (depth) [md setObject:depth forKey:@"depth"];
-				if (model) [md setObject:model forKey:@"model"];
-				if (filetype) [md setObject:filetype forKey:@"filetype"];
-				[md setObject:aPath forKey:@"path"];
+			CGImageSourceStatus status = CGImageSourceGetStatus(source);
 
-				NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
-				if ( nil != exif )
+			if (status == kCGImageStatusComplete) {
+				CFDictionaryRef propsCF = CGImageSourceCopyPropertiesAtIndex(source,  0,  NULL );
+				if (propsCF)
 				{
-					NSString *dateTime = [exif objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal];
-					// format from EXIF -- we could convert to a date and make more localized....
-					if (nil != dateTime)
+					NSDictionary *props = (NSDictionary *)propsCF;
+					NSNumber *width = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelWidth];
+					NSNumber *height= (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyPixelHeight];
+					NSNumber *depth = (NSNumber*) [props objectForKey:(NSString *)kCGImagePropertyDepth];
+					NSString *model = [props objectForKey:(NSString *)kCGImagePropertyColorModel];
+					NSString *filetype = [[aPath pathExtension] uppercaseString];
+					if (width) [md setObject:width forKey:@"width"];
+					if (height) [md setObject:height forKey:@"height"];
+					if (depth) [md setObject:depth forKey:@"depth"];
+					if (model) [md setObject:model forKey:@"model"];
+					if (filetype) [md setObject:filetype forKey:@"filetype"];
+					[md setObject:aPath forKey:@"path"];
+
+					NSDictionary *exif = [props objectForKey:(NSString *)kCGImagePropertyExifDictionary];
+					if ( nil != exif )
 					{
-						[md setObject:dateTime forKey:@"dateTime"];
+						NSString *dateTime = [exif objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal];
+						// format from EXIF -- we could convert to a date and make more localized....
+						if (nil != dateTime)
+						{
+							[md setObject:dateTime forKey:@"dateTime"];
+						}
 					}
+					CFRelease(propsCF);
 				}
-				CFRelease(propsCF);
 			}
 			CFRelease(source);
 		}

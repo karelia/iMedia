@@ -81,6 +81,12 @@
 #import "IMBButtonObject.h"
 
 
+@interface NSWindow (Mac_OS_X_10_7)
+
+- (NSRect)convertRectToScreen:(NSRect)aRect;
+
+@end
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1859,7 +1865,7 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 							}
 							
 							[thisItem setDataProvider:self forTypes:whichTypes];
-							[thisItem setString:[NSString stringWithFormat:@"%ld", thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
+							[thisItem setString:[NSString stringWithFormat:@"%ld", (unsigned long)thisIndex] forType:kIMBPrivateItemIndexPasteboardType];
 							[thisItem setString:thisObject.name forType:kIMBPublicTitleListPasteboardType];
 							[thisItem setPropertyList:thisObject.metadata forType:kIMBPublicMetadataListPasteboardType];
 							[thisItem setData:promiseData forType:kIMBPasteboardTypeObjectsPromise];
@@ -2484,8 +2490,14 @@ NSString* const IMBObjectViewControllerSegmentedControlKey = @"SegmentedControl"
 
 	if (view)
 	{
-		frame = [view convertRectToBase:frame];
-		frame.origin = [view.window convertBaseToScreen:frame.origin];
+		if ([NSWindow instancesRespondToSelector:@selector(convertRectToScreen:)]) {
+			frame	= [[view superview] convertRect:frame toView:nil];
+			frame	= [[view window] convertRectToScreen:frame];
+		}
+		else {
+			frame = [view convertRectToBase:frame];
+			frame.origin = [view.window convertBaseToScreen:frame.origin];
+		}
 	}
 
 	return frame;

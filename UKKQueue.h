@@ -57,7 +57,7 @@
 
 +(id)		sharedFileWatcher;      // Returns a singleton, a shared kqueue object. Handy if you're subscribing to the notifications. Use this, or just create separate objects using alloc/init. Whatever floats your boat.
 
--(NSInteger)		queueFD;		// I know you unix geeks want this...
+-(int)		queueFD;		// I know you unix geeks want this...
 
 -(BOOL)		alwaysNotify;
 -(void)		setAlwaysNotify: (BOOL)state;

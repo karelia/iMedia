@@ -216,7 +216,8 @@
 	newNode.watchedPath = inOldNode.watchedPath;
 	
 	[self populateNode:newNode options:0 error:nil];
-	return newNode;
+
+	return [newNode autorelease];
 }
 
 // Scan the given node "folder" for subfolders and add a subnode for each one we find...
@@ -266,7 +267,7 @@
 	
 	if( inOldNode )
 	{
-		newNode = [[self nodeCopy:inOldNode] autorelease];
+		newNode = [self nodeCopy:inOldNode];
 		// already done in copyNode:
 		// if ( [inOldNode.subNodes count] || [inOldNode.objects count]  )
 		// { 	// If the old node had subnodes, then look for subnodes in the new node...
@@ -673,9 +674,9 @@ static void ICANotificationCallback(CFStringRef notificationType, CFDictionaryRe
 					 nil];
 				[_loadingDevices setObject:deviceDict forKey:deviceID];
 			}
-			else 
+			else if (objectID != nil)
 			{
-				[_loadingDevices setObject:nil forKey:objectID];
+				[_loadingDevices removeObjectForKey:objectID];
 			}
 		}  // end  lock
 	}

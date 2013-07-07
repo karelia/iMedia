@@ -116,7 +116,7 @@
     //NSLog(@"setting query: %@", query);
     query = [query copy]; // in case we got handed in a mutable string...
     [statement setQuery:query];
-    [cachedStatements setObject:statement forKey:query];
+    [cachedStatements setValue:statement forKey:query];
     [query release];
 }
 

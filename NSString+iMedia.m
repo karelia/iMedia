@@ -316,7 +316,7 @@
 	free(lhsBuf);
 	free(rhsBuf);
 	
-	return (CFComparisonResult) compareResult;
+	return (NSComparisonResult) compareResult;
 }
 
 - (NSString *)imb_resolvedPath
@@ -585,7 +585,7 @@
 				if (resolvedUrl != NULL)
 				{
 					resolvedPath =
-                    [(id)CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle)
+                    [NSMakeCollectable(CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle))
                      autorelease];
 					CFRelease(resolvedUrl);
 				}

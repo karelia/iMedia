@@ -172,7 +172,7 @@
 		
 		error = nil;
 		NSDictionary *attributesOfOrig = [fileManager attributesOfItemAtPath:databasePath error:&error];
-		if (attributesOfOrig) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
+		if (!attributesOfOrig) NSLog (@"Unable to fetch attributes from %@: %@", databasePath, error.localizedDescription);
 		NSDate *modDateOfOrig = [attributesOfOrig fileModificationDate];
 		
 		if (NSOrderedSame == [modDateOfOrig compare:modDateOfCopy]) {

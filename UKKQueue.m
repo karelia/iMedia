@@ -45,9 +45,9 @@
 @interface UKKQueuePathEntry : NSObject
 {
 	NSString*		path;
-	NSInteger				watchedFD;
+	int				watchedFD;
 	u_int			subscriptionFlags;
-	NSInteger				pathRefCount;
+	int				pathRefCount;
 }
 
 -(id)	initWithPath: (NSString*)inPath flags: (u_int)fflags;
@@ -56,7 +56,7 @@
 -(BOOL)			releasePath;
 
 -(NSString*)	path;
--(NSInteger)			watchedFD;
+-(int)			watchedFD;
 
 -(u_int)		subscriptionFlags;
 -(void)			setSubscriptionFlags: (u_int)fflags;
@@ -120,7 +120,7 @@
 	return path;
 }
 
--(NSInteger)	watchedFD
+-(int)	watchedFD
 {
 	return watchedFD;
 }
@@ -143,12 +143,12 @@
 
 @interface UKKQueueCentral : NSObject
 {
-	NSInteger						queueFD;				// The actual queue ID (Unix file descriptor).
+	int						queueFD;				// The actual queue ID (Unix file descriptor).
 	NSMutableDictionary*	watchedFiles;			// List of UKKQueuePathEntries.
 	BOOL					keepThreadRunning;
 }
 
--(NSInteger)		queueFD;				// I know you unix geeks want this...
+-(int)		queueFD;				// I know you unix geeks want this...
 
 // UKFileWatcher protocol methods:
 -(void)		addPath: (NSString*)path;
@@ -260,7 +260,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 //		2004-03-13	UK	Documented.
 // -----------------------------------------------------------------------------
 
--(NSInteger)  queueFD
+-(int)  queueFD
 {
 	return queueFD;
 }
@@ -352,7 +352,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 -(NSString*)	descriptionWithLocale: (id)locale indent: (NSUInteger)level
 {
 	NSMutableString*	mutStr = [NSMutableString string];
-	NSInteger					x = 0;
+	int					x = 0;
 	
 	for( x = 0; x < level; x++ )
 		[mutStr appendString: @"    "];
@@ -393,10 +393,10 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 
 -(void)		watcherThread: (id)sender
 {
-	NSInteger					n;
+	int					n;
     struct kevent		ev;
     struct timespec     timeout = { 1, 0 }; // 1 second timeout. Should be longer, but we need this thread to exit when a kqueue is dealloced, so 1 second timeout is quite a while to wait.
-	NSInteger					theFD = queueFD;	// So we don't have to risk accessing iVars when the thread is terminated.
+	int					theFD = queueFD;	// So we don't have to risk accessing iVars when the thread is terminated.
     
 	#if DEBUG_LOG_THREAD_LIFETIME
 	NSLog(@"watcherThread started.");
@@ -410,7 +410,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 			n = kevent( queueFD, NULL, 0, &ev, 1, &timeout );
 			if( n > 0 )
 			{
-				NSLog( @"KEVENT returned %ld", n );
+				NSLog( @"KEVENT returned %d", n );
 				if( ev.filter == EVFILT_VNODE )
 				{
 					NSLog( @"KEVENT filter is EVFILT_VNODE" );
@@ -573,7 +573,7 @@ static id					gUKKQueueSharedNotificationCenterProxy = nil;	// Object to which w
 	[super dealloc];
 }
 
--(NSInteger)		queueFD
+-(int)		queueFD
 {
 	return [[UKKQueue sharedFileWatcher] queueFD];	// We're all one big, happy family now.
 }

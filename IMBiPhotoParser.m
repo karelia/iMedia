@@ -198,8 +198,6 @@
 - (void) dealloc
 {
 	IMBRelease(_appPath);
-	IMBRelease(_plist);
-	IMBRelease(_modificationDate);
 	IMBRelease(_dateFormatter);
 	[super dealloc];
 }
