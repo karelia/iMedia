@@ -344,6 +344,11 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 
 // Create a list containing information about all loaded custom parsers. This list is stored in the prefs...
 
+#if !IMB_COMPILING_WITH_LION_OR_NEWER_SDK
+#define NSURLBookmarkCreationWithSecurityScope 0
+#define NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess 0
+#endif
+
 - (void) saveCustomParsersToPreferences
 {
 	if (_loadedParsers != nil && _loadingCustomParsers == NO)
@@ -399,6 +404,10 @@ static NSMutableDictionary* sRegisteredParserClasses = nil;
 // Restore the custom parser instances from the list which was stored in the prefs. The flag _loadingCustomParsers
 // is used to skip the saveCustomParsersToPreferences method call when calling addCustomParser:forMediaType: which
 // is totally useless while we are loading from the prefs...
+
+#if !IMB_COMPILING_WITH_LION_OR_NEWER_SDK
+#define NSURLBookmarkResolutionWithSecurityScope 0
+#endif
 
 - (void) loadCustomParsersFromPreferences
 {
