@@ -240,7 +240,7 @@ static NSArray* sSupportedUTIs = nil;
 	return nil;
 }
 
-// Key in Ligthroom app user defaults: which library to load
+// Key in Lightroom app user defaults: which library to load
 
 + (NSString*) preferencesLibraryToLoadKey
 {
@@ -248,7 +248,7 @@ static NSArray* sSupportedUTIs = nil;
 	return nil;
 }
 
-// Key in Ligthroom app user defaults: which libraries have been loaded recently
+// Key in Lightroom app user defaults: which libraries have been loaded recently
 
 + (NSString*) preferencesRecentLibrariesKey
 {
