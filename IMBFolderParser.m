@@ -190,6 +190,9 @@
 - (BOOL) populateNode:(IMBNode*)inNode options:(IMBOptions)inOptions error:(NSError**)outError
 {
 	NSString* folder = inNode.mediaSource;
+
+	if (!folder) return NO;
+
     NSURL* folderURL = [NSURL fileURLWithPath:folder isDirectory:YES];
     
     // Handle the folder being a symlink; becomes more likely when sandboxed
