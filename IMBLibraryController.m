@@ -65,6 +65,7 @@
 #import "IMBAudioFolderParser.h"
 #import "IMBMovieFolderParser.h"
 #import "NSWorkspace+iMedia.h"
+#import "NSFileManager+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -259,10 +260,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		if (error != nil)
 		{
 			[self performSelectorOnMainThread:@selector(_presentError:) withObject:error];
-
-			// If we failed then the _oldNode is still good but needs to have its status updated 
-			self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
 		}
+        
+        // If we failed then the _oldNode is still good but needs to have its status updated
+        self.oldNode.badgeTypeNormal = kIMBBadgeTypeNone;
+        self.oldNode.loading = NO;
 	}
 }
 
@@ -390,6 +392,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		_watcherLock = [[NSRecursiveLock alloc] init];
 		_watcherUKKQueuePaths = [[NSMutableArray alloc] init];
 		_watcherFSEventsPaths = [[NSMutableArray alloc] init];
+        
+        _fileRenamePool = [NSMutableDictionary new];
 		
 		// When volume are unmounted we would like to be notified so that we can disable file watching for 
 		// those paths...
@@ -414,7 +418,8 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) dealloc
 {
 	[[[NSWorkspace imb_threadSafeWorkspace] notificationCenter] removeObserver:self];
-
+    
+	IMBRelease(_fileRenamePool);
 	IMBRelease(_mediaType);
 	IMBRelease(_rootNodes);
 	IMBRelease(_watcherUKKQueue);
@@ -668,11 +673,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //		NSLog(@"%s Error: parent of oldNode and newNode must be the same...",__FUNCTION__);
 //		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must be the same" userInfo:nil] raise];
 //	}
-
-	if (inOldNode != nil && inNewNode != nil && ! [inOldNode.identifier isEqual:inNewNode.identifier])
+    
+    NSString *oldNodeParent = [[inOldNode.identifier pathComponents] objectAtIndex:0];
+    NSString *newNodeParent = [[inNewNode.identifier pathComponents] objectAtIndex:0];
+	if (inOldNode != nil && inNewNode != nil && ![oldNodeParent isEqual:newNodeParent])
 	{
 		NSLog(@"%s Error: parent of oldNode and newNode must have same identifiers...",__FUNCTION__);
-		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same identifiers" userInfo:nil] raise];
+		[[NSException exceptionWithName:@"IMBProgrammerError" reason:@"Error: parent of oldNode and newNode must have same root" userInfo:nil] raise];
 	}
 
 	// Workaround for special behavior of IMBImageCaptureParser, which replaces root nodes several times  
@@ -946,11 +953,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 // is a different NSString instance every single time, so we cannot pass it as a param to the coalesced message 
 // (canceling wouldn't work). Instead we'll put it in an array, which is iterated in _coalescedFileWatcherCallback...
 
-- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath
+- (void) watcher:(id<IMBFileWatcher>)inWatcher receivedNotification:(NSString*)inNotificationName forPath:(NSString*)inPath withRenamingInfo:(NSDictionary *)renameInfo
 {
-//	NSLog(@"%s path=%@",__FUNCTION__,inPath);
+ //   NSLog(@"*** watcher:receivedNotification:forPath: %@ \n\t\t\twithRenaimingInfo: %@", inPath, renameInfo);
 	
-	if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
+	if (renameInfo)
+	{
+        [_fileRenamePool addEntriesFromDictionary:renameInfo];
+    }
+    if ([inNotificationName isEqualToString:IMBFileWatcherWriteNotification])
 	{
 		if (inWatcher == _watcherUKKQueue)
 		{
@@ -1019,40 +1030,158 @@ static NSMutableDictionary* sLibraryControllers = nil;
 }
 
 
+- (IMBNode *)nodeAtPath:(NSString*)inPath inNodes:(NSArray*)inNodes
+{
+    IMBNode *rv = nil;
+    NSString* watchedPath = [inPath stringByStandardizingPath];
+	
+	for (IMBNode* node in inNodes)
+	{
+		NSString* nodePath = [(NSString*)node.watchedPath stringByStandardizingPath];
+		if (![nodePath isEqualToString:watchedPath] && (rv == nil))
+		{
+			IMBNode *subNode = [self nodeAtPath:watchedPath inNodes:node.subNodes];
+            if (subNode)
+            {
+               rv = subNode;
+                break;
+            }
+        }
+        else if ([nodePath isEqualToString:watchedPath] && (rv == nil))
+        {
+            rv = node;
+            break;
+        }
+    }
+    return rv;
+}
+
+
 // Pass the message on to the main thread...
 
-- (void) _coalescedUKKQueueCallback
+- (void)_deleteNode:(IMBNode *)aNode
 {
-	BOOL isMainThread = [NSThread isMainThread];
-	
+#ifdef DEBUG
+    //NSLog(@"%s Node with identifier %@ will be deleted", __PRETTY_FUNCTION__, aNode.identifier);
+#endif
+    [self _replaceNode:aNode withNode:nil parentNodeIdentifier:aNode.identifier];
+}
+
+- (void)_preserveBrowserConsistencyWithRefNode:(IMBNode *)aReferenceNode
+{    
+    BOOL isReferenceNodeADummyNode = NO;
+    if (![aReferenceNode identifier] /* No identifier were provided, this is a dummy node to locate FSRootNode */)
+    {
+        isReferenceNodeADummyNode = YES;
+    }
+    
+    NSMutableSet *duplicateTester = [[NSMutableSet new] autorelease];
+    NSMutableSet *duplicates = [[NSMutableSet new] autorelease];
+    
+    IMBNode *fsGroupNode = [self _groupNodeForNewNode:aReferenceNode];
+    for (IMBNode *firstLevelNode in fsGroupNode.subNodes)
+    {
+        if (!isReferenceNodeADummyNode /* The directory has moved */ &&
+            [firstLevelNode.identifier hasPrefix:aReferenceNode.identifier] /* or its parent */)
+        {
+            NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
+            if ([fileManager fileExistsAtPath:firstLevelNode.mediaSource])
+            {
+                /* The folder has just been renamed */
+                firstLevelNode.parser.fileRenamePool = aReferenceNode.parser.fileRenamePool;
+                [self reloadNode:firstLevelNode];
+            }
+            else if ([_fileRenamePool objectForKey:firstLevelNode.mediaSource])
+            {
+                /* Some tough changes (fs tree relocation) */
+                firstLevelNode.parser.fileRenamePool = _fileRenamePool;
+                [self reloadNode:firstLevelNode];
+            }
+            else /* Not here anymore, just delete it */
+            {
+                [self _deleteNode:firstLevelNode];
+            }
+        }
+        else if (isReferenceNodeADummyNode /* Dummy node? we just want to make sure topLevelNodes are still on disk */)
+        {
+            NSFileManager *fileManager = [NSFileManager imb_threadSafeManager];
+            if (![fileManager fileExistsAtPath:firstLevelNode.mediaSource])
+            {
+                /* Not here anymore, just delete it */
+                [self _deleteNode:firstLevelNode];
+            }            
+        }
+        
+        // To detect duplicate first level nodes
+        if ([duplicateTester containsObject:firstLevelNode.mediaSource])
+        {
+            [duplicateTester addObject:firstLevelNode.mediaSource];
+        }
+        else
+        {
+            [duplicates addObject:firstLevelNode];
+        }
+    }
+    
+    // Remove duplicates
+    [duplicates enumerateObjectsUsingBlock:^(id obj, BOOL *stop) { [self _deleteNode:obj]; }];
+}
+
+
+- (void)handleEventsWithPaths:(NSArray *)paths
+{
+    if (![NSThread isMainThread])
+    {
+        // Remainder of method expects main thread, so redirect
+        [self performSelectorOnMainThread:@selector(handleEventsWithPaths:) withObject:paths waitUntilDone:NO];        
+        return;
+    }      
+    
+    // Avoid concurrency, lock the watcher
 	[_watcherLock lock];
-	
-	for (NSString* path in _watcherUKKQueuePaths)
+    
+	for (NSString *path in paths)
 	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
-	}
-	
-	[_watcherUKKQueuePaths removeAllObjects];
+        IMBNode *nodeToHandle = [self nodeAtPath:path inNodes:self.rootNodes];
+        if (nodeToHandle != nil)
+        {
+            nodeToHandle.parser.fileRenamePool = _fileRenamePool;
+            [self _preserveBrowserConsistencyWithRefNode:nodeToHandle];
+        }
+        else
+        {
+            [self _reloadNodesWithWatchedPath:path];
+        }
+    }
+    
+    // ME-430: In any case, when FS did change make a cleanup of first level nodes;
+    // _preserveBrowserConsistencyWithRefNode is also called in 'for (NSString* in paths)' wich also loop once to remove duplicate
+    // So worst case scenario would lead to 'O = ((2 * pathCount) * fsGroupNodeCount) + fsGroupNodeCount'
+    // Seems reasonnable cost for consistency as pathCount would most of the time be equal to 1 or 2
+    // Btw, use a dummy node so we don't have to pass a nil parameter
+    IMBNode *dummyNode = [[IMBNode new] autorelease];
+    dummyNode.groupType = kIMBGroupTypeFolder;
+    [self _preserveBrowserConsistencyWithRefNode:dummyNode];
+    
+    // Current fsWatcher event pool has been handled, clear renamePool
+    [_fileRenamePool removeAllObjects];
+    
+    // unlock locker
 	[_watcherLock unlock];
-}	
+}
+
+- (void) _coalescedUKKQueueCallback
+{	
+    [self handleEventsWithPaths:_watcherUKKQueuePaths];
+	[_watcherUKKQueuePaths removeAllObjects];
+}
 
 
 - (void) _coalescedFSEventsCallback
 {
-	BOOL isMainThread = [NSThread isMainThread];
-	
-	[_watcherLock lock];
-	
-	for (NSString* path in _watcherFSEventsPaths)
-	{
-		if (isMainThread) [self _reloadNodesWithWatchedPath:path];
-		else [self performSelectorOnMainThread:@selector(_reloadNodesWithWatchedPath:) withObject:path waitUntilDone:NO];
-	}
-	
-	[_watcherFSEventsPaths removeAllObjects];
-	[_watcherLock unlock];
-}	
+    [self handleEventsWithPaths:_watcherFSEventsPaths];
+    [_watcherFSEventsPaths removeAllObjects];
+}
 
 
 // Now look for all nodes that are interested in that path and reload them...
@@ -1066,25 +1195,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 - (void) _reloadNodesWithWatchedPath:(NSString*)inPath nodes:(NSArray*)inNodes
 {
 	NSString* watchedPath = [inPath stringByStandardizingPath];
-	
 	for (IMBNode* node in inNodes)
 	{
-		NSString* nodePath = [(NSString*)node.watchedPath stringByStandardizingPath];
-		
-		if ([nodePath isEqualToString:watchedPath])
-		{
-			if ([node.parser respondsToSelector:@selector(watchedPathDidChange:)])
-			{
-				[node.parser watchedPathDidChange:watchedPath];
-			}
-				
-			[self reloadNode:node];
-		}
-		else
-		{
-			[self _reloadNodesWithWatchedPath:inPath nodes:node.subNodes];
-		}
-	}
+        IMBNode *watchedNode = [self nodeAtPath:watchedPath inNodes:node.subNodes];
+        [self reloadNode:watchedNode];
+    }
 }
 
 

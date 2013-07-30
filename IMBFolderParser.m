@@ -114,13 +114,17 @@
 	
 	// Check if the folder exists. If not then do not return a node...
 	
-	BOOL exists,directory;
-	exists = [fm fileExistsAtPath:path isDirectory:&directory];
-	
-	if (!exists || !directory) 
+	BOOL isDirectory;
+	BOOL exists = [fm fileExistsAtPath:path isDirectory:&isDirectory];
+    NSString *renamedNodeName = [self.fileRenamePool objectForKey:path];
+	if ((!exists || !isDirectory) && !renamedNodeName)
 	{
 		return nil;
-	}	
+	}
+    else if(renamedNodeName)
+    {
+        path = renamedNodeName;
+    }
 
 	// Create an empty root node (unpopulated and without subnodes)...
 	
@@ -135,11 +139,13 @@
 	newNode.identifier = [self identifierForPath:path];
 	newNode.displayPriority = self.displayPriority;			// get node's display priority from the folder parser
 	
-	NSString *betterName = [fm displayNameAtPath:[path stringByDeletingPathExtension]];
-    betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-	newNode.name = betterName;
-	
-	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
+	/*
+     NSString *betterName = [fm displayNameAtPath:[path stringByDeletingPathExtension]];
+     betterName = [betterName stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+     ME-431: betterName is not used because we prefer having the real representation of the finder */
+
+	newNode.name = [fm displayNameAtPath:path];
+ 	newNode.icon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:path];
 	[newNode.icon setScalesWhenResized:YES];
 	[newNode.icon setSize:NSMakeSize(16,16)];
 	newNode.parser = self;

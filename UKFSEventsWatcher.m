@@ -25,33 +25,58 @@
 
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
 
-static void FSEventCallback(ConstFSEventStreamRef inStreamRef, 
+/* With this container class we can store the watcher issuing the FSEventCallback as weel as the file desciptor of the directory at watched path */
+@interface FSEventCallbackInfo : NSObject { UKFSEventsWatcher *watcher; int fileDescriptor; }
+@property (retain) UKFSEventsWatcher *watcher;
+@property (assign) int fileDescriptor;
+@end
+
+@implementation FSEventCallbackInfo
+@synthesize fileDescriptor, watcher;
+@end
+
+static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 							void* inClientCallBackInfo, 
 							size_t inNumEvents, 
 							void* inEventPaths, 
 							const FSEventStreamEventFlags inEventFlags[], 
 							const FSEventStreamEventId inEventIds[])
 {
-	UKFSEventsWatcher* watcher = (UKFSEventsWatcher*)inClientCallBackInfo;
-	
+    FSEventCallbackInfo *information = (FSEventCallbackInfo *)inClientCallBackInfo;
+	UKFSEventsWatcher *watcher = information.watcher;
+    int fileDescriptor = information.fileDescriptor;
+    
 	if (watcher != nil && [watcher delegate] != nil)
 	{
 		id delegate = [watcher delegate];
-		
-		if ([delegate respondsToSelector:@selector(watcher:receivedNotification:forPath:)])
+		if ([delegate respondsToSelector:@selector(watcher:receivedNotification:forPath:withRenamingInfo:)])
 		{
-			NSEnumerator* paths = [(NSArray*)inEventPaths objectEnumerator];
-			NSString* path;
-			
-			while (path = [paths nextObject])
-			{
-				[delegate watcher:watcher receivedNotification:UKFileWatcherWriteNotification forPath:path];
-				
-				[[[NSWorkspace sharedWorkspace] notificationCenter] 
-					postNotificationName: UKFileWatcherWriteNotification
-					object:watcher
-					userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path,@"path",nil]];
-			}	
+            NSArray *paths = (NSArray*)inEventPaths;
+            for (int i = 0; i < inNumEvents; ++i)
+            {
+                NSString *path = [paths objectAtIndex:i];
+                if (inEventFlags[i] & kFSEventStreamEventFlagRootChanged)
+                {
+                    char newPathChar[MAXPATHLEN];
+                    int rc = fcntl(fileDescriptor, F_GETPATH, newPathChar);
+                    if (rc != -1 /* No error */)
+                    {
+                        NSString *newPath = [NSString stringWithUTF8String:newPathChar];
+                        NSDictionary *renameInfo = @{path: newPath};
+                        
+                        [delegate watcher:watcher receivedNotification:UKFileWatcherWriteNotification forPath:path withRenamingInfo:renameInfo];
+                        [[[NSWorkspace sharedWorkspace] notificationCenter] postNotificationName:UKFileWatcherWriteNotification
+                                                                                          object:watcher userInfo:@{@"path": path}];
+                    }
+                    else { /* Error */ NSLog(@"%s Unable to locate new path of %@, FSEvent %lld will be ignored", __PRETTY_FUNCTION__, path, inEventIds[i]); }
+                }
+                else
+                {
+                    [delegate watcher:watcher receivedNotification:UKFileWatcherWriteNotification forPath:path withRenamingInfo:nil];                    
+                    [[[NSWorkspace sharedWorkspace] notificationCenter] postNotificationName:UKFileWatcherWriteNotification
+                                                                                      object:watcher userInfo:@{@"path": path}];
+                }
+			}
 		}
 	}
 }
@@ -87,10 +112,11 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
     if (self = [super init])
 	{
-		latency = 1.0;
+		latency = .7;
 		flags = kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagWatchRoot;
-		eventStreams = [[NSMutableDictionary alloc] init];
-		eventStreamPaths = [[NSCountedSet alloc] init];
+		eventStreams = [NSMutableDictionary new];
+        eventStreamInfos = [NSMutableDictionary new];
+		eventStreamPaths = [NSCountedSet new];
     }
 	
     return self;
@@ -104,6 +130,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 {
 	[self removeAllPaths];
     [eventStreams release];
+    [eventStreamInfos release];
 	[eventStreamPaths release];
     [super dealloc];
 }
@@ -197,9 +224,14 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 - (BOOL) _registerFSEventsObserverForPath:(NSString*)path
 {
 	BOOL succeeded = YES;
+    
+    FSEventCallbackInfo *directoryInformation = [FSEventCallbackInfo new];
+    directoryInformation.fileDescriptor = open([path UTF8String], O_RDONLY);
+    directoryInformation.watcher = self;
+    
 	FSEventStreamContext context;
+	context.info = (void*)directoryInformation;
 	context.version = 0;
-	context.info = (void*) self;
 	context.retain = NULL;
 	context.release = NULL;
 	context.copyDescription = NULL;
@@ -213,6 +245,7 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 		FSEventStreamStart(stream);
 
 		[eventStreams setObject:[NSValue valueWithPointer:stream] forKey:path];
+        [eventStreamInfos setObject:directoryInformation forKey:path];
 	}	
 	else
 	{
@@ -301,6 +334,9 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 		
 		if (stream)
 		{
+            [[eventStreamInfos objectForKey:path] release];
+            [eventStreamInfos removeObjectForKey:path];
+            
 			[self _unregisterFSEventStream:stream];
 		}
 	}
@@ -319,18 +355,23 @@ static void FSEventCallback(ConstFSEventStreamRef inStreamRef,
 		// Unregister them all indiscriminately, then remove all objects from 
 		// our tracking collections.
 		
-		NSEnumerator* eventStreamEnum = [[eventStreams allValues] objectEnumerator];
-		NSValue* thisEventStreamPointer = nil;
-		
-		while (thisEventStreamPointer = [eventStreamEnum nextObject])
+		for (NSString *path in [eventStreams allKeys])
 		{
+            NSValue* thisEventStreamPointer = [eventStreams objectForKey:path];
 			FSEventStreamRef stream = [thisEventStreamPointer pointerValue];
 
 			if (stream)
 			{
+                
 				[self _unregisterFSEventStream:stream];				
 			}
 		}
+        
+		for (NSString *path in [eventStreamInfos allKeys])
+		{
+            [[eventStreamInfos objectForKey:path] release];
+            [eventStreamInfos removeObjectForKey:path];
+        }
 		
 		[eventStreams removeAllObjects];
 		[eventStreamPaths removeAllObjects];
