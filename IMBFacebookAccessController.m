@@ -104,7 +104,8 @@
                 else
                 {
                     if (completion) {
-                        completion(NO, nil, [result valueForKey: @"error"]);
+                        BOOL canceled = [result valueForKey: @"error"] == nil;
+                        completion(canceled, nil, [result valueForKey: @"error"]);
                     }
                 }
             }];
