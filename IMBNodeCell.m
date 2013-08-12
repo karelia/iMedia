@@ -106,9 +106,6 @@
 		
 		_badgeType = 0;
 		_clickedRect = NSZeroRect;
-		
-		[self setTarget:self];
-		[self setAction:@selector(showPopover:)];
 	}
 	
 	return self;
