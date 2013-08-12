@@ -212,7 +212,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 #pragma mark 
 
-@protocol IMBNodeViewControllerDelegate
+@protocol IMBNodeViewControllerDelegate <NSObject>
 
 @optional
 
@@ -222,6 +222,9 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customHeaderViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customObjectViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customFooterViewControllerForNode:(IMBNode*)inNode;
+
+// May supply a Facebook app id if app wants to integrate Facebook node into node view
+- (NSString*) facebookAppId;
 
 @end
 //----------------------------------------------------------------------------------------------------------------------

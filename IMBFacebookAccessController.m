@@ -9,8 +9,7 @@
 #import "IMBFacebookAccessController.h"
 #import "IMBFacebookParserMessenger.h"
 #import "SBUtilities.h"
-
-#define FACEBOOK_APP_ID @"509673709092685"
+#import "NSObject+iMedia.h"
 
 @interface IMBFacebookAccessController ()
 
@@ -61,7 +60,19 @@
             self.loginDialogPending = YES;
             node.badgeTypeNormal = kIMBBadgeTypeLoading;
             
-            PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:FACEBOOK_APP_ID delegate:self];
+            NSString *facebookAppId = nil;
+            if ([nodeViewController.delegate respondsToSelector:@selector(facebookAppId)]) {
+                facebookAppId = [nodeViewController.delegate facebookAppId];
+            }
+            // Fallback only for development convenience! (Get if from key chain)
+            if (facebookAppId == nil) {
+                facebookAppId = [self facebookAppId];
+            }
+            if (facebookAppId == nil) {
+                [self imb_throwProgrammerErrorExceptionWithReason:@"No Facebook app id provided. Should be provided by node view controller delegate."];
+            }
+            
+            PhFacebook *facebook = [[PhFacebook alloc] initWithApplicationID:facebookAppId delegate:self];
             
             NSRect rect = NSMakeRect(0.0, 0.0, 0.0, 0.0);
             NSView *rectParentView = nil;
@@ -140,9 +151,38 @@
                            });
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// Delete all Facebook cookies (http and https) except facebook locale
+#pragma mark
+#pragma mark Utility
 
+// Get Facebook app id from key chain (use key chain item type "password". Set "account" to "imb_facebook_app_id"
+// and set password to facebook app id)
+// NOTE: Use this method for development purposes only! Implement -facebookAppId on node view controller delegate
+// before deploying app to store or customer)
+//
+- (NSString *)facebookAppId
+{
+    NSString *facebookAppId = nil;
+    SecKeychainItemRef item = nil;
+    UInt32 stringLength;
+    char* buffer;
+    OSStatus err = SecKeychainFindGenericPassword (NULL, 19, "imb_facebook_app_id", 0, nil, &stringLength, (void**)&buffer, &item);
+    if (noErr == err) {
+        if (stringLength > 0) {
+            facebookAppId = [[[NSString alloc] initWithBytes:buffer length:stringLength encoding:NSUTF8StringEncoding] autorelease];
+            NSLog(@"Warning! You are utilizing key chain entry 'imb_facebook_app_id' for providing a facebook app id. Provide through -facebookAppId on node view controller delegate before deploying app!");
+        } else {
+            NSLog (@"%s Empty password for 'imb_facebook_app_id' account in keychain: status %ld", __FUNCTION__, (long)err);
+        }
+        SecKeychainItemFreeContent (NULL, buffer);
+    } else {
+        NSLog(@"%s Couldn't find 'imb_facebook_app_id' account in keychain: status %ld", __FUNCTION__, (long)err);
+    }
+    
+    return facebookAppId;
+}
+
+// Delete all Facebook cookies (http and https) except facebook locale
+//
 - (void) deleteFacebookCookies
 {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
