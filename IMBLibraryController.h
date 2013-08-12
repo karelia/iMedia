@@ -185,6 +185,10 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 
 - (BOOL) libraryController:(IMBLibraryController*)inController didDoubleClickSelectedObjects:(NSArray*)inObjects inNode:(IMBNode*)inNode;
 
+// A less formal delegate method that is nonetheless checked for and dispatched from IMBNodeViewController. I'm
+// declaring it here to quiet warnings about an unrecognized @selector() constant.
+- (BOOL) allowsFolderDropForMediaType:(NSString*)inMediaType;
+
 @end
 
 
