@@ -669,7 +669,7 @@
 		3091F6B415C9508E005019A1 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3092C3161712F14100E52444 /* IMBFacebookAccessController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IMBFacebookAccessController.h; sourceTree = "<group>"; };
 		3092C3171712F14100E52444 /* IMBFacebookAccessController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IMBFacebookAccessController.m; sourceTree = "<group>"; };
-		3094F7151715C0070016E810 /* PhFacebook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhFacebook.framework; path = "../../../../Library/Developer/Xcode/DerivedData/iMedia-eziqmohtzkxjywecdgfphvntbmzs/Build/Products/Debug/PhFacebook.framework"; sourceTree = "<group>"; };
+		3094F7151715C0070016E810 /* PhFacebook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PhFacebook.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3099018C16637B93006C1212 /* NSBundle+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+iMedia.h"; sourceTree = "<group>"; };
 		3099018D16637B93006C1212 /* NSBundle+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+iMedia.m"; sourceTree = "<group>"; };
 		30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = im.edia.Facebook.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1304,7 +1304,6 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
-				3094F7151715C0070016E810 /* PhFacebook.framework */,
 				30C8ACCA16F089B5005674CA /* Social.framework */,
 				30C8ACC816F08996005674CA /* Accounts.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
@@ -1384,6 +1383,7 @@
 		30FFEBED150A08DB0009C1D0 /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3094F7151715C0070016E810 /* PhFacebook.framework */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
