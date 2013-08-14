@@ -283,7 +283,18 @@ static NSUInteger sFacebookElementLimit = 5000;
                                   connectionType, @"nodeType",
                                   ID, @"facebookID",
                                   [NSNumber numberWithUnsignedInteger:parentNestingLevel+1], @"nestingLevel", nil];
-            [subnodes addObject:subnode];
+            
+            // Test whether 'friend' subnode has itself albums. If not leave it out because would be empty node.
+            
+            if ([connectionType isEqualToString:@"friends"]) {
+                NSArray *friendalbums = [self nodeID:ID connectedNodesByType:@"albums" params:params error:outError];
+                
+                if ([friendalbums count] > 0) {
+                    [subnodes addObject:subnode];
+                }
+            } else {
+                [subnodes addObject:subnode];
+            }
         }
     }
         
