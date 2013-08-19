@@ -75,8 +75,9 @@ typedef enum
 	kIMBLightroomNodeTypeUnspecified = 0,
 	IMBLightroomNodeTypeFolder,
 	IMBLightroomNodeTypeCollection,
-	IMBLightroomNodeTypeRootCollection
-} 
+	IMBLightroomNodeTypeRootCollection,
+	IMBLightroomNodeTypeSmartCollection
+}
 IMBLightroomNodeType;
 
 
@@ -113,8 +114,6 @@ IMBLightroomNodeType;
 + (NSArray*) libraryPaths;
 + (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
-
 - (NSString*) rootNodeIdentifier;
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
 - (NSString*) identifierWithCollectionId:(NSNumber*)inIdLocal;
@@ -125,7 +124,6 @@ IMBLightroomNodeType;
 							  pathFromRoot:(NSString*)inPathFromRoot
                                   nodeType:(IMBLightroomNodeType)inNodeType;
 
-- (NSImage*) largeFolderIcon;
 
 // Returns a cached FMDatabase for the current thread
 - (FMDatabase*) database;
@@ -145,7 +143,9 @@ IMBLightroomNodeType;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-@interface IMBLightroomParser (Abstract)
+@protocol IMBLightroomParser
+
+@required
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
 
@@ -158,12 +158,38 @@ IMBLightroomNodeType;
 - (NSString*) folderObjectsQuery;
 - (NSString*) collectionObjectsQuery;
 
-- (NSImage*) folderIcon;
-- (NSImage*) groupIcon;
-- (NSImage*) collectionIcon;
++ (NSImage*) folderIcon;
++ (NSImage*) groupIcon;
++ (NSImage*) collectionIcon;
 
 @end
 
+
+@interface IMBLightroomParser (Subclassers)
+
+- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
+- (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode;
+- (void) populateSubnodesForFolderNode:(IMBNode*)inParentNode;
+- (void) populateSubnodesForCollectionNode:(IMBNode*)inRootNode;
+- (void) populateSubnodesForSmartCollectionNode:(IMBNode*)inRootNode;
+- (void) populateObjectsForFolderNode:(IMBNode*)inNode;
+- (void) populateObjectsForCollectionNode:(IMBNode*)inNode;
+- (void) populateObjectsForSmartCollectionNode:(IMBNode*)inNode;
+
++ (IMBLightroomNodeType) nodeTypeForCreationId:(NSString *)creationId;
+
++ (NSImage*) largeFolderIcon;
+
+- (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
+- (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
+- (IMBObject*) objectWithPath:(NSString*)inPath
+					  idLocal:(NSNumber*)idLocal
+						 name:(NSString*)inName
+				  pyramidPath:(NSString*)inPyramidPath
+					 metadata:(NSDictionary*)inMetadata
+						index:(NSUInteger)inIndex;
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 

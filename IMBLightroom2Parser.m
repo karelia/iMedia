@@ -145,7 +145,7 @@
 	IMBNode* foldersNode = [[[IMBNode alloc] initWithParser:self topLevel:NO] autorelease];
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
+	foldersNode.icon = [[self class] folderIcon];
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
                                                    rootPath:nil
@@ -163,7 +163,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self largeFolderIcon];
+	foldersObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:foldersObject];
 
@@ -273,7 +273,7 @@
 	return query;
 }
 
-- (NSImage*) folderIcon
++ (NSImage*) folderIcon
 {
 	static NSImage* folderIcon = nil;
 	
@@ -295,7 +295,7 @@
 	return folderIcon;
 }
 
-- (NSImage*) groupIcon;
++ (NSImage*) groupIcon;
 {
 	static NSImage* groupIcon = nil;
 	
@@ -317,7 +317,7 @@
 	return groupIcon;
 }
 
-- (NSImage*) collectionIcon;
++ (NSImage*) collectionIcon;
 {
 	static NSImage* collectionIcon = nil;
 	

@@ -44,6 +44,9 @@
  */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Pierre Bernard
 
 
@@ -52,17 +55,47 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroomParser.h"
-
-
-@interface IMBLightroom3or4Parser : IMBLightroomParser
-{
-	
-}
-
-- (NSNumber*) databaseVersion;
-
-@end
+#import "IMBLightroom5VideoParser.h"
+#import "IMBParserController.h"
+#import "IMBObject.h"
+#import "NSDictionary+iMedia.h"
+#import "NSURL+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBLightroom5VideoParser
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
+// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
+// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
+// Please note that this method may be called on a background thread...
+
+- (NSDictionary*) metadataForObject:(IMBObject*)inObject error:(NSError**)outError
+{
+	NSMutableDictionary* metadata = nil;
+	NSURL* videoURL = [inObject URL];
+	
+	if (videoURL)
+	{
+		metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
+		[metadata setObject:[videoURL path] forKey:@"path"];
+		[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
+	}
+
+	if (outError) *outError = nil;
+	return metadata;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end

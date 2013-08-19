@@ -214,7 +214,7 @@
 	return query;
 }
 
-- (NSImage*) folderIcon
++ (NSImage*) folderIcon
 {
 	static NSImage* folderIcon = nil;
 	
@@ -225,7 +225,7 @@
 	return folderIcon;
 }
 
-- (NSImage*) groupIcon;
++ (NSImage*) groupIcon;
 {
 	static NSImage* groupIcon = nil;
 	
@@ -236,7 +236,7 @@
 	return groupIcon;
 }
 
-- (NSImage*) collectionIcon;
++ (NSImage*) collectionIcon;
 {
 	static NSImage* collectionIcon = nil;
 	
