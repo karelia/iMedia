@@ -365,10 +365,18 @@ static NSUInteger sFacebookElementLimit = 5000;
 - (id)thumbnailForObject:(IMBObject *)inObject error:(NSError **)outError
 {
 #if DEBUG_SIMULATE_MISSING_THUMBNAILS
-    BOOL doNotLoad = arc4random() & 7;      // Will be YES for about 12.5 % of thumbnails
+    BOOL doNotLoad = arc4random_uniform(9) == 8;      // Will be YES for about 12.5 % of thumbnails
 #endif
     
     IMBFacebookObject *object = (IMBFacebookObject *)inObject;
+    
+    // Prepare a UI-presentable error to be handed back to UI if anything goes wrong
+    // (We will log more specific errors to console)
+    NSString *presentableErrorString = NSLocalizedStringWithDefaultValue(@"IMBFacebookParser.ThumbnailLoadError", nil, IMBBundle(), @"Could not load thumbnail. You may retry manually using contextual menu", nil);
+    NSDictionary *presentableUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                              presentableErrorString, NSLocalizedDescriptionKey, nil];
+    NSError *presentableError = [NSError errorWithDomain:kIMBErrorDomain code:1 userInfo:presentableUserInfo];
+    NSError *internalError = nil;
     
 //    // Object might currently have an NSImage representation type if its previous thumbnail load failed
 //    // and the generic thumbnail placeholder image was set as its image representation. But here we are
@@ -386,7 +394,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             
             NSURLRequest *imageRequest = [NSURLRequest requestWithURL:url];
             NSHTTPURLResponse *response = nil;
-            responseData = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:outError];
+            responseData = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:&internalError];
             
             if (responseData)
             {
@@ -399,26 +407,27 @@ static NSUInteger sFacebookElementLimit = 5000;
                     NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with code: %ld, mime type: %@ and response data: %@", url, (long)statusCode, mimeType, responseData];
                     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                               errorString, NSLocalizedDescriptionKey, nil];
-                    NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                    internalError = [NSError errorWithDomain:kIMBErrorDomain code:statusCode userInfo:userInfo];
+                    inObject.error = presentableError;
                     if (outError) {
-                        *outError = error;
+                        *outError = presentableError;
                     }
-                    NSLog(@"%@", error);
+                    NSLog(@"%@", internalError);
                     
                 } else {
                     // Sadly enough, Facebook might return an error page instead of an image despite responding with
                     // a 200 status code and a mime type image/...
                     
                     BOOL responseDataIsImage = NO;
-                    static const char *nonImageResponse = "<html>";
+                    static const char *nonImageIndicator = "<html>";
                     static NSUInteger bytesToInspect;
-                    bytesToInspect = (NSUInteger)strlen(nonImageResponse);
+                    bytesToInspect = (NSUInteger)strlen(nonImageIndicator);
                     if ([responseData length] >= bytesToInspect){
                         responseDataIsImage =
 #if DEBUG_SIMULATE_MISSING_THUMBNAILS
-                        doNotLoad;
+                        !doNotLoad;
 #else
-                        strncmp([responseData bytes], nonImageResponse, bytesToInspect) != 0;
+                        strncmp([responseData bytes], nonImageIndicator, bytesToInspect) != 0;
 #endif
                     }
                     if (!responseDataIsImage) {
@@ -426,17 +435,21 @@ static NSUInteger sFacebookElementLimit = 5000;
                         
                         NSString *errorString = [NSString stringWithFormat:@"Error loading thumbnail %@: Server responded with data:  %@", url,
 #if DEBUG_SIMULATE_MISSING_THUMBNAILS
-                                             @"Simulating missing thumbnail"];
+                            @"Simulating missing thumbnail"];
 #else
-                                             responseData];
+                            responseData];
 #endif
                         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                                   errorString, NSLocalizedDescriptionKey, nil];
-                        NSError *error = [NSError errorWithDomain:kIMBErrorDomain code:kIMBResourceDoesNotExist userInfo:userInfo];
+                        internalError = [NSError errorWithDomain:kIMBErrorDomain code:kIMBResourceDoesNotExist userInfo:userInfo];
+                        inObject.error = presentableError;
                         if (outError) {
-                            *outError = error;
+                            *outError = presentableError;
                         }
-                        NSLog(@"%@", error);
+                        NSLog(@"%@", internalError);
+#if DEBUG_SIMULATE_MISSING_THUMBNAILS
+                        break;              // Do not try to load alternative image locations if we are simulating
+#endif
                     } else {
                         // Response data is ok (should be an image)
                         
@@ -445,23 +458,27 @@ static NSUInteger sFacebookElementLimit = 5000;
                         inObject.accessibility = kIMBResourceIsAccessible;
                         inObject.error = nil;
                         inObject.imageRepresentationType = IKImageBrowserNSDataRepresentationType;
-                        return responseData;
+                        break;
                         
 //                        NSLog(@"%f s to load thumbnail %@", [[NSDate date] timeIntervalSinceDate:startTime], url);
                     }
                 }
             } else {
+                inObject.accessibility = kIMBResourceDoesNotExist;
                 // Server did not respond
-                if (outError && *outError) {
-                    NSLog(@"Error loading thumbnail %@: %@", url, *outError);
+                if (internalError) {
+                    NSLog(@"Error loading thumbnail %@: %@", url, internalError);
                 } else {
                     NSLog(@"Error loading thumbnail %@: No data received but error unknown", url);
+                }
+                inObject.error = presentableError;
+                if (outError) {
+                    *outError = presentableError;
                 }
             }
         }
     }
-    inObject.accessibility = kIMBResourceDoesNotExist;
-    return nil;
+    return responseData;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
