@@ -995,16 +995,14 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 {
     IMBNode* node = (IMBNode*) inItem;
     
-    // Any errors to show via badge?
-
-    if (node.error)
+    if ([node badgeTypeNormalNonLoading] == kIMBBadgeTypeEject)
+    {
+        [self revokeAccessToNode:node errorRect:inRect];
+    } else if (node.error)
     {
         [self showErrorPopoverForNode:node relativeToRect:inRect];
     }
-    else if ([node badgeTypeNormalNonLoading] == kIMBBadgeTypeEject)
-    {
-        [self revokeAccessToNode:node errorRect:inRect];
-    }
+     
 }
 
 
@@ -1037,6 +1035,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
         if (inCompletion) {
             inCompletion(requestCanceled, affectedNodes, error);
         }
+//        if (inNode.error) {
+//            IMBOutlineView *outlineView = self.nodeOutlineView;
+//            NSInteger row = [outlineView rowForItem:inNode];
+//            NSRect rect = [outlineView badgeRectForRow:row];
+//            
+//            [self showErrorPopoverForNode:inNode relativeToRect:rect];
+//        }
      }];
 }
 
