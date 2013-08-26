@@ -1424,7 +1424,9 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 - (void) __volumesDidChange
 {
-	[IMBPopover closeAllPopovers];
+    if (IMBRunningOnLionOrNewer()) {
+        [IMBPopover closeAllPopovers];
+    }
 	[self reload];
 }
 
