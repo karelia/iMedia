@@ -215,7 +215,7 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 
 void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObject,SBReturnValueHandler inReturnHandler)
 {
-    // If we are running sandboxed on Lion (or newer), then send a request to perform selector on target to our XPC
+    // If we have an XPC connection, then send a request to perform selector on target to our XPC
     // service and hand the results to the supplied return handler block...
     
     if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)])
@@ -249,8 +249,8 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
          }];
     }
     
-    // If we are not sandboxed (e.g. running on Snow Leopard) we'll just do the work directly (but asynchronously)
-    // via GCD queues. Once again the result is handed over to the return handler block. Please note that we are 
+    // Otherwise we'll just do the work directly (but asynchronously) via GCD queues.
+    // Once again the result is handed over to the return handler block. Please note that we are
 	// copying inTarget and inObject so they are dispatched under same premises as XPC (XPC uses archiving)...
    
     else
@@ -263,6 +263,7 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
 		{
+            NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 			NSError* error = nil;
 			id result = nil;
 
@@ -286,6 +287,7 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
 				inReturnHandler(result,error);
 				dispatch_release(currentQueue);
 			});
+            [pool drain];
 	   });
     }
 }
