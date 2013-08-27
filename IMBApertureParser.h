@@ -67,7 +67,7 @@
 }
 
 @property (assign) BOOL placeholderParser;
-@property (assign) NSInteger version;
+@property (assign, readonly) NSInteger version;
 
 @end
 
