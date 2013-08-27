@@ -123,7 +123,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 // Library...
 
-@property (retain) IMBLibraryController* libraryController;
+@property (nonatomic, retain) IMBLibraryController* libraryController;
 
 // Support for subclasses; please don't rely on it in your own apps
 + (NSImage *)iconForAppWithBundleIdentifier:(NSString *)identifier fallbackFolder:(NSSearchPathDirectory)directory;
