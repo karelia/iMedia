@@ -329,7 +329,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             object.alternateImageLocations = images;
             // Pick image with highest resolution. This should be the first in images.
             NSString *URLString = nil;
-            NSUInteger width, height = 0;
+            NSNumber *width, *height = nil;
             if ([images count] > 0) {
                 NSDictionary *imageDict = [images objectAtIndex:0];
                 width = [imageDict objectForKey:@"width"];
