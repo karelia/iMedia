@@ -92,16 +92,10 @@
 		308DEF151609C6CE00F889C8 /* IMBTableViewAppearance.h in Headers */ = {isa = PBXBuildFile; fileRef = 308DEF131609C6CE00F889C8 /* IMBTableViewAppearance.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		308DEF161609C6CE00F889C8 /* IMBTableViewAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = 308DEF141609C6CE00F889C8 /* IMBTableViewAppearance.m */; };
 		308FC1FC16A9498B00B42F49 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 308FC1FE16A9498B00B42F49 /* Localizable.strings */; };
-		3091F6B515C9508E005019A1 /* IMBCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930B41010F6C100C527B7 /* IMBCommon.h */; };
-		3091F6B715C9508E005019A1 /* IMBConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = D09931A810110E8900C527B7 /* IMBConfig.h */; };
-		3091F6B915C9508E005019A1 /* IMBOperationQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = D09930BC1010F6C100C527B7 /* IMBOperationQueue.h */; };
-		3091F6BB15C9508E005019A1 /* IMBIconCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D049F0401034A86B003CC49C /* IMBIconCache.h */; };
 		3091F6BD15C9508E005019A1 /* IMBURLGetSizeOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = CE09F301124823020094EC48 /* IMBURLGetSizeOperation.h */; };
 		3091F6BE15C9508E005019A1 /* IMBURLGetSizeOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = CE09F302124823020094EC48 /* IMBURLGetSizeOperation.m */; };
 		3091F6BF15C9508E005019A1 /* IMBURLDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = D052AFD010538B7B00988F53 /* IMBURLDownloadOperation.h */; };
 		3091F6C015C9508E005019A1 /* IMBURLDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = D052AFD110538B7B00988F53 /* IMBURLDownloadOperation.m */; };
-		3091F6C115C9508E005019A1 /* IMBImageItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 274DF616114EF0B200AC8C03 /* IMBImageItem.h */; };
-		3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */ = {isa = PBXBuildFile; fileRef = D08F7F3E11E4974E006E618E /* IMBQLPreviewPanel.h */; };
 		3092C3191712F14100E52444 /* IMBFacebookAccessController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3092C3161712F14100E52444 /* IMBFacebookAccessController.h */; };
 		3092C31A1712F14100E52444 /* IMBFacebookAccessController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3092C3171712F14100E52444 /* IMBFacebookAccessController.m */; };
 		3094F7161715C0070016E810 /* PhFacebook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3094F7151715C0070016E810 /* PhFacebook.framework */; };
@@ -2239,14 +2233,8 @@
 				FC1484121598881A00F6FDB8 /* IMBFlickrParserMessenger.h in Headers */,
 				FC1484161598881A00F6FDB8 /* IMBFlickrSession.h in Headers */,
 				FC14841B1598884E00F6FDB8 /* IMBLoadMoreObject.h in Headers */,
-				3091F6B515C9508E005019A1 /* IMBCommon.h in Headers */,
-				3091F6B715C9508E005019A1 /* IMBConfig.h in Headers */,
-				3091F6B915C9508E005019A1 /* IMBOperationQueue.h in Headers */,
-				3091F6BB15C9508E005019A1 /* IMBIconCache.h in Headers */,
 				3091F6BD15C9508E005019A1 /* IMBURLGetSizeOperation.h in Headers */,
 				3091F6BF15C9508E005019A1 /* IMBURLDownloadOperation.h in Headers */,
-				3091F6C115C9508E005019A1 /* IMBImageItem.h in Headers */,
-				3091F6C315C9508E005019A1 /* IMBQLPreviewPanel.h in Headers */,
 				D0DC63F515ECAB9400DAD84E /* IMBAccessRightsController.h in Headers */,
 				D0A00A9915F47A7100596789 /* IMBAccessRightsViewController.h in Headers */,
 				3000ADEC1612F6DA00EDC78E /* IMBTableViewAppearance+iMediaPrivate.h in Headers */,
@@ -2513,7 +2501,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0460;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3194,7 +3182,12 @@
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				SYMROOT = "";
 			};
 			name = Debug;
@@ -3204,9 +3197,14 @@
 			baseConfigurationReference = D0760AC210C5027100F2119C /* IMBProject.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				PROVISIONING_PROFILE = "";
 				SYMROOT = "";
 			};
