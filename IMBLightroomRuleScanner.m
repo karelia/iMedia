@@ -395,7 +395,7 @@ static NSString *const	lightroomAssignString		= @"=";
 
 	unsigned int			hexValue;
 
-	if (! [self scanHexInt:hexValue]) {
+	if (! [self scanHexInt:&hexValue]) {
 		return NO;
 	}
 

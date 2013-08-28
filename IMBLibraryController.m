@@ -131,6 +131,13 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 @end
 
+// Define __dummyAction: just to quiet the compiler
+
+@interface NSObject ()
+
+- (IBAction) __dummyAction:(id)sender;
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
 

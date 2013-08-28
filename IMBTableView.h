@@ -72,7 +72,7 @@
 @property (assign) NSInteger clickedObjectIndex;
 @property (retain) IMBObject* clickedObject;
 
-@property (retain) IMBTableViewAppearance *imb_Appearance; // Note that there is already -appearance on NSView (private)
+@property (nonatomic, retain) IMBTableViewAppearance *imb_Appearance; // Note that there is already -appearance on NSView (private)
 
 @end
 

@@ -215,6 +215,16 @@
 	return plist;
 }
 
+- (void) setPlist:(NSDictionary *)inPlist
+{
+    @synchronized(self)
+    {
+        if (inPlist != _plist) {
+            [_plist release];
+            _plist = [inPlist retain];
+        }
+    }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -269,11 +269,13 @@
 
 - (NSInteger) version
 {
-	if (_version == 0)
-	{
-		_version = [[self.plist objectForKey:@"Application Version"] integerValue];
-	}
-	
+    @synchronized(self)
+    {
+        if (_version == 0)
+        {
+            _version = [[self.plist objectForKey:@"Application Version"] integerValue];
+        }
+    }	
 	return _version;
 }
 

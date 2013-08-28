@@ -1286,7 +1286,8 @@ static NSArray* sSupportedUTIs = nil;
 												 8,
 												 0,
 												 colorSpace,
-												 kCGImageAlphaPremultipliedFirst);
+												 // CGImageAlphaInfo type documented as being safe to pass in as CGBitmapInfo
+												 (CGBitmapInfo)kCGImageAlphaPremultipliedFirst);
 	CGColorSpaceRelease(colorSpace);
 												 
 	if (context)

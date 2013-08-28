@@ -180,8 +180,9 @@
 													   squareSize,
 													   8, 
 													   4 * squareSize, 
-													   CGImageGetColorSpace(inImage), 
-													   kCGImageAlphaPremultipliedLast);
+													   CGImageGetColorSpace(inImage),
+													   // CGImageAlphaInfo type documented as being safe to pass in as CGBitmapInfo
+													   (CGBitmapInfo)kCGImageAlphaPremultipliedLast);
 	// Fill everything with transparent pixels
 	CGRect bounds = CGContextGetClipBoundingBox(bitmapContext);
 	CGContextClearRect(bitmapContext, bounds);

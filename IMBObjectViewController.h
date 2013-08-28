@@ -176,7 +176,7 @@ extern NSString* kIMBObjectBadgesDidChangeNotification;
 // the outside, wheneven a node is selected in the NSOutlineView of a IMBNodeViewController. This in turn fills  
 // the IMBObjectArrayController with content...
 
-@property (retain) IMBLibraryController* libraryController;
+@property (nonatomic, retain) IMBLibraryController* libraryController;
 - (NSString*) mediaType;
 @property (assign) id<IMBObjectViewControllerDelegate> delegate;
 

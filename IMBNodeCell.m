@@ -106,9 +106,6 @@
 		
 		_badgeType = 0;
 		_clickedRect = NSZeroRect;
-		
-		[self setTarget:self];
-		[self setAction:@selector(showPopover:)];
 	}
 	
 	return self;
@@ -240,16 +237,6 @@
 	}
 	
 	return badgeRect;
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-- (BOOL) isGroupCell
-{
-	return _isGroupCell;
-//    return (self.icon == nil && self.title.length > 0);
 }
 
 
