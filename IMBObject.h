@@ -49,6 +49,14 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
+#pragma mark ABSTRACT
+
+/**
+ IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location
+ property uniquely identifies the item.
+ 
+ IMBObject is not designed to be thread-safe.
+ */
 
 #pragma mark HEADERS
 
@@ -75,9 +83,6 @@ extern NSString* kIMBObjectPasteboardType;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-// IMBObject encapsulates information about a single media item (e.g. image file or audio file). The location 
-// property uniquely identifies the item.
 
 @interface IMBObject : NSObject <NSCopying,NSCoding,IMBImageItem,QLPreviewItem,NSPasteboardItemDataProvider>
 {
@@ -163,7 +168,7 @@ extern NSString* kIMBObjectPasteboardType;
 
 // The following methods are not part of the IKImageBrowserItem protocol, but act in a supporting manner...
 
-@property (assign) BOOL needsImageRepresentation;			// Set to YES if an existing thumbnail should be reloaded
+@property (nonatomic, assign) BOOL needsImageRepresentation;			// Set to YES if an existing thumbnail should be reloaded
 @property (readonly) BOOL isDraggable;						// Can this object be dragged from iMediaBrowser?
 
 @property (retain) id imageLocation;						// Optional url if different from location (e.g. lores thumbnail)
