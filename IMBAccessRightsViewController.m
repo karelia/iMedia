@@ -320,7 +320,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
                 inNode.badgeTypeNormal = kIMBBadgeTypeLoading;
                 inNode.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
 				IMBParserMessenger* messenger = inNode.parserMessenger;
-				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+				SBPerformSelectorAsync(messenger.connection,
+                                       messenger,
+                                       @selector(addAccessRightsBookmark:error:),
+                                       bookmark,
+                                       dispatch_get_main_queue(),
 				
 					^(NSURL* inReceivedURL,NSError* inError)
 					{
@@ -353,7 +357,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
         
         // Send it to the XPC service, so it has access to the folder...
         
-        SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+        SBPerformSelectorAsync(messenger.connection,
+                               messenger,
+                               @selector(addAccessRightsBookmark:error:),
+                               bookmark,
+                               dispatch_get_main_queue(),
                                
                                ^(NSURL* inReceivedURL,NSError* inError)
                                {
@@ -668,7 +676,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
 				
 				IMBParserMessenger* messenger = node.parserMessenger;
-				SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),inBookmark,
+				SBPerformSelectorAsync(messenger.connection,
+                                       messenger,
+                                       @selector(addAccessRightsBookmark:error:),
+                                       inBookmark,
+                                       dispatch_get_main_queue(),
 			
 					^(NSURL* inReceivedURL,NSError* inError)
 					{

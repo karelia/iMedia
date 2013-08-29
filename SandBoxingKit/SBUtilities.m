@@ -213,13 +213,14 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 // When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD, but the 
 // behaviour will be similar...
 
-void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObject,SBReturnValueHandler inReturnHandler)
+void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObject, dispatch_queue_t returnHandlerQueue, SBReturnValueHandler inReturnHandler)
 {
     // If we have an XPC connection, then send a request to perform selector on target to our XPC
     // service and hand the results to the supplied return handler block...
     
     if (inConnection && [inConnection respondsToSelector:@selector(sendSelector:withTarget:object:returnValueHandler:)])
     {
+        [inConnection setReplyDispatchQueue:returnHandlerQueue];
         SBReturnValueHandler returnHandler = [inReturnHandler copy];
         
         [inConnection sendSelector:inSelector
@@ -258,8 +259,7 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
         id targetCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inTarget]];
         id objectCopy = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:inObject]];
         
-        dispatch_queue_t currentQueue = dispatch_get_current_queue();
-        dispatch_retain(currentQueue);
+        dispatch_retain(returnHandlerQueue);
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
 		{
@@ -282,10 +282,10 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
 			
 			result = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:result]];
 			
-			dispatch_async(currentQueue,^()
+			dispatch_async(returnHandlerQueue,^()
 			{
 				inReturnHandler(result,error);
-				dispatch_release(currentQueue);
+				dispatch_release(returnHandlerQueue);
 			});
             [pool drain];
 	   });
@@ -300,9 +300,9 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
  							
 @implementation NSObject (SBPerformSelectorAsync)
 
-- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandler:(SBReturnValueHandler)inCompletionHandler
+- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandlerQueue:(dispatch_queue_t)inQueue completionHandler:(SBReturnValueHandler)inCompletionHandler
 {
-	SBPerformSelectorAsync(inConnection,self,inSelector,inObject,inCompletionHandler);
+	SBPerformSelectorAsync(inConnection,self,inSelector,inObject,inQueue,inCompletionHandler);
 }
 
 @end
