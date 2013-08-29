@@ -177,7 +177,11 @@
         // Use more lightweight copy of self to load thumbnail to save CPU cycles when archiving/unarchiving
         IMBSkimmableObject *copy = [self thumbnailProvider];
         
-        SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailForObject:error:),copy,
+        SBPerformSelectorAsync(messenger.connection,
+                               messenger,
+                               @selector(loadThumbnailForObject:error:),
+                               copy,
+                               dispatch_get_main_queue(),
                                
                                ^(IMBObject* inPopulatedObject,NSError* inError)
                                {

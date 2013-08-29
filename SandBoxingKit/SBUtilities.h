@@ -70,12 +70,13 @@ void SBPerformSelectorAsync(
     id inTarget,
 	SEL inSelector, 
 	id inObject,
+    dispatch_queue_t completionHandlerQueue,
 	SBReturnValueHandler inCompletionHandler);
 
 // Here's the same thing as an Objective-C wrapper (for those developers that do not like using pure C functions)...
  							
 @interface NSObject (SBPerformSelectorAsync)
-- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandler:(SBReturnValueHandler)inCompletionHandler;
+- (void) performAsyncSelector:(SEL)inSelector withObject:(id)inObject onConnection:(id)inConnection completionHandlerQueue:(dispatch_queue_t)inQueue completionHandler:(SBReturnValueHandler)inCompletionHandler;
 @end
 
 

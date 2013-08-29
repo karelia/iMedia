@@ -679,7 +679,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		_isLoadingThumbnail = YES;
 		
 		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadThumbnailAndMetadataForObject:error:),self,
+		SBPerformSelectorAsync(messenger.connection,
+                               messenger,
+                               @selector(loadThumbnailAndMetadataForObject:error:),
+                               self,
+                               dispatch_get_main_queue(),
 		
 			^(IMBObject* inPopulatedObject,NSError* inError)
 			{
@@ -726,7 +730,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	if (self.metadata == nil && !self.isLoadingThumbnail)
 	{
 		IMBParserMessenger* messenger = self.parserMessenger;
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(loadMetadataForObject:error:),self,
+		SBPerformSelectorAsync(messenger.connection,
+                               messenger,
+                               @selector(loadMetadataForObject:error:),
+                               self,
+                               dispatch_get_main_queue(),
 		
 			^(IMBObject* inPopulatedObject,NSError* inError)
 			{
@@ -784,7 +792,11 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 		void (^completionBlock)(NSError*) = [inCompletionBlock copy];
 		IMBParserMessenger* messenger = self.parserMessenger;
 		
-		SBPerformSelectorAsync(messenger.connection,messenger,@selector(bookmarkForObject:error:),self,
+		SBPerformSelectorAsync(messenger.connection,
+                               messenger,
+                               @selector(bookmarkForObject:error:),
+                               self,
+                               dispatch_get_main_queue(),
 		
 			^(NSData* inBookmark,NSError* inError)
 			{

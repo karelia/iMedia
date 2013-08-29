@@ -316,7 +316,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
 		[_delegate libraryController:self willCreateNodeWithParserMessenger:inParserMessenger];
 	}
 	
-	SBPerformSelectorAsync(inParserMessenger.connection,inParserMessenger,@selector(unpopulatedTopLevelNodes:),nil,
+	SBPerformSelectorAsync(inParserMessenger.connection,inParserMessenger,@selector(unpopulatedTopLevelNodes:),nil, dispatch_get_main_queue(),
 	
 		^(NSArray* inNodes,NSError* inError)
 		{
@@ -414,7 +414,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 
 	NSString* parentNodeIdentifier = inNode.parentNode.identifier;
 	IMBParserMessenger* messenger = inNode.parserMessenger;
-	SBPerformSelectorAsync(messenger.connection,messenger,@selector(populateNode:error:),inNode,
+	SBPerformSelectorAsync(messenger.connection,
+                           messenger,
+                           @selector(populateNode:error:),
+                           inNode,
+                           dispatch_get_main_queue(),
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
@@ -515,7 +519,11 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	inOldNode.isLoading = YES;
 	inOldNode.badgeTypeNormal = kIMBBadgeTypeLoading;
 
-	SBPerformSelectorAsync(messenger.connection,messenger,@selector(reloadNodeTree:error:),inOldNode,
+	SBPerformSelectorAsync(messenger.connection,
+                           messenger,
+                           @selector(reloadNodeTree:error:),
+                           inOldNode,
+                           dispatch_get_main_queue(),
 	
 		^(IMBNode* inNewNode,NSError* inError)
 		{
