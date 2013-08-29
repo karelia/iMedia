@@ -676,7 +676,11 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
                              node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
                              
                              IMBParserMessenger* messenger = node.parserMessenger;
-                             SBPerformSelectorAsync(messenger.connection,messenger,@selector(addAccessRightsBookmark:error:),bookmark,
+                             SBPerformSelectorAsync(messenger.connection,
+                                                    messenger,
+                                                    @selector(addAccessRightsBookmark:error:),
+                                                    bookmark,
+                                                    dispatch_get_main_queue(),
                                                     
                                                     ^(NSURL* inReceivedURL,NSError* inError)
                                                     {

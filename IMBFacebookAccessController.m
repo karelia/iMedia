@@ -104,6 +104,7 @@
                                            messenger,
                                            @selector(setFacebookAccessor:error:),
                                            facebook,
+                                           dispatch_get_main_queue(),
                                            
                                            ^(id nothing,NSError *error)
                                            {
@@ -141,7 +142,11 @@
     
     IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)node.parserMessenger;
     
-    SBPerformSelectorAsync(messenger.connection, messenger, @selector(revokeAccessToNode:error:), node,
+    SBPerformSelectorAsync(messenger.connection,
+                           messenger,
+                           @selector(revokeAccessToNode:error:),
+                           node,
+                           dispatch_get_main_queue(),
                            ^(id nothing, NSError *error)
                            {
                                if (completion) {
