@@ -222,8 +222,29 @@ extern NSString* kIMBObjectPasteboardType;
 
 @interface IMBObject (FileAccess)
 
+/**
+ @abstract
+ Asynchronously requests a bookmark for self and sets it within self.
+ Submits the completion block to the provided queue.
+ 
+ @discussion
+ If the bookmark is already stored with self calls the completion block synchronously.
+ */
+- (void) requestBookmarkWithQueue:(dispatch_queue_t)inQueue completionBlock:(void(^)(NSError*))inCompletionBlock;
+
+/**
+ @abstract
+ Asynchronously requests a bookmark for self and sets it within self.
+ Submits the completion block to the main queue.
+ 
+ @discussion
+ If the bookmark is already stored with self calls the completion block synchronously.
+ 
+ @see
+ requestBookmarkWithQueue:completionBlock:
+ */
 - (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock;
-- (void) waitForBookmark;
+
 - (NSURL*) URLByResolvingBookmark;
 
 @property (retain,readonly) NSData* bookmark;

@@ -135,35 +135,38 @@
 #pragma mark QLPreviewItem Protocol 
 
 
-// Request the URL to our processed preview data. Since this is an asynchronous operation, but we have to return
-// synchronously for this protocol method, we'll wrap the calls in a dispatch_sync to a background queue, and 
-// there we wait until we get the bookmark...
-
+/**
+ Returns the URL to preview this Object's resource.
+ Being resolved by a bookmark this URL will have sufficient entitlements.
+ */
 - (NSURL*) previewItemURL
 {
-	if (self.bookmark == nil)
+	if (self.bookmark == nil && !_isLoadingQuicklookPreview)
 	{
-		if (!_isLoadingQuicklookPreview)
-		{
-			_isLoadingQuicklookPreview = YES;
-			 
-			dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
-			{
-				[self requestBookmarkWithCompletionBlock:^(NSError* inError)
-				{
-					if (inError) 
-					{
-						dispatch_async(dispatch_get_main_queue(),^()
-						{
-							[NSApp presentError:inError];
-						});
-					}
-				}];
+        _isLoadingQuicklookPreview = YES;
+         
+        // Request a bookmark for the resource to get entitled for it. Requesting bookmarks is asynchronous, i.e.
+        // we need a semaphore to wait for bookmark so method can return synchronously
+        
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        
+        [self requestBookmarkWithQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)
+                       completionBlock:^(NSError* inError)
+        {
+            if (inError) 
+            {
+                dispatch_async(dispatch_get_main_queue(),^()
+                {
+                    [NSApp presentError:inError];
+                });
+            }
+            dispatch_semaphore_signal(semaphore);
+        }];
 
-				[self waitForBookmark];
-				_isLoadingQuicklookPreview = NO;
-			});
-		}
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        dispatch_release(semaphore);
+        
+        _isLoadingQuicklookPreview = NO;
 	}
 	
 	return [self URLByResolvingBookmark];
