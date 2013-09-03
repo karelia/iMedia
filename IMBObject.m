@@ -565,31 +565,31 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 - (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
-	// Request the bookmark. Since this is an asynchronous operation - but we need to return with a result
-	// synchronously, we'll wrap the whole thing in a dispatch_sync on a background queue and wait for the 
-	// result there. Please note that it is important to use a concurrent background queue. We cannot do this
-	// on the main queue, or the completion block of requestBookmarkWithCompletionBlock: would never fire.
-	// Once we have the bookmark, we cn resolve it to a URL (thus punching a hole in the sandbox) and return it...
-	
 	if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
-		dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0),^()
-		{
-			[self requestBookmarkWithCompletionBlock:^(NSError* inError)
-			{
-				if (inError)
-				{
-					dispatch_async(dispatch_get_main_queue(),^()
-					{
-						[NSApp presentError:inError];
-					});
-				}
-			}];
+        // Request a bookmark for the resource to get entitled for it. Requesting bookmarks is asynchronous, i.e.
+        // we need a semaphore to wait for bookmark so method can return synchronously
+        
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        
+        [self requestBookmarkWithQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)
+                       completionBlock:^(NSError* inError)
+        {
+            if (inError)
+            {
+                dispatch_async(dispatch_get_main_queue(),^()
+                {
+                    [NSApp presentError:inError];
+                });
+            }
+            dispatch_semaphore_signal(semaphore);
+        }];
 
-            [self waitForBookmark];
-			NSURL* url = [self URLByResolvingBookmark];
-			if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
-		});
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+        dispatch_release(semaphore);
+        
+        NSURL* url = [self URLByResolvingBookmark];
+        if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 	}
 	
 	// For IMBObjects simply use self...
@@ -781,11 +781,15 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 @implementation IMBObject (FileAccess)
 
 
-// Request a bookmark and execute the completion block once it is available. This usually requires an  
-// asynchronous round trip to an XPC service, but if the bookmark is already available, the completion 
-// block is called immediately...
-
-- (void) requestBookmarkWithCompletionBlock:(void(^)(NSError*))inCompletionBlock
+/**
+ @abstract
+ Asynchronously requests a bookmark for self and sets it within self.
+ Submits the completion block to the provided queue.
+ 
+ @discussion
+ If the bookmark is already stored with self calls the completion block synchronously.
+ */
+- (void) requestBookmarkWithQueue:(dispatch_queue_t)inQueue completionBlock:(void(^)(NSError*))inCompletionBlock
 {
 	if (self.bookmark == nil)
 	{
@@ -796,7 +800,7 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
                                messenger,
                                @selector(bookmarkForObject:error:),
                                self,
-                               dispatch_get_main_queue(),
+                               inQueue,
 		
 			^(NSData* inBookmark,NSError* inError)
 			{
@@ -819,15 +823,20 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 	}
 }
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Convenience: Will return once bookmark is set
-
-- (void) waitForBookmark
+/**
+ @abstract
+ Asynchronously requests a bookmark for self and sets it within self.
+ Submits the completion block to the main queue.
+ 
+ @discussion
+ If the bookmark is already stored with self calls the completion block synchronously.
+ 
+ @see
+ requestBookmarkWithQueue:completionBlock:
+ */
+- (void) requestBookmarkWithCompletionBlock:(void (^)(NSError *))inCompletionBlock
 {
-    while (self.bookmark == nil) {};
+    [self requestBookmarkWithQueue:dispatch_get_main_queue() completionBlock:inCompletionBlock];
 }
 
 
