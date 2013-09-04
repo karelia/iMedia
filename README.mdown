@@ -8,7 +8,10 @@ With the advent of sandboxing and XPC services in OS X 10.7 and the enforcement 
 Read the [Installation How To](https://github.com/iMediaSandboxing/iMedia/wiki/How-To-Install) from the GitHub wiki.
 
 ## Development
-
-Developers are welcome to work on enhancements and fixes!  Please use the [GitHub issue tracker](https://github.com/iMediaSandboxing/imedia/issues); note that we are not done migrating issues from the old [Google Code issue tracker](http://code.google.com/p/imedia/issues/list).
+Developers are welcome to work on enhancements and fixes!  Please use the [GitHub issue tracker](https://github.com/iMediaSandboxing/imedia/issues).
 
 There are plenty of things that need to be done, and your help would be appreciated!
+
+## Release Notes
+### 3.0.6
+Initial release tag for iMedia 3
