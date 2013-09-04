@@ -38,132 +38,9 @@ static NSUInteger sFacebookElementLimit = 5000;
 
 #pragma mark - Mandatory overrides from superclass
 
-- (IMBNode*) unpopulatedTopLevelNode: (NSError**) outError
+- (IMBNode *)unpopulatedTopLevelNode:(NSError **)outError
 {
-//    // Running in app process or XPC service?
-//    NSString *facebookAppId = FACEBOOK_APP_ID_APP_PROCESS;
-//    
-//    if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
-//    
-//    // This method must return synchronously with all necessary requests to facebook being already returned.
-//    // Use NSCondition and BOOL for that matter.
-//    
-//    NSCondition *authenticationCond = [[NSCondition alloc] init];
-//    __block BOOL authenticationDone = NO;
-//    
-//    [authenticationCond lock];
-//    
-//    self.accountStore = [[ACAccountStore alloc] init];
-//    
-//    NSLog(@"%@", [self.accountStore accounts]);
-//
-//    ACAccountType *facebookAccountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
-//    
-//    NSArray *facebookPermissions = [NSArray arrayWithObjects:@"email", nil];
-//    
-//    NSDictionary *facebookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-//                                              facebookAppId, ACFacebookAppIdKey,
-//                                              //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
-//                                              facebookPermissions, ACFacebookPermissionsKey, nil];
-//    
-//    [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:facebookClientAccessInfo completion:^(BOOL granted, NSError *error) {
-//        if (granted) {
-//            NSLog(@"Facebook access basically granted!!!");
-//            
-//            NSArray *facebookPermissions = [NSArray arrayWithObjects:
-//                                            @"user_photos", @"friends_photos",
-//                                            nil];
-//            NSDictionary *subseqFacbookClientAccessInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-//                                                           facebookAppId, ACFacebookAppIdKey,
-//                                                           //ACFacebookAudienceOnlyMe, ACFacebookAudienceKey,
-//                                                           facebookPermissions, ACFacebookPermissionsKey, nil];
-//            [self.accountStore requestAccessToAccountsWithType:facebookAccountType options:subseqFacbookClientAccessInfo completion:^(BOOL granted, NSError *error) {
-//                if (granted) {
-//                    NSLog(@"Facebook access totally granted!!!");
-//                    NSArray *accounts = [self.accountStore accountsWithAccountType:facebookAccountType];
-//                    self.account = [accounts lastObject];
-//                } else {
-//                    NSLog(@"No total Facebook access granted :-((");
-//                    *outError = error;
-//                }
-//                [authenticationCond lock];
-//                authenticationDone = YES;
-//                [authenticationCond signal];
-//                [authenticationCond unlock];
-//            }];
-//        } else {
-//            NSLog(@"No basic Facebook access granted :-((");
-//            *outError = error;
-//        }
-//    }];
-//    
-//    while (!authenticationDone) {
-//        [authenticationCond wait];
-//    }
-//    [authenticationCond unlock];
-//    
-//    if (outError && *outError) {
-//        return nil;
-//    }
-//    
-//    // Facebook user name will be part of Node name. Get user name from Facebook.
-//    
-//    NSURL *meURL = [NSURL URLWithString:@"https://graph.facebook.com/me"];
-//    NSDictionary *params = @{ @"fields" : @"id,name"};
-//    
-//    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook
-//                                            requestMethod:SLRequestMethodGET
-//                                                      URL:meURL
-//                                               parameters:params];
-//    request.account = self.account;
-//    
-//    NSURLResponse *urlResponse = nil;
-//    NSError *error = nil;
-//    NSData *responseData = [NSURLConnection sendSynchronousRequest:[request preparedURLRequest]
-//                                                 returningResponse:&urlResponse
-//                                                             error:&error];
-//    if (error) {
-//        NSLog(@"%@ Access to me failed:%@", [[NSRunningApplication currentApplication] bundleIdentifier], error);
-//        *outError = error;
-//        return nil;
-//    }
-//    
-//    NSDictionary *me = (NSDictionary *) [NSJSONSerialization JSONObjectWithData:responseData options:0 error:nil];
-//    
-//    // Account for expired session
-//    
-//    __block IMBNode *node = nil;
-//    if ([self isSessionExpired:me])
-//    {
-//        NSCondition *condition = [[NSCondition alloc] init];
-//        __block BOOL conditionDone = NO;
-//        
-//        [condition lock];
-//        
-//        [self.accountStore renewCredentialsForAccount:self.account completion:^(ACAccountCredentialRenewResult renewResult, NSError *error) {
-//            
-//            [condition lock];
-//            conditionDone = YES;
-//            [condition signal];
-//            [condition unlock];
-//            
-//            node = [self unpopulatedTopLevelNode:outError];
-//        }];
-//        while (!conditionDone) {
-//            [condition wait];
-//        }
-//        [condition unlock];
-//        
-//        return node;
-//    }
-//    
-//    NSLog(@"Facebook returned me: %@",me);
-//    
-//    NSString *myName = [me objectForKey:@"name"];
-//    NSString *myID = [me objectForKey:@"id"];
-    
-    //------------------------------------------------------------------
-    
+    NSError *error = nil;
     
     //	load Facebook icon...
     NSBundle* ourBundle = [NSBundle bundleForClass:[IMBNode class]];
@@ -194,18 +71,16 @@ static NSUInteger sFacebookElementLimit = 5000;
 	node.identifier = [self identifierForPath:@"/"];
 
     NSString *myID, *myName = nil;
+    
     if ([self mediaSourceAccessibility] == kIMBResourceIsAccessible)
     {
         // Add a dummy watched path to ensure that file system observer does not trigger unwanted reloads
         // (seems to trigger reloads meant for other pahts when watchedPath is nil)
         node.watchedPath = @"https://graph.facebook.com";
         
-        NSError *error = nil;
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:@"me"];
         error = [self iMediaErrorFromFacebookResponse:responseDict];
 
-//        NSLog(@"%@", responseDict);
-        
         if (error) {
             NSLog(@"Facebook: Access to /me failed:%@", error);
             *outError = error;
@@ -219,13 +94,22 @@ static NSUInteger sFacebookElementLimit = 5000;
                                [NSNumber numberWithUnsignedInteger:0], @"nestingLevel", nil];
             node.name = [NSString stringWithFormat:@"Facebook (%@)", myName];
         }
+    } else {
+        *outError = error;
     }
 	return node;
 }
 
 - (BOOL) populateNode:(IMBNode *)inParentNode error:(NSError **)outError
 {
-    if (outError) *outError = nil;     // Ensure out-parameter is properly initialized
+    NSError *error = nil;
+    
+    // Can't do anything if Facebook object is not set
+    
+    if (![self facebookWithError:&error]) {
+        if (outError) *outError = error;
+        return NO;
+    }
     
 	// Create the subNodes array on demand - even if turns out to be empty after exiting this method,
 	// because without creating an array we would cause an endless loop...
@@ -247,14 +131,18 @@ static NSUInteger sFacebookElementLimit = 5000;
     for (NSString *connectionType in connectionTypes)
     {
         someSubnodes = [self nodeID:[inParentNode.attributes objectForKey:@"facebookID"]
-               connectedNodesByType:connectionType params:params error:outError];
+               connectedNodesByType:connectionType params:params error:&error];
         
-        if (*outError) {
+        if (error) {
             [inParentNode setSubnodes:nil];
             
-            // Map error code to one known by the framework
-            if ((*outError).code == 190) {      // Session expired
-                *outError = [NSError errorWithDomain:(*outError).domain code:kIMBResourceNoPermission userInfo:(*outError).userInfo];
+            if (outError) {
+                // Map error code to one known by the framework
+                if (error.code == 190) {      // Session expired
+                    *outError = [NSError errorWithDomain:kIMBErrorDomain code:kIMBResourceNoPermission userInfo:(*outError).userInfo];
+                } else {
+                    *outError = error;
+                }
             }
             return NO;
         }
@@ -520,6 +408,19 @@ static NSUInteger sFacebookElementLimit = 5000;
     return self.atomic_facebook;
 }
 
+/**
+ Returns the facebook object of this parser. If the object is not set
+ will also return an error with code kIMBResourceNoPermission (without localized description).
+ */
+- (PhFacebook *)facebookWithError:(NSError **)pError
+{
+    PhFacebook *facebook = self.facebook;
+    
+    if (!facebook && pError) {
+        *pError = [NSError errorWithDomain:kIMBErrorDomain code:kIMBResourceNoPermission userInfo:nil];
+    }
+    return facebook;
+}
 
 #pragma mark - Access Control
 
@@ -563,11 +464,11 @@ connectedNodesByType:(NSString *)nodeType
 
     NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", nodeID, nodeType]];
 
-    NSLog(@"Graph URL: %@", URL);
+//    NSLog(@"Graph URL: %@", URL);
 
     NSError *error = nil;
 
-    if (self.facebook) {
+    if ([self facebookWithError:&error]) {
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString] params:params];
         error = [self iMediaErrorFromFacebookResponse:responseDict];
         
@@ -580,6 +481,8 @@ connectedNodesByType:(NSString *)nodeType
 //        NSLog(@"Facebook returned %@: %@", nodeType, responseDict);
 
         nodes = [[responseDict objectForKey:@"resultDict"] objectForKey:@"data"];
+    } else {
+        *outError = error;
     }
 
     return nodes;

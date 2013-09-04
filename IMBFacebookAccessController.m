@@ -64,7 +64,7 @@
             if ([nodeViewController.delegate respondsToSelector:@selector(facebookAppId)]) {
                 facebookAppId = [nodeViewController.delegate facebookAppId];
             }
-            // Fallback only for development convenience! (Get if from key chain)
+            // Fallback only for development convenience! (Get it from key chain)
             if (facebookAppId == nil) {
                 facebookAppId = [self facebookAppId];
             }
@@ -94,31 +94,20 @@
             {
 				node.badgeTypeNormal = [node badgeTypeNormalNonLoading];
                 self.loginDialogPending = NO;
-                if ([[result valueForKey: @"valid"] boolValue])
-                {
+                
+                BOOL success = [[result valueForKey: @"valid"] boolValue];
+                if (success) {
+                    // JJ/TODO: Can remove the following two lines?
 //                    node.badgeTypeNormal = kIMBBadgeTypeLoading;
                     node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
                     IMBFacebookParserMessenger *messenger = (IMBFacebookParserMessenger *)node.parserMessenger;
                     
-                    SBPerformSelectorAsync(messenger.connection,
-                                           messenger,
-                                           @selector(setFacebookAccessor:error:),
-                                           facebook,
-                                           dispatch_get_main_queue(),
-                                           
-                                           ^(id nothing,NSError *error)
-                                           {
-                                               if (completion) {
-                                                   completion(NO, [NSArray arrayWithObject:node], error);
-                                               }
-                                           });
+                    messenger.facebook = facebook;
                 }
-                else
-                {
-                    if (completion) {
-                        BOOL canceled = [result valueForKey: @"error"] == nil;
-                        completion(canceled, nil, [result valueForKey: @"error"]);
-                    }
+                if (completion) {
+                    NSError *error = [result valueForKey: @"error"];
+                    BOOL isLoginCanceled = !success && (error == nil);
+                    completion(isLoginCanceled, success ? @[node] : nil, error);
                 }
             }];
         }
@@ -149,6 +138,7 @@
                            dispatch_get_main_queue(),
                            ^(id nothing, NSError *error)
                            {
+                               messenger.facebook = nil;
                                if (completion) {
                                    completion(error == nil, error);
                                }

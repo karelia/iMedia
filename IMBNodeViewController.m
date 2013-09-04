@@ -1079,8 +1079,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
          if (inNode.error) {
              [self showErrorPopoverForNode:inNode relativeToRect:inRect];
          } else if (reloadNode) {
-             [self.libraryController reloadNodeTree:inNode];
              [self.nodeOutlineView collapseItem:inNode];
+             [inNode unpopulate];
+             [self.libraryController reloadNodeTree:inNode];
              [self _setExpandedNodeIdentifiers];
          }
      }];
@@ -1338,7 +1339,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			if (!(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+			if ((inNode.accessibility == kIMBResourceIsAccessible) && !(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
 
 			[self installObjectViewForNode:inNode];
 			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];

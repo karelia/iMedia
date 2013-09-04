@@ -620,7 +620,7 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 
 #pragma mark
-#pragma mark IMBRequestAccessDelegate Protocol
+#pragma mark IMBNodeAccessDelegate Protocol
 
 // Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
 // bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights

@@ -15,6 +15,8 @@
 
 @implementation IMBFacebookParserMessenger
 
+@synthesize facebook = _facebook;
+
 // Use this switch if you want to turn off XPC service usage for this service type
 + (BOOL) useXPCServiceWhenPresent
 {
@@ -75,6 +77,56 @@
 }
 
 
+#pragma mark - Object Lifecycle
+
+/**
+ 
+ */
+- (void) dealloc
+{
+    IMBRelease(_facebook);
+    
+    [super dealloc];
+}
+
+/**
+ 
+ */
+- (id) initWithCoder:(NSCoder *)inDecoder
+{
+	NSKeyedUnarchiver* decoder = (NSKeyedUnarchiver*)inDecoder;
+	
+	if ((self = [super initWithCoder:decoder]))
+	{
+        self.facebook = [decoder decodeObjectForKey:@"facebook"];
+    }
+    return self;
+}
+
+/**
+ 
+ */
+- (void) encodeWithCoder:(NSCoder *)inCoder
+{
+    [super encodeWithCoder:inCoder];
+    
+	NSKeyedArchiver* coder = (NSKeyedArchiver*)inCoder;
+	
+	[coder encodeObject:self.facebook forKey:@"facebook"];
+}
+
+
+/**
+ 
+ */
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBFacebookParserMessenger* copy = [super copyWithZone:inZone];
+	copy.facebook = self.facebook;
+	return copy;
+}
+
+
 #pragma mark - IMBRequestAccessDelegate Delegate
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -109,25 +161,21 @@
 	return parsers;
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// Set Facebook accessor object on parser for subsequent use
-// Always returns nil (must match signature required by XPCKit)
 
-- (id) setFacebookAccessor:(PhFacebook *)facebook error:(NSError **)outError
+/**
+ Returns a particular parser with a given identifier.
+ 
+ @discussion
+ Also sets the parser's facebook object to the parser messenger's facebook object if present.
+ */
+- (IMBParser *) parserWithIdentifier:(NSString *)inIdentifier
 {
-    // There is supposed to be only _one_ parser. If that condition no longer holds true
-    // we must find other ways to identify the correct parser here.
+    IMBFacebookParser *parser = (IMBFacebookParser *)[super parserWithIdentifier:inIdentifier];
     
-    IMBFacebookParser *parser = [[[self class] parsers] lastObject];
-    parser.facebook = facebook;
+    parser.facebook = self.facebook;
     
-	if (outError) *outError = nil;
-
-//    NSLog(@"Cookies left: %@", [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]);
-    
-    return nil;
+    return parser;
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // Always returns nil (must match signature required by XPCKit)
