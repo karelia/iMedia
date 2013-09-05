@@ -86,7 +86,7 @@
             }
             
             // JJ/TODO: Do we need all these permisstions?
-            [facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"read_stream", @"export_stream", @"user_photos", @"friends_photos", nil]
+            [facebook getAccessTokenForPermissions: [NSArray arrayWithObjects: @"user_photos", @"user_friends", @"friends_photos", nil]
                                             cached: NO
                                     relativeToRect:rect
                                             ofView:rectParentView
