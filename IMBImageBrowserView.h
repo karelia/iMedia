@@ -44,7 +44,7 @@
 */
 
 
-// Author: Peter Baumgartner, Dan Wood, Daniel Jalkut
+// Author: Peter Baumgartner, Dan Wood, Daniel Jalkut, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,6 +90,23 @@
 #endif
 
 @end
+
+
+/*!
+ @category NSObject (IMBImageBrowserDelegate)
+ @abstract Informal protocol for extending IKImageBrowserDelegate informal protocol
+ */
+@interface NSObject (IMBImageBrowserDelegate)
+
+/*!
+ @method imageBrowser:cellWasClickedAtIndex:
+ @abstract Invoked by 'inView' when a cell was single clicked.
+ @param inIndex Index of the cell that was double clicked.
+ */
+- (void) imb_imageBrowser:(IKImageBrowserView *)inView cellWasClickedAtIndex:(NSUInteger)inIndex;
+
+@end
+
 
 
 //----------------------------------------------------------------------------------------------------------------------

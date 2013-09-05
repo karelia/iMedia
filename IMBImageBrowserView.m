@@ -75,7 +75,8 @@ enum IMBMouseOperation
 {
 	kMouseOperationNone,
 	kMouseOperationButtonClick,
-	kMouseOperationDragSelection
+	kMouseOperationDragSelection,
+    kMouseOperationObjectClick
 };
 
 
@@ -344,8 +345,12 @@ enum IMBMouseOperation
 	
 	else if (_clickedObject != nil && _clickedObject.isSelectable)
 	{	
-		_mouseOperation = kMouseOperationDragSelection;
+		_mouseOperation = kMouseOperationObjectClick;
 	}
+    else if (NO)
+    {
+        
+    }
 	else
 	{
 		_mouseOperation = kMouseOperationNone;
@@ -382,6 +387,7 @@ enum IMBMouseOperation
 	{
 		if ([_clickedObject isDraggable])
 		{
+            _mouseOperation = kMouseOperationDragSelection;
 			[super mouseDragged:inEvent];
 			return;
 		}
@@ -401,13 +407,13 @@ enum IMBMouseOperation
 
 - (void) mouseUp:(NSEvent*)inEvent
 {
+    NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
+    NSInteger objectIndex = [self indexOfItemAtPoint: mouse];
+
 	// If a button was clicked the perform the click action and remove the highlight...
 	
 	if (_mouseOperation == kMouseOperationButtonClick)
 	{
-		NSPoint mouse = [self convertPoint:[inEvent locationInWindow] fromView:nil];
-		NSInteger objectIndex = [self indexOfItemAtPoint: mouse];
-
 		if (objectIndex == _clickedObjectIndex)
 		{
 			[(IMBButtonObject*)_clickedObject sendClickAction];
@@ -415,8 +421,9 @@ enum IMBMouseOperation
 			
 		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:NO];
 		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
+        
 	}
-	
+    
 	// Let the superclass handle other events...
 	
 	else
@@ -424,6 +431,17 @@ enum IMBMouseOperation
 		[super mouseUp:inEvent];
 	}
 
+    // If a regular thumbnail was clicked additionally forward the click to the delegate
+    
+    if (_mouseOperation == kMouseOperationObjectClick &&
+        !(inEvent.modifierFlags & NSDeviceIndependentModifierFlagsMask))
+    {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(imb_imageBrowser:cellWasClickedAtIndex:)])
+        {
+            [self.delegate imb_imageBrowser:self cellWasClickedAtIndex:objectIndex];
+        }
+    }
+	
 	// Cleanup...
 	
 	_mouseOperation = kMouseOperationNone;
