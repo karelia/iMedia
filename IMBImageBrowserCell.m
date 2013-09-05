@@ -303,7 +303,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
             {
                 stampLayer.contentsScale = [[[self imageBrowserView] window] backingScaleFactor];
             }
-            NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMB.ObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
+            NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMBObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
             stampLayer.string = stampText;
             stampLayer.fontSize = 13.0;
             //        stampLayer.alignmentMode = kCAAlignmentCenter;
