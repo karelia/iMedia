@@ -1008,30 +1008,6 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 
 - (void) imageBrowserSelectionDidChange:(IKImageBrowserView*)inView
 {
-	// If a missing object was selected, then display an alert...
-	
-	if (self.viewType == kIMBObjectViewTypeIcon)
-	{
-		NSArray* objects = [ibObjectArrayController selectedObjects];
-		IMBObject* object = objects.count == 1 ? [objects objectAtIndex:0] : nil;
-	
-		if (object)
-		{
-			if (object.accessibility == kIMBResourceDoesNotExist)
-			{
-				NSUInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:object];
-				NSRect rect = [inView itemFrameAtIndex:index];
-				[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:inView relativeToRect:rect];
-			}
-			else if (object.accessibility == kIMBResourceNoPermission)
-			{
-				[[IMBAccessRightsViewController sharedViewController]
-					imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
-					withObject:self.currentNode];
-			}
-		}
-	}
-	
 	// Notify the Quicklook panel of the selection change...
 	
 	QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
@@ -1177,7 +1153,38 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
+#pragma mark IMBImageBrowserDelegate (informal)
+
+/**
+ If a missing object was selected, then display an alert...
+ */
+- (void) imb_imageBrowser:(IKImageBrowserView *)inView cellWasClickedAtIndex:(NSUInteger)inIndex
+{
+	if (self.viewType == kIMBObjectViewTypeIcon)
+	{
+		IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
+        
+		if (object)
+		{
+			if (object.accessibility == kIMBResourceDoesNotExist)
+			{
+				NSUInteger index = [ibObjectArrayController.arrangedObjects indexOfObjectIdenticalTo:object];
+				NSRect rect = [inView itemFrameAtIndex:index];
+				[IMBAccessRightsViewController showMissingResourceAlertForObject:object view:inView relativeToRect:rect];
+			}
+			else if (object.accessibility == kIMBResourceNoPermission)
+			{
+				[[IMBAccessRightsViewController sharedViewController]
+                 imb_performCoalescedSelector:@selector(grantAccessRightsForObjectsOfNode:)
+                 withObject:self.currentNode];
+			}
+		}
+    }
+}
+
+
+#pragma mark
 #pragma mark NSTableViewDelegate
 
 
