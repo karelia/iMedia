@@ -258,11 +258,18 @@ static NSMutableDictionary* sLibraryControllers = nil;
 #pragma mark Loading Nodes
 
 
-// Reload behaves differently on first call and on subsequent calls. The first time around, we'll just create
-// empty (unpopulated) toplevel nodes. On subsequent calls, we will reload the existing nodes and populate 
-// them to the same level as before...
-
-- (void) reload
+/**
+ Loads all top-level nodes (first call) or reloads top-level nodes optionally filtered by flag (subsequent calls)
+ 
+ @param fileSystemBasedOnly On first call to this method is irrelevant. On subsequent calls if set to YES
+ inhibits reload of top-level nodes that are not filesystem based.
+ 
+ @discussion
+ Reload behaves differently on first call and on subsequent calls. The first time around, we'll just create
+ empty (unpopulated) toplevel nodes. On subsequent calls, we will reload the existing nodes and populate
+ them to the same level as before...
+ */
+- (void) reloadFileSystemBasedOnly:(BOOL)fileSystemBasedOnly
 {
 	NSArray* messengers = [[IMBParserController sharedParserController] loadedParserMessengersForMediaType:self.mediaType];
 
@@ -284,13 +291,25 @@ static NSMutableDictionary* sLibraryControllers = nil;
 	
 	else 
 	{
-		[self _reloadTopLevelNodes];
+		[self _reloadTopLevelNodesFileSystemBasedOnly:fileSystemBasedOnly];
 	
 		for (IMBParserMessenger* messenger in messengers)
 		{
 			[self createTopLevelNodesWithParserMessenger:messenger];
 		}
 	}
+}
+
+
+/**
+ @discussion
+ Reload behaves differently on first call and on subsequent calls. The first time around, we'll just create
+ empty (unpopulated) toplevel nodes. On subsequent calls, we will reload the existing nodes and populate
+ them to the same level as before...
+ */
+- (void) reload
+{
+    [self reloadFileSystemBasedOnly:NO];
 }
 
 
@@ -612,10 +631,15 @@ static NSMutableDictionary* sLibraryControllers = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Reload all of our top-level nodes. Please note that we may have to look one level deep, if the 
-// nodes on the root level are group nodes...
-
-- (void) _reloadTopLevelNodes
+/**
+ Reloads top-level nodes optionally filtered by flag
+ 
+ @param fileSystemBasedOnly If set to YES only top-level nodes that are filesystem based will be reloaded
+ 
+ @discussion
+ Please note that we may have to look one level deep if the nodes on the root level are group nodes
+ */
+- (void) _reloadTopLevelNodesFileSystemBasedOnly:(BOOL)fileSystemBasedOnly
 {
 	NSArray* subnodes = [[self.subnodes copy] autorelease];
 	
@@ -627,14 +651,28 @@ static NSMutableDictionary* sLibraryControllers = nil;
 			
 			for (IMBNode* node2 in subnodes2)
 			{
-				[self _reloadTopLevelNode:node2];
+                if (!fileSystemBasedOnly || [node2.mediaSource isFileURL]) {
+                    [self _reloadTopLevelNode:node2];
+                }
 			}
 		}
 		else 
 		{
-			[self _reloadTopLevelNode:node];
+            if (!fileSystemBasedOnly || [node.mediaSource isFileURL]) {
+                [self _reloadTopLevelNode:node];
+            }
 		}
 	}
+}
+
+
+/**
+ Reloads all of our top-level nodes. Please note that we may have to look one level deep, if the
+ nodes on the root level are group nodes...
+ */
+- (void) _reloadTopLevelNodes
+{
+    [self _reloadTopLevelNodesFileSystemBasedOnly:NO];
 }
 
 
@@ -1442,7 +1480,7 @@ static NSMutableDictionary* sLibraryControllers = nil;
     if (IMBRunningOnLionOrNewer()) {
         [IMBPopover closeAllPopovers];
     }
-	[self reload];
+	[self reloadFileSystemBasedOnly:YES];
 }
 
 

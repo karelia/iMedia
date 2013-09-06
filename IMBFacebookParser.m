@@ -75,7 +75,7 @@ static NSUInteger sFacebookElementLimit = 5000;
     if ([self mediaSourceAccessibility] == kIMBResourceIsAccessible)
     {
         // Add a dummy watched path to ensure that file system observer does not trigger unwanted reloads
-        // (seems to trigger reloads meant for other pahts when watchedPath is nil)
+        // (seems to trigger reloads meant for other paths when watchedPath is nil)
         node.watchedPath = @"https://graph.facebook.com";
         
         NSDictionary *responseDict = [self.facebook sendSynchronousRequest:@"me"];
