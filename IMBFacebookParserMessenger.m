@@ -25,7 +25,12 @@
 
 + (void) load {
     @autoreleasepool {
-        [IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+        
+        // JJ/2013-09-06 Facebook parser should work on OS X 10.6 but won't be tested specifically against it anymore
+        
+        if (IMBRunningOnLionOrNewer()) {
+            [IMBParserController registerParserMessengerClass:self forMediaType:[self mediaType]];
+        }
     }
 }
 
