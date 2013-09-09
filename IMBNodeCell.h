@@ -78,8 +78,6 @@
 - (NSRect) titleRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 - (NSRect) badgeRectForBounds:(NSRect)inBounds flipped:(BOOL)inFlipped;
 
-- (IBAction) showAccessRightsPopover:(id)inSender;
-
 @end
 
 

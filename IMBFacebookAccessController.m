@@ -149,11 +149,6 @@
     }
 }
 
-- (void) requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
-{
-    [self nodeViewController:nil requestAccessToNode:inNode completion:inCompletion];
-}
-
 // Log out from Facebook
 // (will also delete Facebook cookies to enable different login id while auth token is not expired)
 //

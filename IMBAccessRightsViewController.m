@@ -713,11 +713,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
     }
 }
 
--(void)requestAccessToNode:(IMBNode *)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion
-{
-    [self nodeViewController:nil requestAccessToNode:inNode completion:inCompletion];
-}
-
 // Doesn't do anything but invoke completion handler
 
 - (void) revokeAccessToNode:(IMBNode *)inNode completion:(IMBRevokeAccessCompletionHandler) inCompletion

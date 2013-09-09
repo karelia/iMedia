@@ -228,9 +228,6 @@ typedef void (^IMBRevokeAccessCompletionHandler)(BOOL reloadNode, NSError *error
 // with indication whether access granted may affect other nodes (i.e. grant access to those nodes as well)
 - (void) nodeViewController:(IMBNodeViewController*)inNodeViewController requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
 
-// Same as the above except that a node view controller (sender) may not be provided
-- (void) requestAccessToNode:(IMBNode*)inNode completion:(IMBRequestAccessCompletionHandler)inCompletion;
-
 // Revoke access to node and call completion handler with indication whether node should be reloaded
 // and an error object on failure
 - (void) revokeAccessToNode:(IMBNode*)inNode completion:(IMBRevokeAccessCompletionHandler)inCompletion;
