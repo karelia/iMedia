@@ -714,11 +714,9 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.accessibility == kIMBResourceIsAccessible)
 	{
-        [self.libraryController populateNode:node errorCompletion:^(NSError *error)
-        {
+        [self.libraryController populateNode:node errorHandler:^(NSError *error) {
             if (error) {
-                if (error.code == kIMBResourceNoPermission)
-                {
+                if (error.code == kIMBResourceNoPermission) {
                     // Try again after requesting access (e.g. session may have expired).
                     [self performSelector:@selector(populateNode:) withAccessRequestedToNode:node];
                 } else {
@@ -797,15 +795,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
-                [self.libraryController populateNode:newNode errorCompletion:^(NSError *error)
-                 {
-                     if (error.code == kIMBResourceNoPermission)
-                     {
-                         // Try again after requesting access (e.g. session may have expired).
-                         
-                         [self performSelector:@selector(populateNode:) withAccessRequestedToNode:newNode];
-                     }
-                 }];
+                [self.libraryController populateNode:newNode errorHandler:^(NSError *error) {
+                    if (error.code == kIMBResourceNoPermission) {
+                        // Try again after requesting access (e.g. session may have expired).
+
+                        [self performSelector:@selector(populateNode:) withAccessRequestedToNode:newNode];
+                    }
+                }];
 				[ibNodeOutlineView showProgressWheels];
 			}
 			else if (newNode.accessibility == kIMBResourceDoesNotExist)
@@ -1553,12 +1549,10 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (IBAction) reloadNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
-	[self.libraryController reloadNodeTree:node errorCompletion:^(NSError *error)
-    {
-        if (error.code == kIMBResourceNoPermission)
-        {
+    [self.libraryController reloadNodeTree:node errorHandler:^(NSError *error) {
+        if (error.code == kIMBResourceNoPermission) {
             // Try again after requesting access (e.g. session may have expired).
-            
+
             [self performSelector:@selector(reloadNodeTree:) withAccessRequestedToNode:node];
         }
     }];
