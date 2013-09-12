@@ -724,6 +724,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
                 }
             }
         }];
+        [self.nodeOutlineView setNeedsDisplay];
 	}
 }
 
@@ -1047,6 +1048,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
     [self requestAccessToNode:inNode completion:^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error) {
         for (IMBNode *node in affectedNodes) {
             [self.libraryController reloadNodeTree:node];
+            [self.nodeOutlineView setNeedsDisplay];
         }
     }];
 }
@@ -1335,8 +1337,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			if ((inNode.accessibility == kIMBResourceIsAccessible) && !(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
-
+			if ((inNode.accessibility == kIMBResourceIsAccessible) &&
+                !(inNode.isPopulated || inNode.isLoading))
+            {
+                [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+                [self.nodeOutlineView setNeedsDisplay];
+            }
 			[self installObjectViewForNode:inNode];
 			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
 		}
@@ -1556,6 +1562,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
             [self performSelector:@selector(reloadNodeTree:) withAccessRequestedToNode:node];
         }
     }];
+    [self.nodeOutlineView setNeedsDisplay];
 }
 
 

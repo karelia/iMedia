@@ -580,7 +580,6 @@ static NSMutableDictionary* sLibraryControllers = nil;
 					{
 						[_delegate libraryController:self didCreateNode:inNewNode withParserMessenger:messenger];
 					}
-                    inNewNode.badgeTypeNormal = [inNewNode badgeTypeNormalNonLoading];
 				}
 			}
 		});		
