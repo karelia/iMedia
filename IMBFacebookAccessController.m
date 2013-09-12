@@ -145,6 +145,7 @@
                     completion(isLoginCanceled, success ? @[node] : nil, error);
                 }
             }];
+            [facebook release];
         }
     }
 }
