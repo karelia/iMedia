@@ -207,7 +207,30 @@ CFTypeRef SBPreferencesCopyAppValue(CFStringRef inKey,CFStringRef inBundleIdenti
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Dispatch a message with optional argument object to a target object asynchronously. When connnection (which must 
+/**
+ returns a static semaphore of eight resources intended to restrain parallelity when dispatching events with GCD
+ 
+ @Discussion
+ We had instances where the Facebook parser hung up on us when about 60 some parallel requests were issued
+ (this might correlate with the fact that all Facebook requests reach out to the internet).
+ 
+ Going beyond eight parallel resources did not seem to gain any better performance on any of the parsers.
+ */
+dispatch_semaphore_t dispatch_semaphore()
+{
+	static dispatch_semaphore_t sSharedInstance = NULL;
+	static dispatch_once_t sOnceToken = 0;
+    
+    dispatch_once(&sOnceToken,
+                  ^{
+                      sSharedInstance = dispatch_semaphore_create(8);
+                  });
+    
+ 	return sSharedInstance;
+}
+
+
+// Dispatch a message with optional argument object to a target object asynchronously. When connnection (which must
 // be an XPCConnection) is supplied the message will be transferred to an XPC service for execution. Please note  
 // that inTarget and inObject must conform to NSCoding for this to work, or they cannot be sent across the connection. 
 // When connection is nil (e.g. running on Snow Leopard) message will be dispatched asynchronously via GCD, but the 
@@ -261,6 +284,7 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
         
         dispatch_retain(returnHandlerQueue);
         
+        dispatch_semaphore_wait(dispatch_semaphore(), DISPATCH_TIME_FOREVER);
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0),^()
 		{
             NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -288,6 +312,7 @@ void SBPerformSelectorAsync(id inConnection,id inTarget,SEL inSelector,id inObje
 				dispatch_release(returnHandlerQueue);
 			});
             [pool drain];
+            dispatch_semaphore_signal(dispatch_semaphore());
 	   });
     }
 }
