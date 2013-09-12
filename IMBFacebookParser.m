@@ -10,6 +10,7 @@
 #import "IMBFacebookObject.h"
 #import "NSImage+iMedia.h"
 #import "IMBIconCache.h"
+#import "IMBNodeObject.h"
 
 #define DEBUG_SIMULATE_MISSING_THUMBNAILS 0
 
@@ -116,6 +117,11 @@ static NSUInteger sFacebookElementLimit = 5000;
 	
 	NSMutableArray* subnodes = [inParentNode mutableArrayForPopulatingSubnodes];
     
+	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
+	// without creating an array we would cause an endless loop...
+	
+	NSMutableArray* objects = [NSMutableArray array];
+    
     // For nodes below top-level node do not ask for friends
     
     NSUInteger parentNestingLevel = [[inParentNode.attributes objectForKey:@"nestingLevel"] unsignedIntegerValue];
@@ -126,11 +132,11 @@ static NSUInteger sFacebookElementLimit = 5000;
         connectionTypes = [NSArray arrayWithObjects:@"albums", nil];
     }
     
-    NSArray *someSubnodes = nil;
+    NSArray *subnodeDicts = nil;
     NSDictionary *params = @{ @"limit" : [NSNumber numberWithUnsignedInteger:sFacebookElementLimit]};
     for (NSString *connectionType in connectionTypes)
     {
-        someSubnodes = [self nodeID:[inParentNode.attributes objectForKey:@"facebookID"]
+        subnodeDicts = [self nodeID:[inParentNode.attributes objectForKey:@"facebookID"]
                connectedNodesByType:connectionType params:params error:&error];
         
         if (error) {
@@ -147,10 +153,21 @@ static NSUInteger sFacebookElementLimit = 5000;
             return NO;
         }
         
-        NSString *ID, *name;
-        IMBNode *subnode;
-        for (NSDictionary *nodeDict in someSubnodes)
+        // Which friends do have albums that we have access to?
+//        NSDictionary *friendsWithAlbums = [self friendIDsWithAlbumsWithError:&error];
+        
+        // Parallelize subnode creation since "friend" nodes require sending another request to Facebook
+        
+        dispatch_group_t subnodeCreationGroup = dispatch_group_create();
+        dispatch_queue_t subnodeCreationQueue = dispatch_queue_create("com.karelia.facebook.subnodeCreation", NULL); // Serial queue
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(8);
+        
+        NSMutableArray *unsortedSubnodes = [NSMutableArray arrayWithCapacity:[subnodeDicts count]];
+        
+        for (NSDictionary *nodeDict in subnodeDicts)
         {
+            NSString *ID, *name;
+            IMBNode *subnode;
             ID = [nodeDict objectForKey:@"id"];
             name = [nodeDict objectForKey:@"name"];
             
@@ -164,36 +181,97 @@ static NSUInteger sFacebookElementLimit = 5000;
             subnode.name = name;
             subnode.identifier = ID;
             
-			// Keep a ref to the type of the subnode – so when later populating it we know how to deal with it
-			
+            // Keep a ref to the type of the subnode – so when later populating it we know how to deal with it
+            
             //NSUInteger nestingLevel = [[inParentNode.attributes objectForKey:@"nestingLevel"] unsignedIntegerValue] + 1;
-			subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+            subnode.attributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                   connectionType, @"nodeType",
                                   ID, @"facebookID",
                                   [NSNumber numberWithUnsignedInteger:parentNestingLevel+1], @"nestingLevel", nil];
             
             // Test whether 'friend' subnode has itself albums. If not leave it out because would be empty node.
             // NOTE: Can't afford these time intensive requests unless we parallelize them (think about a
-            // Facebook user with 500 friends easily)s
+            // Facebook user with 500 friends easily)
             
-            if (NO) { //[connectionType isEqualToString:@"friends"]) {
-                NSArray *friendalbums = [self nodeID:ID connectedNodesByType:@"albums" params:params error:outError];
-                
-                if ([friendalbums count] > 0) {
+            if ([connectionType isEqualToString:@"friends"])
+            {
+                dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+                dispatch_group_async(subnodeCreationGroup,
+                                     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),     // Concurrent
+                                     //                                 subnodeCreationQueue,                                              // Serial
+                                     ^{
+                                         NSArray *friendalbums = [self nodeID:ID connectedNodesByType:@"albums" params:params error:outError];
+                                         
+                                         if ([friendalbums count] > 0) {
+                                             @synchronized(unsortedSubnodes) {
+                                                 [unsortedSubnodes addObject:subnode];
+//                                                 NSLog(@"Adding friend: %@:", subnode);
+                                             }
+                                         } else {
+                                             @synchronized(self) {
+//                                                 NSLog(@"Friend %@ does not have accessible albums", subnode);
+                                             }
+                                         }
+                                         dispatch_semaphore_signal(semaphore);
+                                     });
+            } else {
+                @synchronized(subnodes) {
                     [subnodes addObject:subnode];
                 }
-            } else {
-                [subnodes addObject:subnode];
             }
         }
-    }
+        dispatch_group_wait(subnodeCreationGroup, DISPATCH_TIME_FOREVER);
+        dispatch_release(subnodeCreationQueue);
+        dispatch_release(subnodeCreationGroup);
+        dispatch_release(semaphore);
         
-	// Create the objects array on demand  - even if turns out to be empty after exiting this method, because
-	// without creating an array we would cause an endless loop...
-	
-	NSMutableArray* objects = [NSMutableArray array];
-	
-    if (inParentNode.attributes && [[inParentNode.attributes objectForKey:@"nodeType"] isEqual:@"albums"])
+        // Since friend nodes were collected in parallel (i.e. unsorted) we must sort them
+        // (and add them to the list of albums already collected)
+        
+        NSSortDescriptor* nameDescriptor = [[[NSSortDescriptor alloc]
+                                             initWithKey:@"name"
+                                             ascending:YES] autorelease];
+        NSArray* sortDescriptors = [NSArray arrayWithObject:nameDescriptor];
+        
+        [subnodes addObjectsFromArray:[unsortedSubnodes sortedArrayUsingDescriptors:sortDescriptors]];
+    }
+    
+    // me node, friend nodes, and album nodes treated differently regarding object view:
+    // - me node shows albums and friends (so you can search for friends)
+    // - friend nodes show photos of all of his albums
+    // - album nodes show photos of album
+    
+    NSString *parentNodeType = [inParentNode.attributes objectForKey:@"nodeType"];
+    if (parentNodeType == nil) parentNodeType = @"me";
+    
+    // *** me node's objects ***
+    // *** friend node's objects ***
+    
+    if ([parentNodeType isEqualTo:@"me"] || [parentNodeType isEqualTo:@"friends"])
+    {
+        IMBNodeObject *object = nil;
+        for (IMBNode *node in subnodes) {
+            NSString *nodeType = [node.attributes objectForKey:@"nodeType"];
+            object = [[IMBNodeObject alloc] init];
+			[objects addObject:object];
+			[object release];
+            
+            object.identifier = node.identifier;
+            object.representedNodeIdentifier = node.identifier;
+            object.parserIdentifier = self.identifier;
+			object.location = [NSURL URLWithString:node.identifier]; // object identifier will be set by IMBParser based on location and others (see: -identifierForObject:)
+			object.name = node.name;
+			object.metadata = nil;
+			object.parserIdentifier = self.identifier;
+            object.atomic_imageRepresentation = [self iconForConnectionType:nodeType highlight:NO];
+            object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
+            object.needsImageRepresentation = NO;
+        }
+    }
+    
+    // *** Album node's objects ***
+    
+    if ([parentNodeType isEqualTo:@"albums"])
     {
         // Get all photos from this album
         NSDictionary *params = @{ @"fields" : @"id,picture,images,source",
@@ -252,6 +330,11 @@ static NSUInteger sFacebookElementLimit = 5000;
 //
 - (id)thumbnailForObject:(IMBObject *)inObject error:(NSError **)outError
 {
+    if ([inObject isKindOfClass:[IMBNodeObject class]])
+    {
+        return [inObject atomic_imageRepresentation];
+    }
+    
 #if DEBUG_SIMULATE_MISSING_THUMBNAILS
     BOOL doNotLoad = arc4random_uniform(9) == 8;      // Will be YES for about 12.5 % of thumbnails
 #endif
@@ -396,14 +479,18 @@ static NSUInteger sFacebookElementLimit = 5000;
 
 - (void) setFacebook:(PhFacebook *)facebook
 {
-    [facebook setDelegate:self];
-    self.atomic_facebook = facebook;
+    @synchronized(self) {
+        [facebook setDelegate:self];
+        self.atomic_facebook = facebook;
+    }
 }
 
 - (PhFacebook *)facebook
 {
-    if (![self.atomic_facebook delegate]) {
-        [self.atomic_facebook setDelegate:self];
+    @synchronized(self) {
+        if (![self.atomic_facebook delegate]) {
+            [self.atomic_facebook setDelegate:self];
+        }
     }
     return self.atomic_facebook;
 }
@@ -454,6 +541,55 @@ static NSUInteger sFacebookElementLimit = 5000;
 
 #pragma mark - Utility Methods
 
+
+/**
+ This method currently unused and currently not meant for use
+ */
+- (NSDictionary *)friendIDsWithAlbumsWithError:(NSError **)pError
+{
+    static NSString *FQLFriendsAlbumsQuery = @"SELECT uid, name, first_name, last_name FROM user WHERE uid IN (SELECT owner FROM album WHERE owner IN (SELECT uid1 FROM friend WHERE uid2 = me()))";
+    
+    NSMutableDictionary *friendsIDs = nil;
+    
+    NSError *error = nil;
+    PhFacebook *facebook = [self facebookWithError:&error];
+    if (facebook) {
+        NSDictionary *responseDict = [facebook sendSynchronousFQLRequest:FQLFriendsAlbumsQuery];
+        
+        error = [self iMediaErrorFromFacebookResponse:responseDict];
+        
+        if (error) {
+            NSLog(@"Execution of %@ failed:%@", FQLFriendsAlbumsQuery, error);
+            *pError = error;
+            return nil;
+        }
+        
+        NSArray *friends = [responseDict objectForKey:@"resultDict"];
+        
+        NSLog(@"Our %lu friends have albums: %@", (unsigned long)[friends count], friends);
+        
+        friendsIDs = [NSMutableDictionary dictionary];
+        id friendID = nil;
+        
+        for (NSDictionary *friend in friends)
+        {
+            friendID = [[friend objectForKey:@"uid"] stringValue];
+            NSLog(@"String value: %@", friend);
+            if (![friendsIDs objectForKey:friend]) {
+                [friendsIDs setObject:friendID forKey:friend];
+            }
+        }
+    } else {
+        *pError = error;
+    }
+    
+    NSLog(@"We got %lu friends that have albums: %@", (unsigned long)[friendsIDs count], friendsIDs);
+    
+    return [NSDictionary dictionaryWithDictionary:friendsIDs];
+}
+
+/**
+ */
 - (NSArray *) nodeID:(NSString *)nodeID
 connectedNodesByType:(NSString *)nodeType
               params:(NSDictionary *)params
@@ -467,9 +603,9 @@ connectedNodesByType:(NSString *)nodeType
 //    NSLog(@"Graph URL: %@", URL);
 
     NSError *error = nil;
-
-    if ([self facebookWithError:&error]) {
-        NSDictionary *responseDict = [self.facebook sendSynchronousRequest:[URL absoluteString] params:params];
+    PhFacebook *facebook = [self facebookWithError:&error];
+    if (facebook) {
+        NSDictionary *responseDict = [facebook sendSynchronousRequest:[URL absoluteString] params:params];
         error = [self iMediaErrorFromFacebookResponse:responseDict];
         
         if (error) {
@@ -516,7 +652,8 @@ connectedNodesByType:(NSString *)nodeType
 
 - (NSImage *)iconForConnectionType:(NSString *)inConnectionType highlight:(BOOL)inHighlight
 {
-    NSDictionary *iconTypeMapping = @{@"albums": @"album",
+    NSDictionary *iconTypeMapping = @{@"me"     : @"person",
+                                      @"albums" : @"album",
                                       @"friends": @"person"};
     
 	return [[IMBIconCache sharedIconCache] iconForType:[iconTypeMapping objectForKey:inConnectionType]
@@ -527,6 +664,8 @@ connectedNodesByType:(NSString *)nodeType
 {
     if (!facebookError) return nil;
 
+    NSLog(@"%@", facebookError);
+    
     IMBResourceAccessibility iMediaErrorCode;
     NSUInteger errorCode = [[facebookError valueForKey:@"code"] unsignedIntegerValue];
     switch (errorCode) {
