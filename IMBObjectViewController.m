@@ -157,6 +157,28 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //@synthesize progressWindowController = _progressWindowController;
 
 
+#pragma mark Organic Setters/Getters
+
+/**
+ Sets the current node and resets the view's search field if current node changes
+ 
+ @param currentNode the node that this instance's current node is set to (retained)
+
+ @discussion
+ Does not affect the delegate-based object filter (cf. badges)
+ */
+- (void) setCurrentNode:(IMBNode *)currentNode
+{
+    if (_currentNode != currentNode)
+    {
+        [_currentNode release];
+        _currentNode = [currentNode retain];
+        
+        [self resetSearchFilter];
+    }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -996,6 +1018,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 {
 	[self.objectArrayController rearrangeObjects];
 	[self.view setNeedsDisplay:YES];
+}
+
+
+/**
+ Resets the search field so that all objects of current node are shown
+ 
+ @discussion
+ Does not affect the delegate-based object filter (cf. badges)
+ */
+- (void) resetSearchFilter
+{
+    [self.objectArrayController resetSearch:self];
 }
 
 
