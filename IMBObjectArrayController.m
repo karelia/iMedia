@@ -54,6 +54,7 @@
 
 #import "IMBObjectArrayController.h"
 #import "IMBObject.h"
+#import "IMBNodeObject.h"
 #import "IMBParser.h"
 #import "IMBCommon.h"
 
@@ -237,7 +238,7 @@ const NSString* kSearchStringContext = @"searchString";
 			// First check whether object passes our delegate's filter
 			// (e.g. used to display badged objects only)
 			
-			if (_delegate && ![_delegate objectArrayController:self filterObject:object])
+			if (_delegate && ![object isKindOfClass:[IMBNodeObject class]] && ![_delegate objectArrayController:self filterObject:object])
 			{
 				continue;
 			}
