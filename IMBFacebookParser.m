@@ -13,6 +13,7 @@
 #import "IMBNodeObject.h"
 
 #define DEBUG_SIMULATE_MISSING_THUMBNAILS 0
+#define SHOW_FRIENDS_WITH_ALBUMS_ONLY 1
 
 // Limit of Facebook elements to retrieve in one request response
 // Note that there is no "Load More" mechanism implemented
@@ -132,6 +133,8 @@ static NSUInteger sFacebookElementLimit = 5000;
         connectionTypes = [NSArray arrayWithObjects:@"albums", nil];
     }
     
+    // Get subnodes for each node type
+    
     NSArray *subnodeDicts = nil;
     NSDictionary *params = @{ @"limit" : [NSNumber numberWithUnsignedInteger:sFacebookElementLimit]};
     for (NSString *connectionType in connectionTypes)
@@ -153,13 +156,9 @@ static NSUInteger sFacebookElementLimit = 5000;
             return NO;
         }
         
-        // Which friends do have albums that we have access to?
-//        NSDictionary *friendsWithAlbums = [self friendIDsWithAlbumsWithError:&error];
-        
         // Parallelize subnode creation since "friend" nodes require sending another request to Facebook
         
         dispatch_group_t subnodeCreationGroup = dispatch_group_create();
-        dispatch_queue_t subnodeCreationQueue = dispatch_queue_create("com.karelia.facebook.subnodeCreation", NULL); // Serial queue
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(8);
         
         NSMutableArray *unsortedSubnodes = [NSMutableArray arrayWithCapacity:[subnodeDicts count]];
@@ -195,25 +194,32 @@ static NSUInteger sFacebookElementLimit = 5000;
             
             if ([connectionType isEqualToString:@"friends"])
             {
+#if SHOW_FRIENDS_WITH_ALBUMS_ONLY
                 dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
                 dispatch_group_async(subnodeCreationGroup,
                                      dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),     // Concurrent
-                                     //                                 subnodeCreationQueue,                                              // Serial
+                                     //                                     subnodeCreationQueue,                                              // Serial
                                      ^{
                                          NSArray *friendalbums = [self nodeID:ID connectedNodesByType:@"albums" params:params error:outError];
                                          
                                          if ([friendalbums count] > 0) {
                                              @synchronized(unsortedSubnodes) {
                                                  [unsortedSubnodes addObject:subnode];
-//                                                 NSLog(@"Adding friend: %@:", subnode);
+                                                 //                                                 NSLog(@"Adding friend: %@:", subnode);
                                              }
                                          } else {
                                              @synchronized(self) {
-//                                                 NSLog(@"Friend %@ does not have accessible albums", subnode);
+                                                 //                                                 NSLog(@"Friend %@ does not have accessible albums", subnode);
                                              }
                                          }
                                          dispatch_semaphore_signal(semaphore);
                                      });
+#else
+                @synchronized(unsortedSubnodes) {
+                    [unsortedSubnodes addObject:subnode];
+                    //                    NSLog(@"Adding friend: %@:", subnode);
+                }
+#endif
             } else {
                 @synchronized(subnodes) {
                     [subnodes addObject:subnode];
@@ -221,7 +227,6 @@ static NSUInteger sFacebookElementLimit = 5000;
             }
         }
         dispatch_group_wait(subnodeCreationGroup, DISPATCH_TIME_FOREVER);
-        dispatch_release(subnodeCreationQueue);
         dispatch_release(subnodeCreationGroup);
         dispatch_release(semaphore);
         
