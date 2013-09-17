@@ -1195,7 +1195,8 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
  */
 - (void) imb_imageBrowser:(IKImageBrowserView *)inView cellWasClickedAtIndex:(NSUInteger)inIndex
 {
-	if (self.viewType == kIMBObjectViewTypeIcon)
+	if (inIndex < [[ibObjectArrayController arrangedObjects] count] &&
+        self.viewType == kIMBObjectViewTypeIcon)
 	{
 		IMBObject* object = [[ibObjectArrayController arrangedObjects] objectAtIndex:inIndex];
         

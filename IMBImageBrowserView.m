@@ -347,10 +347,6 @@ enum IMBMouseOperation
 	{	
 		_mouseOperation = kMouseOperationObjectClick;
 	}
-    else if (NO)
-    {
-        
-    }
 	else
 	{
 		_mouseOperation = kMouseOperationNone;
@@ -421,7 +417,6 @@ enum IMBMouseOperation
 			
 		[(IMBButtonObject*)_clickedObject setImageRepresentationForState:NO];
 		[self setNeedsDisplayInRect:[self itemFrameAtIndex:_clickedObjectIndex]];
-        
 	}
     
 	// Let the superclass handle other events...
@@ -433,7 +428,8 @@ enum IMBMouseOperation
 
     // If a regular thumbnail was clicked additionally forward the click to the delegate
     
-    if (_mouseOperation == kMouseOperationObjectClick &&
+    if (objectIndex != NSNotFound &&
+        _mouseOperation == kMouseOperationObjectClick &&
         !(inEvent.modifierFlags & NSDeviceIndependentModifierFlagsMask))
     {
         if (self.delegate && [self.delegate respondsToSelector:@selector(imb_imageBrowser:cellWasClickedAtIndex:)])
