@@ -2092,13 +2092,24 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 	if ([QLPreviewPanel sharedPreviewPanelExists] && [[QLPreviewPanel sharedPreviewPanel] isVisible])
 	{
 		[[QLPreviewPanel sharedPreviewPanel] orderOut:nil];
-	} 
+	}
 	else
 	{
-		QLPreviewPanel* panel = [QLPreviewPanel sharedPreviewPanel];
-		[panel makeKeyAndOrderFront:nil];
-		[ibTabView.window makeKeyWindow];	// Important to make key event handling work correctly!
-	}
+        // Quick Look only works if app is active (may yet not be active if we triggered action through contextual menu)
+        
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+        
+        [ibTabView.window makeKeyWindow];   // Important to make key event handling work correctly!
+        
+		QLPreviewPanel* QLPanel = [QLPreviewPanel sharedPreviewPanel];
+
+        // Since app activation (see above) is not necessarily performed immediately
+        // (Apple: "you should not assume the application will be active immediately after sending this message")
+        // we perform subsequent method through the run loop with a little delay to try to keep execution order.
+        // Note, that merely going through the runloop with delay of 0.0 did not cut it
+        
+        [QLPanel performSelector:@selector(orderFront:) withObject:nil afterDelay:0.05];
+    }
 }
 
 
