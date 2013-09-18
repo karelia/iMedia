@@ -71,6 +71,7 @@ static NSUInteger sFacebookElementLimit = 5000;
     node.accessibility = [self mediaSourceAccessibility];
     node.isAccessRevocable = YES;
 	node.identifier = [self identifierForPath:@"/"];
+    node.displayedObjectCount = 0;  // me has only albums and friends as objects but only photos are counted
 
     NSString *myID, *myName = nil;
     
@@ -194,6 +195,8 @@ static NSUInteger sFacebookElementLimit = 5000;
             
             if ([connectionType isEqualToString:@"friends"])
             {
+                subnode.displayedObjectCount = 0;   // friends have only albums as objects but only photos are counted
+                
 #if SHOW_FRIENDS_WITH_ALBUMS_ONLY
                 dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
                 dispatch_group_async(subnodeCreationGroup,
