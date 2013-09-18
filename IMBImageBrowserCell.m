@@ -305,9 +305,9 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
             }
             NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMBObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
             stampLayer.string = stampText;
-            stampLayer.fontSize = 13.0;
+            stampLayer.fontSize = MIN(16.0, placeHolderLayer.bounds.size.height / 7.5);
             //        stampLayer.alignmentMode = kCAAlignmentCenter;
-            CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 1.0};   // gray
+            CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 0.5};   // gray
             color = CGColorCreate(colorSpace, fontColorComponents);
             stampLayer.foregroundColor = color;
             CGColorRelease(color);
