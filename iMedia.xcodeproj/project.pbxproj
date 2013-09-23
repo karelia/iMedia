@@ -103,6 +103,8 @@
 		3099018E16637B93006C1212 /* NSBundle+iMedia.h in Headers */ = {isa = PBXBuildFile; fileRef = 3099018C16637B93006C1212 /* NSBundle+iMedia.h */; };
 		3099018F16637B93006C1212 /* NSBundle+iMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = 3099018D16637B93006C1212 /* NSBundle+iMedia.m */; };
 		309901941663B2A3006C1212 /* im.edia.Aperture.xpc in Copy XPCServices */ = {isa = PBXBuildFile; fileRef = D05D39AC152ACD1300E30C43 /* im.edia.Aperture.xpc */; };
+		309BA06917F0219500866E64 /* album_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 309BA06717F0219500866E64 /* album_512x512.png */; };
+		309BA06A17F0219500866E64 /* person_512x512.png in Resources */ = {isa = PBXBuildFile; fileRef = 309BA06817F0219500866E64 /* person_512x512.png */; };
 		30B83AD01701AFDB000EC74E /* SBServiceMain.m in Sources */ = {isa = PBXBuildFile; fileRef = D08109A7151A052300201850 /* SBServiceMain.m */; };
 		30B83AD21701AFDB000EC74E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FFEBEE150A08DB0009C1D0 /* Foundation.framework */; };
 		30B83AD31701AFDB000EC74E /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D09930FC1010FF9700C527B7 /* Quartz.framework */; };
@@ -672,6 +674,8 @@
 		3094F7151715C0070016E810 /* PhFacebook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PhFacebook.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3099018C16637B93006C1212 /* NSBundle+iMedia.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+iMedia.h"; sourceTree = "<group>"; };
 		3099018D16637B93006C1212 /* NSBundle+iMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+iMedia.m"; sourceTree = "<group>"; };
+		309BA06717F0219500866E64 /* album_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = album_512x512.png; sourceTree = "<group>"; };
+		309BA06817F0219500866E64 /* person_512x512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = person_512x512.png; sourceTree = "<group>"; };
 		30B83ADC1701AFDB000EC74E /* im.edia.Facebook.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = im.edia.Facebook.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		30B83ADE1701B11F000EC74E /* im.edia.Facebook.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = im.edia.Facebook.entitlements; sourceTree = "<group>"; };
 		30C8ACC816F08996005674CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
@@ -1434,6 +1438,7 @@
 				30ED4DF8175E140F0096376D /* album_sel.png */,
 				30ED4DF9175E140F0096376D /* album_sel@2x.png */,
 				30ED4DFA175E140F0096376D /* album.png */,
+				309BA06717F0219500866E64 /* album_512x512.png */,
 				30ED4DFB175E140F0096376D /* logout@2x.png */,
 				30ED4DFC175E140F0096376D /* logout_sel.png */,
 				30ED4DFD175E140F0096376D /* logout_sel@2x.png */,
@@ -1442,6 +1447,7 @@
 				30ED4E00175E140F0096376D /* person_sel.png */,
 				30ED4E01175E140F0096376D /* person_sel@2x.png */,
 				30ED4E02175E140F0096376D /* person.png */,
+				309BA06817F0219500866E64 /* person_512x512.png */,
 				3016792813B225B9000E57D2 /* badge_checkbox.png */,
 				CE394AC11371A1F700EF0D1E /* cork-background.jpg */,
 				CEAF1FE4125A8B6A001C3EBB /* Credits.html */,
@@ -2679,8 +2685,10 @@
 				D0FDC6531668ACC000181E15 /* iTunes11-icon-21.png in Resources */,
 				D0FDC6541668ACC000181E15 /* iTunes11-icon-21@2x.png in Resources */,
 				D0FDC6651668ACC000181E15 /* iTunes11-icon-30.png in Resources */,
+				309BA06917F0219500866E64 /* album_512x512.png in Resources */,
 				D0FDC6661668ACC000181E15 /* iTunes11-icon-30@2x.png in Resources */,
 				30421DE416A9943400311AC4 /* SandboxingKit.strings in Resources */,
+				309BA06A17F0219500866E64 /* person_512x512.png in Resources */,
 				308BF46516F2184400D7A11D /* facebook_logo.png in Resources */,
 				308BF46616F2184400D7A11D /* facebook_logo@2x.png in Resources */,
 				30B83ADF1701B11F000EC74E /* im.edia.Facebook.entitlements in Resources */,

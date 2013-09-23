@@ -271,7 +271,7 @@ static NSUInteger sFacebookElementLimit = 5000;
 			object.name = node.name;
 			object.metadata = nil;
 			object.parserIdentifier = self.identifier;
-            object.atomic_imageRepresentation = [self iconForConnectionType:nodeType highlight:NO];
+            object.atomic_imageRepresentation = [self thumbnailForConnectionType:nodeType];
             object.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
             object.needsImageRepresentation = NO;
         }
@@ -667,6 +667,18 @@ connectedNodesByType:(NSString *)nodeType
 	return [[IMBIconCache sharedIconCache] iconForType:[iconTypeMapping objectForKey:inConnectionType]
                                              highlight:inHighlight];
 }
+
+
+- (NSImage *)thumbnailForConnectionType:(NSString *)inConnectionType
+{
+    NSDictionary *typeMapping = @{@"me"     : @"person_512x512",
+                                  @"albums" : @"album_512x512",
+                                  @"friends": @"person_512x512"};
+    
+	return [[IMBIconCache sharedIconCache] iconForType:[typeMapping objectForKey:inConnectionType]
+                                             highlight:NO];
+}
+
 
 - (NSError *) iMediaErrorFromFacebookError:(NSDictionary *)facebookError
 {
