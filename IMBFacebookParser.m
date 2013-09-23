@@ -86,7 +86,7 @@ static NSUInteger sFacebookElementLimit = 5000;
 
         if (error) {
             NSLog(@"Facebook: Access to /me failed:%@", error);
-            *outError = error;
+            if (outError) *outError = error;
             return nil;
         }
         myID = [[responseDict objectForKey:@"resultDict"] objectForKey:@"id"];
@@ -98,7 +98,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             node.name = [NSString stringWithFormat:@"Facebook (%@)", myName];
         }
     } else {
-        *outError = error;
+        if (outError) *outError = error;
     }
 	return node;
 }
@@ -568,7 +568,7 @@ static NSUInteger sFacebookElementLimit = 5000;
         
         if (error) {
             NSLog(@"Execution of %@ failed:%@", FQLFriendsAlbumsQuery, error);
-            *pError = error;
+            if (pError) *pError = error;
             return nil;
         }
         
@@ -588,7 +588,7 @@ static NSUInteger sFacebookElementLimit = 5000;
             }
         }
     } else {
-        *pError = error;
+        if (pError) *pError = error;
     }
     
     NSLog(@"We got %lu friends that have albums: %@", (unsigned long)[friendsIDs count], friendsIDs);
@@ -618,7 +618,7 @@ connectedNodesByType:(NSString *)nodeType
         
         if (error) {
             NSLog(@"Access to %@ failed:%@", nodeType, error);
-            *outError = error;
+            if (outError) *outError = error;
             return nil;
         }
 
@@ -626,7 +626,7 @@ connectedNodesByType:(NSString *)nodeType
 
         nodes = [[responseDict objectForKey:@"resultDict"] objectForKey:@"data"];
     } else {
-        *outError = error;
+        if (outError) *outError = error;
     }
 
     return nodes;
