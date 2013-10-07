@@ -1314,8 +1314,6 @@
 		0867D691FE84028FC02AAC07 /* iMedia */ = {
 			isa = PBXGroup;
 			children = (
-				30C8ACCA16F089B5005674CA /* Social.framework */,
-				30C8ACC816F08996005674CA /* Accounts.framework */,
 				D0760AC210C5027100F2119C /* IMBProject.xcconfig */,
 				D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */,
 				D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */,
@@ -1393,7 +1391,6 @@
 		30FFEBED150A08DB0009C1D0 /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3094F7151715C0070016E810 /* PhFacebook.framework */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 				D0DA9AE0102EB7BD008EC9F9 /* Carbon.framework */,
 				30FFEBEE150A08DB0009C1D0 /* Foundation.framework */,
@@ -1405,6 +1402,9 @@
 				CE0E0C80104C72A200EE6B09 /* Security.framework */,
 				D0C911C71521038F006655C9 /* ObjectiveFlickr.framework */,
 				3089F94A151C8FDD00D56DC0 /* XPCKit.framework */,
+				30C8ACCA16F089B5005674CA /* Social.framework */,
+				30C8ACC816F08996005674CA /* Accounts.framework */,
+				3094F7151715C0070016E810 /* PhFacebook.framework */,
 				D0F2DBCE1098270F004280C1 /* libsqlite3.dylib */,
 			);
 			name = "Linked Frameworks";
@@ -2457,6 +2457,7 @@
 				D09933531011B26E00C527B7 /* Frameworks */,
 				D08E8FBA101A0F15005D8614 /* Copy Frameworks */,
 				30FFEBFD150A09780009C1D0 /* Copy XPCServices */,
+				D0DD821D180310C700FB655B /* Code Sign 3rd-Party Mach-O */,
 			);
 			buildRules = (
 			);
@@ -2508,6 +2509,15 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0460;
+				TargetAttributes = {
+					D09933541011B26E00C527B7 = {
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
+				};
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "iMedia" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -2825,6 +2835,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# shell script goes here\n\nrm -fv ./en.lproj/Localizable.strings\n\ngenstrings *.c -u -a -o ./en.lproj/ \ngenstrings *.cp -u -a -o ./en.lproj/\ngenstrings *.m -u -a -o ./en.lproj/\ngenstrings *.mm -u -a -o ./en.lproj/\n\nexit 0";
+		};
+		D0DD821D180310C700FB655B /* Code Sign 3rd-Party Mach-O */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Code Sign 3rd-Party Mach-O";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Load the external script\nsource \"${SOURCE_ROOT}/_3rdPartyCodeSign.sh\"\n\n# Setup path attributes\npath_xpcservice=\"${CONFIGURATION_BUILD_DIR}/${XPCSERVICES_FOLDER_PATH}\"\npath_plugins=\"${CONFIGURATION_BUILD_DIR}/${PLUGINS_FOLDER_PATH}\"\npath_frameworks=\"${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\npath_resources=\"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\n# Sign Frameworks\n_resign_mach_o_file \"${path_frameworks}/ObjectiveFlickr.framework/Versions/A/ObjectiveFlickr\"\n_resign_mach_o_file \"${path_frameworks}/XPCKit.framework/Versions/A/XPCKit\"\n\n# Sign XPC Services\n#_resign_mach_o_file \"${path_xpcservice}/com.andymatuschak.Sparkle.install-service.xpc\"";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
