@@ -563,32 +563,41 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 #pragma mark NSPasteboard Protocols
 
 
+// Request a bookmark for the resource to get entitled for it. Requesting bookmarks is asynchronous, i.e.
+// we need a semaphore to wait for bookmark so method can return synchronously...
+
+- (NSURL*) _synchronouslyResolvedBookmarkURL
+{
+	dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+	
+	[self requestBookmarkWithQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)
+				   completionBlock:^(NSError* inError)
+	{
+		if (inError)
+		{
+			dispatch_async(dispatch_get_main_queue(),^()
+			{
+				[NSApp presentError:inError];
+			});
+		}
+		dispatch_semaphore_signal(semaphore);
+	}];
+
+	dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+	dispatch_release(semaphore);
+	
+	NSURL* url = [self URLByResolvingBookmark];
+	return url;
+}
+
+
 - (void) pasteboard:(NSPasteboard*)inPasteboard item:(NSPasteboardItem*)inItem provideDataForType:(NSString*)inType
 {
+	// If we want a URL, we need to request the bookmark and resolve it, or the sandbox will interfere...
+	
 	if ([inType isEqualToString:(NSString*)kUTTypeFileURL])
 	{
-        // Request a bookmark for the resource to get entitled for it. Requesting bookmarks is asynchronous, i.e.
-        // we need a semaphore to wait for bookmark so method can return synchronously
-        
-        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-        
-        [self requestBookmarkWithQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH,0)
-                       completionBlock:^(NSError* inError)
-        {
-            if (inError)
-            {
-                dispatch_async(dispatch_get_main_queue(),^()
-                {
-                    [NSApp presentError:inError];
-                });
-            }
-            dispatch_semaphore_signal(semaphore);
-        }];
-
-        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-        dispatch_release(semaphore);
-        
-        NSURL* url = [self URLByResolvingBookmark];
+        NSURL* url = [self _synchronouslyResolvedBookmarkURL];
         if (url) [inItem setString:[url absoluteString] forType:(NSString*)kUTTypeFileURL];
 	}
 	
@@ -606,14 +615,14 @@ NSString* kIMBObjectPasteboardType = @"com.karelia.imedia.IMBObject";
 
 
 #pragma mark 
-#pragma mark QLPreviewItem Protocol 
+#pragma mark QLPreviewItem Protocol
 
 
 - (NSURL*) previewItemURL
 {
 	if (self.accessibility == kIMBResourceIsAccessible)
 	{
-		return self.URL;
+        return [self _synchronouslyResolvedBookmarkURL];
 	}
 	
 	return nil;
