@@ -3178,7 +3178,6 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
-				ONLY_ACTIVE_ARCH = NO;
 				"OTHER_LDFLAGS[arch=x86_64]" = "";
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
@@ -3196,7 +3195,6 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = iMedia;
 				WRAPPER_EXTENSION = framework;
 			};
