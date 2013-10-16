@@ -549,13 +549,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView isItemExpandable:(id)inItem
 {
+    IMBNode *node = (IMBNode *)inItem;
+    
 	if (inItem == nil)
 	{
 		return YES;
 	}
 	else
 	{
-		return ![(IMBNode*)inItem isLeafNode];
+        // Do not treat inaccessible nodes as to be expandable.
+        // This would particularly trigger opening access control views (like Facebook login) when dragging
+        // any object accross the item's row (NSOutlineView implements NSDraggingDestination and tries to
+        // expand any expandable node that is met while dragging).
+        
+		return ![node isLeafNode] && (node.accessibility == kIMBResourceIsAccessible);
 	}
 }
 
