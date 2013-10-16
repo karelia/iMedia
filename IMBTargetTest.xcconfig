@@ -7,8 +7,8 @@
 // You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
 // is now referencing your own set of xcconfig files.
 
+ONLY_ACTIVE_ARCH = NO
 
 GCC_MODEL_TUNING = G5
 GCC_PRECOMPILE_PREFIX_HEADER = YES
-
 GCC_PREPROCESSOR_DEFINITIONS = MAS=1
