@@ -2848,7 +2848,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Load the external script\nsource \"${SOURCE_ROOT}/_3rdPartyCodeSign.sh\"\n\n# Setup path attributes\npath_xpcservice=\"${CONFIGURATION_BUILD_DIR}/${XPCSERVICES_FOLDER_PATH}\"\npath_plugins=\"${CONFIGURATION_BUILD_DIR}/${PLUGINS_FOLDER_PATH}\"\npath_frameworks=\"${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\npath_resources=\"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\n# Sign Frameworks\n_resign_mach_o_file \"${path_frameworks}/ObjectiveFlickr.framework/Versions/A/ObjectiveFlickr\"\n_resign_mach_o_file \"${path_frameworks}/XPCKit.framework/Versions/A/XPCKit\"\n\n# Sign XPC Services\n#_resign_mach_o_file \"${path_xpcservice}/com.andymatuschak.Sparkle.install-service.xpc\"";
+			shellScript = "# Load the external script\nsource \"${SOURCE_ROOT}/_3rdPartyCodeSign.sh\"\n\n# Setup path attributes\npath_xpcservice=\"${CONFIGURATION_BUILD_DIR}/${XPCSERVICES_FOLDER_PATH}\"\npath_plugins=\"${CONFIGURATION_BUILD_DIR}/${PLUGINS_FOLDER_PATH}\"\npath_frameworks=\"${CONFIGURATION_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\npath_resources=\"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\n# Sign Frameworks\n_resign_mach_o_file \"${path_frameworks}/ObjectiveFlickr.framework/Versions/A/ObjectiveFlickr\"\n_resign_mach_o_file \"${path_frameworks}/XPCKit.framework/Versions/A/XPCKit\"\n_resign_mach_o_file \"${path_frameworks}/PhFacebook.framework/Versions/A/PhFacebook\"\n\n# Sign XPC Services\n#_resign_mach_o_file \"${path_xpcservice}/com.andymatuschak.Sparkle.install-service.xpc\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
