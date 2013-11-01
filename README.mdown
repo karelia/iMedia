@@ -13,6 +13,9 @@ Developers are welcome to work on enhancements and fixes!  Please use the [GitHu
 There are plenty of things that need to be done, and your help would be appreciated!
 
 ## Release Notes
+### 3.1.0
+- Add Facebook parser and the necessary architectual additions that go with it (specifically regarding access control). See section "Host App Configuration" in
+[How To Install](https://github.com/iMediaSandboxing/iMedia/wiki/How-To-Install) on how to integrate into your host app.
 ### 3.0.7
 - Show warning or error alert panel when left-clicking on thumbnail cell that has an error or warning associated with (and not only when cell was selected)
 - Improve thumbnail Quick Look behavior
