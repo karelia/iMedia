@@ -295,7 +295,11 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
         
         // Stamp placeholder layer with text "Loading..." if resource is accessible
         
-        if (item.accessibility == kIMBResourceIsAccessible)
+        // JJ/Note (2013-11-01): there are reports that adding a stamp layer significantly
+        // slows down drawing performance of the IKImageBrowser - so we remove it for now.
+        // Might be reconsidered in the future.
+        
+        if (NO /*item.accessibility == kIMBResourceIsAccessible*/)
         {
             CATextLayer *stampLayer = [CATextLayer layer];
             [placeHolderLayer addSublayer:stampLayer];
