@@ -172,6 +172,57 @@ static IMBIconCache* sSharedIconCache;
 
 //----------------------------------------------------------------------------------------------------------------------
 
+/**
+ Returns an image object matching input parameters
+ @discussion The receiver will first try to lookup the image in question within its image cache. If it's not
+ in its chache already it will try to load it from the iMedia framework's bundle.
+ @param inType The image base name. Will append "_sel" if inHighlight is set to YES. Will append .tiff as postfix
+ or .png if image with name ....tiff could not be found.
+ @param inHighlight See inType parameter
+ @return  An image object matching input parameter. Will return nil if image could not be retrieved.
+  */
+- (NSImage*) iconForType:(NSString*)inType highlight:(BOOL)inHighlight
+{
+	NSImage* image = nil;
+    NSString* bundleID = @"iMedia";
+    
+	if (inType != nil)
+	{
+		@synchronized(self)
+		{
+            NSString* typeKey = inType;
+            if (inHighlight)
+            {
+                typeKey = [inType stringByAppendingString:@"_sel"];
+            }
+            
+			NSMutableDictionary* bundleCache = [_iconCache objectForKey:bundleID];
+			
+			if (bundleCache == nil)
+			{
+				bundleCache = [NSMutableDictionary dictionary];
+				[_iconCache setObject:bundleCache forKey:bundleID];
+			}
+            
+			image = [bundleCache objectForKey:typeKey];
+			
+			if (image == nil)
+			{
+                // First, try TIFF format
+				image = [NSImage imb_imageNamed:[NSString stringWithFormat:@"%@.tiff", typeKey]];
+                
+                // If failed retry with PNG format
+                if (!image) {
+                    image = [NSImage imb_imageNamed:[NSString stringWithFormat:@"%@.png", typeKey]];
+                }
+                
+				if (image) [bundleCache setObject:image forKey:typeKey];
+			}
+		}
+    }
+    return image;
+}
+
 
 - (NSImage*) iconForType:(NSString*)inType fromBundleID:(NSString*)inBundleID withMappingTable:(const IMBIconTypeMapping*)inMappingTable highlight:(BOOL)inHighlight
 {

@@ -68,6 +68,11 @@
 // backend controller, while IMBNodeViewController is a frontend controller.
 
 
+#pragma mark HEADERS
+
+#import "IMBOutlineView.h"
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -83,7 +88,6 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 @class IMBLibraryController;
 @class NSObjectViewController;
-@class IMBOutlineView;
 @class IMBNode;
 @protocol IMBNodeViewControllerDelegate;
 
@@ -93,7 +97,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 #pragma mark 
 
-@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,NSOutlineViewDelegate,NSSplitViewDelegate>
+@interface IMBNodeViewController : NSViewController <NSOutlineViewDataSource,IMBOutlineViewDelegate,NSSplitViewDelegate>
 {
 	IBOutlet NSSplitView* ibSplitView;
 	IBOutlet IMBOutlineView* ibNodeOutlineView;
@@ -208,7 +212,7 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 
 #pragma mark 
 
-@protocol IMBNodeViewControllerDelegate
+@protocol IMBNodeViewControllerDelegate <NSObject>
 
 @optional
 
@@ -219,9 +223,10 @@ extern NSString* kIMBExpandAndSelectNodeWithIdentifierNotification;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customObjectViewControllerForNode:(IMBNode*)inNode;
 - (NSViewController*) nodeViewController:(IMBNodeViewController*)inNodeViewController customFooterViewControllerForNode:(IMBNode*)inNode;
 
+// May supply a Facebook app id if app wants to integrate Facebook node into node view
+- (NSString*) facebookAppId;
+
 @end
-
-
 //----------------------------------------------------------------------------------------------------------------------
 
 

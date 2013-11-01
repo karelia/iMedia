@@ -464,7 +464,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
+#pragma mark IMBNodeViewControllerDelegate
+
+- (NSString *)facebookAppId
+{
+    // Return a valid Facebook app id here if you want to access Facebook from node view
+    return nil;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark IMBObjectViewControllerDelegate
 
 

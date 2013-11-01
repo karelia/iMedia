@@ -180,7 +180,7 @@ extern NSString* kIMBObjectBadgesDidChangeNotification;
 - (NSString*) mediaType;
 @property (assign) id<IMBObjectViewControllerDelegate> delegate;
 
-@property (retain) IMBNode* currentNode;
+@property (nonatomic, retain) IMBNode* currentNode;
 @property (readonly) IMBObjectArrayController* objectArrayController;
 
 // Persistence...

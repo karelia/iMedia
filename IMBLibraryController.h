@@ -121,8 +121,16 @@ extern NSString* kIMBDidCreateTopLevelNodeNotification;
 - (void) reload;
 
 - (void) createTopLevelNodesWithParserMessenger:(IMBParserMessenger*)inParserMessenger;
+- (void)populateNode:(IMBNode *)inNode errorHandler:(void(^)(NSError* error))inErrorHandler;
 - (void) populateNode:(IMBNode*)inNode;
+- (void)reloadNodeTree:(IMBNode *)inOldNode errorHandler:(void(^)(NSError* error))inErrorHandler;
 - (void) reloadNodeTree:(IMBNode*)inOldNode;
+
+// Try to reload any top-level nodes that do not have access rights and which might benefit from the newly
+// granted URL...
+
++ (void) reloadTopLevelNodesWithoutAccessRights;
+
 
 // Node accessors (must only be called on the main thread)...
 

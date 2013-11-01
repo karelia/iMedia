@@ -112,6 +112,7 @@
 	BOOL _wantsRecursiveObjects;
 	BOOL _shouldDisplayObjectView;
     IMBResourceAccessibility _accessibility;
+    BOOL _isAccessRevocable;
 	
 	// Observing file system changes...
 	
@@ -147,6 +148,10 @@
 @property (copy) NSString* parserIdentifier;		// Unique identifier of the parser
 @property (retain) NSError* error;					// Per node error
 
+// Badges
+
+- (NSImage*) badgeIcon;
+- (NSImage*) badgeHighlightIcon;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -156,7 +161,8 @@
 // subnodes is an empty array, then there really aren't any subnodes...
 
 @property (retain,readonly) NSArray* subnodes;		
-		
+- (void) setSubnodes:(NSArray*)inNodes;
+
 // Designated initializer
 
 - (id) initWithParser:(IMBParser*)inParser topLevel:(BOOL)inTopLevel;
@@ -216,6 +222,7 @@
 @property (assign) BOOL shouldDisplayObjectView;	
 @property (assign) NSUInteger displayPriority;		// to push certain nodes up or down in the list
 @property (assign) IMBResourceAccessibility accessibility;
+@property (assign) BOOL isAccessRevocable;          // will enable us to show a "logout" badge or not
 
 // Observing file system changes...
 
@@ -251,7 +258,14 @@
 - (IMBNode*) subnodeWithIdentifier:(NSString*)identifier;
 - (BOOL) isPopulated;
 
+// The normal (non-mouseover), non-loading badge type for this node possibly derived
+// from other properties.
 
+- (IMBBadgeType) badgeTypeNormalNonLoading;
+
+- (BOOL)hasBadgeCallback;
+
+- (void)performBadgeCallback;
 @end
 
 

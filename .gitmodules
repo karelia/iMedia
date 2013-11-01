@@ -4,3 +4,6 @@
 [submodule "XPCKit"]
 	path = XPCKit
 	url = git@github.com:iMediaSandboxing/XPCKit.git
+[submodule "PhFacebook"]
+	path = PhFacebook
+	url = git@github.com:iMediaSandboxing/PhFacebook.git

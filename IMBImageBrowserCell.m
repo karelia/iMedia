@@ -248,6 +248,7 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 //---------------------------------------------------------------------------------
 - (CALayer *) layerForType:(NSString*) type
 {
+    IMBObject* item = (IMBObject*) [self representedItem];
 	CGColorRef color;
 	
 	//retrieve some usefull rects
@@ -292,6 +293,40 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
             [layer addSublayer:badgeLayer];
         }
         
+        // Stamp placeholder layer with text "Loading..." if resource is accessible
+        
+        // JJ/Note (2013-11-01): there are reports that adding a stamp layer significantly
+        // slows down drawing performance of the IKImageBrowser - so we remove it for now.
+        // Might be reconsidered in the future.
+        
+        if (NO /*item.accessibility == kIMBResourceIsAccessible*/)
+        {
+            CATextLayer *stampLayer = [CATextLayer layer];
+            [placeHolderLayer addSublayer:stampLayer];
+            if ([stampLayer respondsToSelector:@selector(setContentsScale:)])
+            {
+                stampLayer.contentsScale = [[[self imageBrowserView] window] backingScaleFactor];
+            }
+            NSString *stampText = NSLocalizedStringWithDefaultValue(@"IMBObjectViewController.thumbnail.loading", nil, IMBBundle(), @"Loading...", @"Loading text shown on placeholder image");
+            stampLayer.string = stampText;
+            stampLayer.fontSize = MIN(16.0, placeHolderLayer.bounds.size.height / 7.5);
+            //        stampLayer.alignmentMode = kCAAlignmentCenter;
+            CGFloat fontColorComponents[4] = {0.5, 0.5, 0.5, 0.5};   // gray
+            color = CGColorCreate(colorSpace, fontColorComponents);
+            stampLayer.foregroundColor = color;
+            CGColorRelease(color);
+            //stampLayer.delegate = self;
+            
+            //stampLayer.backgroundColor = [[NSColor yellowColor] CGColor];
+            placeHolderLayer.layoutManager = [CAConstraintLayoutManager layoutManager];
+            [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidX relativeTo:@"superlayer" attribute:kCAConstraintMidX]];
+            [stampLayer addConstraint:[CAConstraint constraintWithAttribute:kCAConstraintMidY relativeTo:@"superlayer" attribute:kCAConstraintMidY]];
+            [stampLayer setNeedsLayout];
+            
+            //stampLayer.contentsGravity = kCAGravityCenter;
+            stampLayer.name = type; // a way to refer to the layer location type during drawing if need be
+                                    //[stampLayer setNeedsDisplay];
+        }
 		return layer;
 	}
 	
@@ -389,6 +424,41 @@ extern NSString *const IKImageBrowserCellPlaceHolderLayer __attribute__((weak_im
 	}
 	
 	return nil;
+}
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark - CALayerDelegate Protocol
+
+- (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)context
+{
+    // Set the current context.
+    [NSGraphicsContext saveGraphicsState];
+    NSGraphicsContext *nscg = [NSGraphicsContext graphicsContextWithGraphicsPort:context flipped:NO];
+    [NSGraphicsContext setCurrentContext:nscg];
+    
+    NSString *stamp = @"Loading Thumbnail...";
+    
+    // Wrap and center the text
+    NSMutableParagraphStyle *paragraphStyle = [[[NSMutableParagraphStyle alloc] init] autorelease];
+    [paragraphStyle setLineBreakMode:NSLineBreakByWordWrapping];
+    [paragraphStyle setAlignment:NSCenterTextAlignment];
+    
+    NSMutableDictionary *attrs = [NSMutableDictionary dictionary];
+    [attrs setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+    [attrs setObject:[NSFont systemFontOfSize:12.0f] forKey:NSFontAttributeName];
+    
+    NSRect drawRect = NSMakeRect(20,
+                                 20, //-(self.imageFrame.size.height + padding),
+                                 self.frame.size.width,
+                                 100
+                                 );
+    [stamp drawInRect:drawRect withAttributes:attrs];
+    
+    [NSGraphicsContext restoreGraphicsState];
 }
 
 

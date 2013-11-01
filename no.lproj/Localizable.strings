@@ -27,6 +27,7 @@
 "IMBAudioViewController.tableColumn.artist" = "Sjanger";
 "IMBAudioViewController.tableColumn.name" = "Navn";
 "IMBAudioViewController.tableColumn.time" = "Tid";
+"IMBFacebookParser.ThumbnailLoadError" = "Forhåndsvisningen kan ikke lastes opp. Prøv pånytt ved å bruke menyen.";
 "IMBFaceObjectViewController.countFormatPlural" = "%d ansikter";
 "IMBFaceObjectViewController.countFormatSingular" = "%d ansikt";
 "IMBFlickrParser.button.add" = "Legg til";
@@ -92,6 +93,10 @@
 "IMBObjectViewController.menuItem.openWithFinder" = "Åpne med Finder";
 "IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Åpne Master-bilde med Finder";
 "IMBObjectViewController.menuItem.quickLook" = "Rask forhåndvisning";
+
+/* Menu item in context menu of IMBObjectViewController */
+"IMBObjectViewController.menuItem.reload" = "Last opp pånytt";
+
 "IMBObjectViewController.menuItem.revealInFinder" = "Vis i Finder";
 "IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Vis Master-bilde i Finder";
 "IMBObjectViewController.menuItem.showAll" = "Vis alt";
@@ -102,6 +107,10 @@
 "IMBObjectViewController.segment.combo" = "Kombinasjon";
 "IMBObjectViewController.segment.grid" = "Rutenett";
 "IMBObjectViewController.segment.list" = "Liste";
+
+/* Loading text shown on placeholder image */
+"IMBObjectViewController.thumbnail.loading" = "Laster opp...";
+
 "IMBOmniWebParser.name" = "OmniWeb";
 "IMBOutlineView.draggingPrompt" = "Dra ekstra mapper hit";
 "IMBSafariBookmarkParser.bookmarksBar" = "Bokmerkerlinje";

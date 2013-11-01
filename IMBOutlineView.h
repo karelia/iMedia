@@ -76,5 +76,10 @@ extern NSString* IMBIsDefaultAppearanceAttributeName;
 
 @end
 
+@protocol IMBOutlineViewDelegate <NSOutlineViewDelegate>
+
+- (void)outlineView:(IMBOutlineView *)view badgeButtonRect:(NSRect)rect clickedForItem:(id)item;
+
+@end
 
 //----------------------------------------------------------------------------------------------------------------------

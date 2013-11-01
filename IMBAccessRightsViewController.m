@@ -87,7 +87,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 #pragma mark
 
 @interface IMBAccessRightsViewController ()
-- (void) _reloadTopLevelNodesWithoutAccessRightsWithURL:(NSURL*)inURL bookmark:(NSData*)inBookmark;
 @end
 
 
@@ -240,49 +239,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 	}
 	
 	[keyWindow makeKeyWindow];
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
-// bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
-// to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
-// Note that this is an empty operation if not sandboxed.
-
-- (void) grantAccessRightsForNode:(IMBNode*)inNode
-{
-    if (SBIsSandboxed())
-    {
-        // Calculate the best possible folder to select...
-        
-        IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
-        NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
-        IMBNode* node = nodes.count==1 ? [nodes objectAtIndex:0] : nil;
-        NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
-        NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
-        
-        // Show an NSOpenPanel with this folder...
-        
-        [self _showForSuggestedURL:proposedURL name:node.name completionHandler:^(NSURL* inGrantedURL)
-         {
-             if (inGrantedURL)
-             {
-                 // Create bookmark...
-                 
-                 NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
-                 
-                 // Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
-                 
-                 [self _reloadTopLevelNodesWithoutAccessRightsWithURL:inGrantedURL bookmark:bookmark];
-                 
-                 // Also send it to the FSEvents service, so that it can do its job...
-                 
-                 [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
-             }
-         }];
-    }
 }
 
 
@@ -534,13 +490,6 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"Media File is Missing",
 			@"Alert title");
 
-		NSString* format = NSLocalizedStringWithDefaultValue(
-			@"IMBAccessRightsViewController.missingObjectMessage",
-			nil,
-			IMBBundle(),
-			@"The file %@ cannot be used because it is missing. It may have been deleted, moved, or renamed.",
-			@"Alert message");
-			
 		NSString* ok = NSLocalizedStringWithDefaultValue(
 			@"IMBAccessRightsViewController.missingObjectButton",
 			nil,
@@ -548,7 +497,26 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 			@"   OK   ",
 			@"Alert button");
 
-		NSString* message = [NSString stringWithFormat:format,name];
+        NSError* error = inObject.error;
+        NSString* message;
+        
+        if (error)
+        {
+            message = [error localizedDescription];
+            
+            if ([[error userInfo] valueForKey:@"title"]) {
+                title = [[error userInfo] valueForKey:@"title"];
+            }
+        } else {
+            NSString* format = NSLocalizedStringWithDefaultValue(
+                @"IMBAccessRightsViewController.missingObjectMessage",
+                nil,
+                IMBBundle(),
+                @"The file %@ cannot be used because it is missing. It may have been deleted, moved, or renamed.",
+                @"Alert message");
+			
+            message = [NSString stringWithFormat:format,name];
+        }
 		
 		if (IMBRunningOnLionOrNewer() && inView.window != nil)
 		{
@@ -652,47 +620,112 @@ typedef void (^IMBOpenPanelCompletionHandler)(NSURL* inURL);
 
 
 #pragma mark
+#pragma mark IMBNodeAccessDelegate Protocol
+
+// Show an NSOpenPanel and let the user select a folder. This punches a hole into the sandbox. Then create a
+// bookmark for this folder and send it to as many XPC services as possible, thus transferring the access rights
+// to the XPC service processes. The XPC service processes are then responsible for persisting these access rights...
+// Note that this is an empty operation if not sandboxed.
+
+-(void)nodeViewController:(IMBNodeViewController *)inNodeViewController
+      requestAccessToNode:(IMBNode *)inNode
+               completion:(IMBRequestAccessCompletionHandler)inCompletion
+{
+    if (SBIsSandboxed())
+    {
+        // Calculate the best possible folder to select...
+        
+        IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:inNode.mediaType];
+        NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+        IMBNode* node = nodes.count==1 ? [nodes objectAtIndex:0] : nil;
+        NSArray* urls = [libraryController libraryRootURLsForNodes:nodes];
+        NSURL* proposedURL = [IMBAccessRightsController commonAncestorForURLs:urls];
+        
+        // Show an NSOpenPanel with this folder...
+        
+        [self _showForSuggestedURL:proposedURL name:node.name completionHandler:^(NSURL* inGrantedURL)
+         {
+             if (inGrantedURL)
+             {
+                 // Create bookmark...
+                 
+                 NSData* bookmark = [IMBAccessRightsController bookmarkForURL:inGrantedURL];
+                 
+                 // Send it to XPC services of all nodes that do not have access rights (thus blessing the XPC services)...
+                 
+                 NSArray* mediaTypes = [IMBLibraryController knownMediaTypes];
+                 NSString* path = [inGrantedURL path];
+                 
+                 // Collect all affected nodes for which bookmarks were provided. Since these bookmarks are sent
+                 // to messengers asynchronously we must use a counter that tells us when the last bookmark
+                 // was provided, so we can then call the completion handler with the list of granted nodes.
+                 
+                 NSMutableArray *grantedNodes = [NSMutableArray array];                 
+                 __block NSUInteger affectedNodesCount = 0;
+                 
+                 for (NSString* mediaType in mediaTypes)
+                 {
+                     IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
+                     NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
+                     affectedNodesCount += [nodes count];
+                     for (IMBNode* node in nodes)
+                     {
+                         if ([node.libraryRootURL.path hasPathPrefix:path])
+                         {
+                             node.badgeTypeNormal = kIMBBadgeTypeLoading;
+                             node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
+                             
+                             IMBParserMessenger* messenger = node.parserMessenger;
+                             SBPerformSelectorAsync(messenger.connection,
+                                                    messenger,
+                                                    @selector(addAccessRightsBookmark:error:),
+                                                    bookmark,
+                                                    dispatch_get_main_queue(),
+                                                    
+                                                    ^(NSURL* inReceivedURL,NSError* inError)
+                                                    {
+                                                        BOOL granted = inError == nil;
+                                                        @synchronized(grantedNodes) {
+                                                            affectedNodesCount--;
+                                                        }
+                                                        if (granted) {
+                                                            [grantedNodes addObject:node];
+                                                        }
+                                                        if (affectedNodesCount == 0) {
+                                                            // The last affected node was provided with a bookmark.
+                                                            // Now we can invoke the completion block with collected nodes.
+                                                            inCompletion(NO, grantedNodes, nil);
+                                                        }
+                                                    });
+                         } else {
+                             affectedNodesCount--;
+                         }
+                     }
+                 }
+                 // Also send it to the FSEvents service, so that it can do its job...
+                 
+                 [[IMBFileSystemObserver sharedObserver] addAccessRights:bookmark];
+                 
+             } else {
+                 inCompletion(YES, nil, nil);
+             }
+         }];
+    }
+}
+
+// Doesn't do anything but invoke completion handler
+
+- (void) revokeAccessToNode:(IMBNode *)inNode completion:(IMBRevokeAccessCompletionHandler) inCompletion
+{
+    inCompletion(NO, nil);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark Helpers
 
-
-// Try to reload any top-level nodes that do not have access rights and which might benefit from the newly
-// granted URL...
-
-- (void) _reloadTopLevelNodesWithoutAccessRightsWithURL:(NSURL*)inURL bookmark:(NSData*)inBookmark
-{
-	NSArray* mediaTypes = [IMBLibraryController knownMediaTypes];
-	NSString* path = [inURL path];
-	
-	for (NSString* mediaType in mediaTypes)
-	{
-		IMBLibraryController* libraryController = [IMBLibraryController sharedLibraryControllerWithMediaType:mediaType];
-		NSArray* nodes = [libraryController topLevelNodesWithoutAccessRights];
-		
-		for (IMBNode* node in nodes)
-		{
-			if ([node.libraryRootURL.path hasPathPrefix:path])
-			{
-				node.badgeTypeNormal = kIMBBadgeTypeLoading;
-				node.accessibility = kIMBResourceIsAccessible; // Temporarily, so that loading wheel shows again
-				
-				IMBParserMessenger* messenger = node.parserMessenger;
-				SBPerformSelectorAsync(messenger.connection,
-                                       messenger,
-                                       @selector(addAccessRightsBookmark:error:),
-                                       inBookmark,
-                                       dispatch_get_main_queue(),
-			
-					^(NSURL* inReceivedURL,NSError* inError)
-					{
-						if (inError == nil)
-						{
-							[libraryController reloadNodeTree:node];
-						}
-					});
-			}
-		}
-	}
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------

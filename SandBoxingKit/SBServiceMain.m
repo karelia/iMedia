@@ -63,6 +63,27 @@
 
 
 #pragma mark
+/**
+ returns a static semaphore of eight resources intended to restrain parallelity when dispatching events with this service
+ 
+ @Discussion
+ We had instances where the Facebook parser service hung up on us when about 60 some parallel requests were issued
+ (this might correlate with the fact that all Facebook requests reach out to the internet).
+ 
+ Going beyond eight parallel resources did not seem to gain any better performance on any of the parsers.
+ */
+dispatch_semaphore_t dispatch_semaphore()
+{
+	static dispatch_semaphore_t sSharedInstance = NULL;
+	static dispatch_once_t sOnceToken = 0;
+    
+    dispatch_once(&sOnceToken,
+                  ^{
+                      sSharedInstance = dispatch_semaphore_create(8);
+                  });
+    
+ 	return sSharedInstance;
+}
 
 
 // This is a generic main function for all our XPC services. It simply tries to invoke the message and 
@@ -81,25 +102,30 @@ int main(int argc, const char *argv[])
 	{
 		[inConnection setEventHandler:^(XPCMessage* inMessage, XPCConnection* inReplyConnection)
 		{
-			NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
-
-			@try
-			{
-				XPCMessage* reply = [inMessage invoke];
-				if (reply) [inReplyConnection sendMessage:reply];
-			}
-			@catch (NSException* inException)
-			{
-				NSString* text = [NSString stringWithFormat:@"Uncaught exception %@: %@\n\n%@\n\n",
-					inException.name,
-					inException.reason,
-					[[inException callStackSymbols] componentsJoinedByString:@"\n"]];
-				
-				NSLog(@"%@",text);
-				[inReplyConnection sendLog:text];
-			}
-			
-			[pool2 drain];
+            dispatch_semaphore_wait(dispatch_semaphore(), DISPATCH_TIME_FOREVER);
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+            ^{
+                NSAutoreleasePool* pool2 = [[NSAutoreleasePool alloc] init];
+                
+                @try
+                {
+                    XPCMessage* reply = [inMessage invoke];
+                    if (reply) [inReplyConnection sendMessage:reply];
+                }
+                @catch (NSException* inException)
+                {
+                    NSString* text = [NSString stringWithFormat:@"Uncaught exception %@: %@\n\n%@\n\n",
+                                      inException.name,
+                                      inException.reason,
+                                      [[inException callStackSymbols] componentsJoinedByString:@"\n"]];
+                    
+                    NSLog(@"%@",text);
+                    [inReplyConnection sendLog:text];
+                }
+                
+                [pool2 drain];
+                dispatch_semaphore_signal(dispatch_semaphore());
+            });
 		}];
 	}];
 	

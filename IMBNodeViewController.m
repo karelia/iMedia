@@ -71,6 +71,7 @@
 #import "NSFileManager+iMedia.h"
 #import "NSCell+iMedia.h"
 #import "IMBTableViewAppearance+iMediaPrivate.h"
+#import "IMBAlertPopover.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -548,13 +549,20 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 - (BOOL) outlineView:(NSOutlineView*)inOutlineView isItemExpandable:(id)inItem
 {
+    IMBNode *node = (IMBNode *)inItem;
+    
 	if (inItem == nil)
 	{
 		return YES;
 	}
 	else
 	{
-		return ![(IMBNode*)inItem isLeafNode];
+        // Do not treat inaccessible nodes as to be expandable.
+        // This would particularly trigger opening access control views (like Facebook login) when dragging
+        // any object accross the item's row (NSOutlineView implements NSDraggingDestination and tries to
+        // expand any expandable node that is met while dragging).
+        
+		return ![node isLeafNode] && (node.accessibility == kIMBResourceIsAccessible);
 	}
 }
 
@@ -649,7 +657,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 
 
 #pragma mark 
-#pragma mark NSOutlineView Delegate
+#pragma mark IMBOutlineView Delegate (derived from NSOutlineViewDelegate)
 
 
 // If the user is  expanding an item in the IMBOutlineView then ask the delegate of the library controller if 
@@ -678,7 +686,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
             case kIMBResourceNoPermission:
             {
                 shouldExpand = NO;
-                [[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+                [self requestAccessToNode:node];
                 break;
             }
             
@@ -708,14 +716,24 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (void) outlineViewItemWillExpand:(NSNotification*)inNotification
 {
 	id item = [[inNotification userInfo] objectForKey:@"NSObject"];
+    NSOutlineView *outlineView = [inNotification object];
 	IMBNode* node = (IMBNode*)item;
 	
 	if (node.accessibility == kIMBResourceIsAccessible)
 	{
-        [self.libraryController populateNode:node];
+        [self.libraryController populateNode:node errorHandler:^(NSError *error) {
+            if (error) {
+                if (error.code == kIMBResourceNoPermission) {
+                    // Try again after requesting access (e.g. session may have expired).
+                    [self performSelector:@selector(populateNode:) withAccessRequestedToNode:node];
+                } else {
+                    [outlineView collapseItem:item];
+                }
+            }
+        }];
+        [self.nodeOutlineView setNeedsDisplay];
 	}
 }
-
 
 // When nodes were expanded or collapsed, then store the current state of the user interface. Also cancel any
 // pending populate operation for the nodes that were just collapsed...
@@ -785,7 +803,13 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			if (newNode.accessibility == kIMBResourceIsAccessible)
 			{
-                [self.libraryController populateNode:newNode];
+                [self.libraryController populateNode:newNode errorHandler:^(NSError *error) {
+                    if (error.code == kIMBResourceNoPermission) {
+                        // Try again after requesting access (e.g. session may have expired).
+
+                        [self performSelector:@selector(populateNode:) withAccessRequestedToNode:newNode];
+                    }
+                }];
 				[ibNodeOutlineView showProgressWheels];
 			}
 			else if (newNode.accessibility == kIMBResourceDoesNotExist)
@@ -832,11 +856,11 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
         switch (newNode.accessibility)
 		{
             case kIMBResourceNoPermission:
-			[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:newNode];
+                [self requestAccessToNode:newNode];
 			break;
                 
             case kIMBResourceDoesNotExist:
-			[IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
+                [IMBAccessRightsViewController showMissingResourceAlertForNode:newNode view:ibNodeOutlineView relativeToRect:rect];
 			break;
                 
             default:
@@ -864,19 +888,21 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	if (node.accessibility == kIMBResourceDoesNotExist)
 	{
 		cell.badgeType = kIMBBadgeTypeResourceMissing;
-		cell.badgeIcon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
 		cell.badgeError = nil;
 	}
 	else if (node.accessibility == kIMBResourceNoPermission)
 	{
 		cell.badgeType = kIMBBadgeTypeNoAccessRights;
-		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+		cell.badgeError = nil;
+	}
+	else if (node.accessibility == kIMBResourceIsAccessible && node.isAccessRevocable)
+	{
+		cell.badgeType = kIMBBadgeTypeEject;
 		cell.badgeError = nil;
 	}
 	else if (node.error)
 	{
 		cell.badgeType = kIMBBadgeTypeWarning;
-		cell.badgeIcon = [NSImage imageNamed:NSImageNameCaution];
 		cell.badgeError = node.error;
 	}
 	else if ([node respondsToSelector:@selector(license)])
@@ -968,6 +994,22 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
     
 }
 
+
+- (void)outlineView:(IMBOutlineView *)inView badgeButtonRect:(NSRect)inRect clickedForItem:(id)inItem
+{
+    IMBNode* node = (IMBNode*) inItem;
+    
+    if ([node badgeTypeNormalNonLoading] == kIMBBadgeTypeEject)
+    {
+        [self revokeAccessToNode:node errorRect:inRect];
+    } else if (node.error)
+    {
+        [self showErrorPopoverForNode:node relativeToRect:inRect];
+    }
+     
+}
+
+
 - (BOOL)respondsToSelector:(SEL)aSelector;
 {
     // I found that (slightly weirdly), if you implement -outlineView:isGroupItem:, NSOutlineView assumes that you must have at least one group item somewhere in the tree, and so it automatically outdents all but the top-level nodes by 1. Thus if configured not to show group nodes, we need to pretend that method doesn't even exist so as to receive regular layout
@@ -985,7 +1027,74 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
+#pragma mark Access Control
+
+- (void) requestAccessToNode:(IMBNode*)inNode completion:(void(^)(BOOL requestCanceled, NSArray* affectedNodes, NSError* error))inCompletion
+{
+    [[[inNode.parserMessenger class] nodeAccessDelegate] nodeViewController:self requestAccessToNode:inNode completion:
+     ^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error)
+    {
+        inNode.error = error;
+        if (inCompletion) {
+            inCompletion(requestCanceled, affectedNodes, error);
+        }
+//        if (inNode.error) {
+//            IMBOutlineView *outlineView = self.nodeOutlineView;
+//            NSInteger row = [outlineView rowForItem:inNode];
+//            NSRect rect = [outlineView badgeRectForRow:row];
+//            
+//            [self showErrorPopoverForNode:inNode relativeToRect:rect];
+//        }
+     }];
+}
+
+
+- (void) requestAccessToNode:(IMBNode*)inNode
+{
+    [self requestAccessToNode:inNode completion:^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error) {
+        for (IMBNode *node in affectedNodes) {
+            [self.libraryController reloadNodeTree:node];
+            [self.nodeOutlineView setNeedsDisplay];
+        }
+    }];
+}
+
+// Selector will be performed with node after requesting access to this node
+
+- (void) performSelector:(SEL)inSelector withAccessRequestedToNode:(IMBNode*)inNode
+{
+    [self requestAccessToNode:inNode completion:^(BOOL requestCanceled, NSArray *affectedNodes, NSError *error)
+     {
+         if (!requestCanceled && !error) {
+             for (IMBNode *affectedNode in affectedNodes) {
+                 [self.libraryController performSelector:inSelector withObject:inNode];
+             }
+         }
+     }];
+}
+
+- (void) revokeAccessToNode:(IMBNode*)inNode errorRect:(NSRect)inRect
+{
+    id <IMBNodeAccessDelegate> accessDelegate = [[inNode.parserMessenger class] nodeAccessDelegate];
+    [accessDelegate revokeAccessToNode:inNode completion:
+     ^(BOOL reloadNode, NSError *error)
+     {
+         inNode.error = error;
+         if (inNode.error) {
+             [self showErrorPopoverForNode:inNode relativeToRect:inRect];
+         } else if (reloadNode) {
+             [self.nodeOutlineView collapseItem:inNode];
+             [inNode unpopulate];
+             [self.libraryController reloadNodeTree:inNode];
+             [self _setExpandedNodeIdentifiers];
+         }
+     }];
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
 #pragma mark NSSplitView Delegate
 
 
@@ -1235,8 +1344,12 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 		{
 			NSInteger row = [ibNodeOutlineView rowForItem:inNode];
 			[ibNodeOutlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-			if (!(inNode.isPopulated || inNode.isLoading)) [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
-
+			if ((inNode.accessibility == kIMBResourceIsAccessible) &&
+                !(inNode.isPopulated || inNode.isLoading))
+            {
+                [self.libraryController populateNode:inNode]; // Not redundant! Needed if selection doesn't change due to previous line!
+                [self.nodeOutlineView setNeedsDisplay];
+            }
 			[self installObjectViewForNode:inNode];
 			[(IMBObjectViewController*)self.objectViewController setCurrentNode:inNode];
 		}
@@ -1335,7 +1448,7 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 	
 	if (node.accessibility == kIMBResourceNoPermission)
 	{
-		[[IMBAccessRightsViewController sharedViewController] grantAccessRightsForNode:node];
+        [self requestAccessToNode:node];
 	}
 	
 	[self selectNode:node];
@@ -1449,7 +1562,43 @@ static NSMutableDictionary* sRegisteredNodeViewControllerClasses = nil;
 - (IBAction) reloadNode:(id)inSender
 {
 	IMBNode* node = [self selectedNode];
-	[self.libraryController reloadNodeTree:node];
+    [self.libraryController reloadNodeTree:node errorHandler:^(NSError *error) {
+        if (error.code == kIMBResourceNoPermission) {
+            // Try again after requesting access (e.g. session may have expired).
+
+            [self performSelector:@selector(reloadNodeTree:) withAccessRequestedToNode:node];
+        }
+    }];
+    [self.nodeOutlineView setNeedsDisplay];
+}
+
+
+// If node holds an error display an alert. On Lion we'll use a modeless popover, on earlier system just use a modal NSAlert...
+
+- (IBAction) showErrorPopoverForNode:(IMBNode*)inNode relativeToRect:(NSRect)inRect
+{
+    if (IMBRunningOnLionOrNewer())
+    {
+        NSString* title = [[inNode.error userInfo] objectForKey:@"title"];
+        NSString* description = [[inNode.error userInfo] objectForKey:NSLocalizedDescriptionKey];
+        NSString* ok = @"   OK   ";
+
+        IMBAlertPopover* alert = [IMBAlertPopover warningPopoverWithHeader:title body:description footer:nil];
+
+        [alert addButtonWithTitle:ok block:^()
+        {
+            [alert close];
+        }];
+
+        [alert showRelativeToRect:inRect ofView:self.view preferredEdge:NSMaxYEdge];
+    }
+    else
+    {
+        dispatch_async(dispatch_get_main_queue(),^()
+        {
+            [NSApp presentError:inNode.error];
+        });
+    }
 }
 
 

@@ -127,11 +127,10 @@
 			NSBundle* bundle = [NSBundle bundleForClass:[IMBNode class]];	
 			NSString* path = [bundle pathForResource:inName ofType:nil];
 			image = [[NSImage alloc] initWithContentsOfFile:path];
-			[sImageCache setObject:image forKey:inName];
+            if (image) [sImageCache setObject:image forKey:inName];
             [image release];
 		}
 	}
-	
 	return image;
 }
 

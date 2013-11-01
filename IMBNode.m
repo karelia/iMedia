@@ -121,6 +121,7 @@
 @synthesize wantsRecursiveObjects = _wantsRecursiveObjects;
 @synthesize shouldDisplayObjectView = _shouldDisplayObjectView;
 @synthesize accessibility = _accessibility;
+@synthesize isAccessRevocable = _isAccessRevocable;
 
 // Observing file system changes...
 
@@ -164,6 +165,7 @@
 		self.wantsRecursiveObjects = NO;
 		self.shouldDisplayObjectView = YES;
         self.accessibility = kIMBResourceIsAccessible;
+        self.isAccessRevocable = NO;
 		
 		self.watcherType = kIMBWatcherTypeNone;
 		self.badgeTypeNormal = kIMBBadgeTypeNone;
@@ -177,10 +179,10 @@
             
             if (self.isTopLevelNode)
             {
-                // Being sandboxed the app may yet not have entitlements to access this top level node
-                // accessibility = kIMBResourceIsAccessible if media source is not a file URL (e.g. Flickr node)
+                // Being sandboxed the app may yet not have entitlements to access this top level node if
+                // it's a file URL. Non-file URLs may have to authenticated before they can be used (e.g Facebook).
 
-                self.accessibility = [self.mediaSource imb_accessibility];
+                self.accessibility = [inParser mediaSourceAccessibility];
                 
 //                NSLog(@"Entitlements: %@ is accessible? %@", self.mediaSource, self.accessibility == kIMBResourceIsAccessible ? @"YES" :@"NO");
             }
@@ -250,6 +252,7 @@
 	copy.wantsRecursiveObjects = self.wantsRecursiveObjects;
 	copy.shouldDisplayObjectView = self.shouldDisplayObjectView;
 	copy.accessibility = self.accessibility;
+    copy.isAccessRevocable = self.isAccessRevocable;
 	
 	copy.watcherType = self.watcherType;
 	copy.watchedPath = self.watchedPath;
@@ -322,6 +325,7 @@
 		self.wantsRecursiveObjects = [inCoder decodeBoolForKey:@"wantsRecursiveObjects"];
 		self.shouldDisplayObjectView = [inCoder decodeBoolForKey:@"shouldDisplayObjectView"];
 		self.accessibility = (IMBResourceAccessibility)[inCoder decodeInt64ForKey:@"accessibility"];
+		self.isAccessRevocable = [inCoder decodeBoolForKey:@"isAccessRevocable"];
 
 		self.watcherType = [inCoder decodeIntegerForKey:@"watcherType"];
 		self.watchedPath = [inCoder decodeObjectForKey:@"watchedPath"];
@@ -381,6 +385,7 @@
 	[inCoder encodeBool:self.shouldDisplayObjectView forKey:@"shouldDisplayObjectView"];
     int64_t accessibility = (int64_t)self.accessibility;
 	[inCoder encodeInt64:accessibility forKey:@"accessibility"];
+	[inCoder encodeBool:self.isAccessRevocable forKey:@"isAccessRevocable"];
 
 	[inCoder encodeInteger:self.watcherType forKey:@"watcherType"];
 	[inCoder encodeObject:self.watchedPath forKey:@"watchedPath"];
@@ -452,6 +457,43 @@
 }
 
 
+- (NSImage*) badgeIcon
+{
+    NSImage* badgeIcon = nil;
+    
+	if (self.accessibility == kIMBResourceDoesNotExist)
+	{
+		badgeIcon = [NSImage imb_imageNamed:@"IMBStopIcon.icns"];
+	}
+	else if (self.accessibility == kIMBResourceNoPermission)
+	{
+		badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+	}
+	else if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable)
+	{
+		badgeIcon = [NSImage imb_imageNamed:@"logout.tiff"];
+	}
+	else if (self.error)
+	{
+		badgeIcon = [NSImage imageNamed:NSImageNameCaution];
+	}
+    return badgeIcon;
+}
+
+
+- (NSImage*) badgeHighlightIcon
+{
+    NSImage* badgeIcon = nil;
+    
+    if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable) {
+		badgeIcon = [NSImage imb_imageNamed:@"logout_sel.tiff"];
+    } else {
+        badgeIcon = [self badgeIcon];
+    }
+    return badgeIcon;
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -504,7 +546,7 @@
 	}
 	else 
 	{
-		NSLog(@"%s ERROR trying to insert node at illegal index!",__FUNCTION__);
+		NSLog(@"%s ERROR trying to insert node at illegal index %lu!",__FUNCTION__, (unsigned long)inIndex);
 	}
 }
 
@@ -519,7 +561,7 @@
 	}
 	else 
 	{
-		NSLog(@"%s ERROR trying to remove node at illegal index!",__FUNCTION__);
+		NSLog(@"%s ERROR trying to remove node at illegal index %lu!",__FUNCTION__, (unsigned long)inIndex);
 	}
 }
 
@@ -941,6 +983,18 @@
 }
 
 
+// The normal (non-mouseover), non-loading badge type for this node possibly derived
+// from other properties.
+//
+- (IMBBadgeType) badgeTypeNormalNonLoading
+{
+    if (self.accessibility == kIMBResourceIsAccessible && self.isAccessRevocable) {
+        return kIMBBadgeTypeEject;
+    } else {
+        return kIMBBadgeTypeNone;
+    }
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -999,6 +1053,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
+- (BOOL)hasBadgeCallback {
+    return (self.badgeTarget && self.badgeSelector);
+}
+
+- (void)performBadgeCallback {
+    if ([self.badgeTarget respondsToSelector:self.badgeSelector])
+        [self.badgeTarget performSelector:self.badgeSelector withObject:self];
+}
 @end
 
 

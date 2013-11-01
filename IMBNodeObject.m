@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Author: Peter Baumgartner
+// Author: Peter Baumgartner, Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -179,7 +179,7 @@
 
 - (NSImage *) sharedImageRepresentation
 {
-	return [NSImage imb_sharedLargeGenericFolderIcon];
+	return nil;
 }
 
 

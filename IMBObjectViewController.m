@@ -157,6 +157,28 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 //@synthesize progressWindowController = _progressWindowController;
 
 
+#pragma mark Organic Setters/Getters
+
+/**
+ Sets the current node and resets the view's search field if current node changes
+ 
+ @param currentNode the node that this instance's current node is set to (retained)
+
+ @discussion
+ Does not affect the delegate-based object filter (cf. badges)
+ */
+- (void) setCurrentNode:(IMBNode *)currentNode
+{
+    if (_currentNode != currentNode)
+    {
+        [_currentNode release];
+        _currentNode = [currentNode retain];
+        
+        [self resetSearchFilter];
+    }
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -999,6 +1021,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
+/**
+ Resets the search field so that all objects of current node are shown
+ 
+ @discussion
+ Does not affect the delegate-based object filter (cf. badges)
+ */
+- (void) resetSearchFilter
+{
+    [self.objectArrayController resetSearch:self];
+}
+
+
 //----------------------------------------------------------------------------------------------------------------------
 
 
@@ -1624,6 +1658,18 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 			else
 			{
 				title = NSLocalizedStringWithDefaultValue(
+                          @"IMBObjectViewController.menuItem.reload",
+                          nil,IMBBundle(),
+                          @"Reload",
+                          @"Menu item in context menu of IMBObjectViewController");
+				
+				item = [[NSMenuItem alloc] initWithTitle:title action:@selector(reload:) keyEquivalent:@""];
+				[item setRepresentedObject:inObject];
+				[item setTarget:self];
+				[menu addItem:item];
+				[item release];
+				
+				title = NSLocalizedStringWithDefaultValue(
 					@"IMBObjectViewController.menuItem.download",
 					nil,IMBBundle(),
 					@"Download",
@@ -1815,13 +1861,21 @@ static NSMutableDictionary* sRegisteredObjectViewControllerClasses = nil;
 }
 
 
-- (IBAction) download:(id)inSender
-{
+//- (IBAction) download:(id)inSender
+//{
 //	IMBParser* parser = self.currentNode.parser;
 //	NSArray* objects = [ibObjectArrayController selectedObjects];
 //	IMBObjectsPromise* promise = [parser objectPromiseWithObjects:objects];
 //	[promise setDelegate:self completionSelector:@selector(_postProcessDownload:)];
 //    [promise start];
+//}
+
+
+- (IBAction) reload:(id)inSender
+{
+	IMBObject* object = (IMBObject*)[inSender representedObject];
+    object.needsImageRepresentation = YES;
+	[object loadThumbnail];
 }
 
 
