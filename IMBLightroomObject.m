@@ -41,70 +41,125 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
-
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
-
-// Model...
-
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-#import <iMedia/IMBLightroomObject.h>
-
-// Parsers...
-
-#import <iMedia/IMBParser.h>
-#import <iMedia/IMBFolderParser.h>
-#import <iMedia/IMBImageFolderParser.h>
-#import <iMedia/IMBiPhotoParser.h>
-#import <iMedia/IMBiTunesParser.h>
-#import <iMedia/IMBApertureParser.h>
-#import <iMedia/IMBLightroomParser.h>
-#import <iMedia/IMBImageCaptureParser.h>
-#import <iMedia/IMBFlickrParser.h>
-#import <iMedia/IMBGarageBandParser.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
+// Author: Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark HEADERS
+
+#import "IMBLightroomObject.h"
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark 
+
+@implementation IMBLightroomObject
+
+@synthesize absolutePyramidPath = _absolutePyramidPath;
+@synthesize idLocal = _idLocal;
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) init
+{
+	if ((self = [super init]))
+	{
+		_absolutePyramidPath = nil;
+		_idLocal = nil;
+		}
+	
+	return self;
+}
+
+
+- (void) dealloc
+{
+	IMBRelease(_absolutePyramidPath);
+	IMBRelease(_idLocal);
+	[super dealloc];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) initWithCoder:(NSCoder*)inCoder
+{
+	if ((self = [super initWithCoder:inCoder]) != nil)
+	{
+		self.absolutePyramidPath = [inCoder decodeObjectForKey:@"absolutePyramidPath"];
+		self.idLocal = [inCoder decodeObjectForKey:@"idLocal"];
+	}
+	
+	return self;
+}
+
+
+- (void) encodeWithCoder:(NSCoder*)inCoder
+{
+	[super encodeWithCoder:inCoder];
+	
+	[inCoder encodeObject:self.absolutePyramidPath forKey:@"absolutePyramidPath"];
+	[inCoder encodeObject:self.idLocal forKey:@"idLocal"];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+- (id) copyWithZone:(NSZone*)inZone
+{
+	IMBLightroomObject* copy = [super copyWithZone:inZone];
+	copy.absolutePyramidPath = self.absolutePyramidPath;
+	copy.idLocal = self.idLocal;
+	return copy;
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+#pragma mark
+#pragma mark IKImageBrowserItem Protocol
+
+// Use the path or URL as the unique identifier...
+
+- (NSString*) identifier
+{
+	/*
+	 NSString* absolutePyramidPath = self.absolutePyramidPath;
+
+	 if (absolutePyramidPath != nil) {
+	 NSString* parserName = self.parserClassName;
+
+	 return [NSString stringWithFormat:@"%@:/%@", parserName, absolutePyramidPath];
+	 }
+
+	 return [super identifier];
+	 */
+
+	NSString* identifier = [super identifier];
+
+	// Account for virtual copies
+	return [NSString stringWithFormat:@"%@/%@", identifier, self.idLocal];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+@end
 
 

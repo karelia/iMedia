@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4VideoParser.h"
+#import "IMBLightroom5VideoParser.h"
 #import "IMBParserController.h"
 #import "IMBObject.h"
 #import "NSDictionary+iMedia.h"
@@ -63,7 +63,7 @@
 
 #pragma mark 
 
-@interface IMBLightroom4VideoParser ()
+@interface IMBLightroom5VideoParser ()
 
 - (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
 
@@ -75,7 +75,7 @@
 
 #pragma mark 
 
-@implementation IMBLightroom4VideoParser
+@implementation IMBLightroom5VideoParser
 
 //----------------------------------------------------------------------------------------------------------------------
 

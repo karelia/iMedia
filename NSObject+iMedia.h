@@ -44,79 +44,40 @@
  */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark HEADERS
+#import <Foundation/Foundation.h>
 
-#import "IMBLightroom4VideoParser.h"
-#import "IMBParserController.h"
-#import "IMBObject.h"
-#import "NSDictionary+iMedia.h"
-#import "NSURL+iMedia.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+@interface NSObject (iMedia)
 
-@interface IMBLightroom4VideoParser ()
++ (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason;
 
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+// Throws a "must subclass" exception.
+// Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
+
++ (void) imb_throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
+
+// Convenience methods for coalesced delayed perfoming...
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector;
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay;
++ (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject;
++ (void) imb_cancelAllCoalescedSelectors;
 
 @end
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark 
-
-@implementation IMBLightroom4VideoParser
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
-{
-	NSURL* videoURL = [inObject URL];
-	
-	if (videoURL == nil) {
-		return;
-	}
-	
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	[metadata setObject:[inObject path] forKey:@"path"];
-	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
-	
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
-}
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
-{
-	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
-}
-
-
-@end

@@ -44,7 +44,10 @@
  */
 
 
-// Author: Peter Baumgartner
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Author: Jörg Jacobsen
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,71 +55,74 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4VideoParser.h"
-#import "IMBParserController.h"
-#import "IMBObject.h"
-#import "NSDictionary+iMedia.h"
-#import "NSURL+iMedia.h"
-
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@interface IMBLightroom4VideoParser ()
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
-
-@end
+#import "NSObject+iMedia.h"
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-#pragma mark 
+#pragma mark
 
-@implementation IMBLightroom4VideoParser
+@implementation NSObject (iMedia)
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
-
-- (void) loadMetadataForObject:(IMBObject*)inObject
++ (void) imb_throwProgrammerErrorExceptionWithReason:(NSString*)inReason
 {
-	NSURL* videoURL = [inObject URL];
-	
-	if (videoURL == nil) {
-		return;
-	}
-	
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	[metadata setObject:[inObject path] forKey:@"path"];
-	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
-	
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:inReason userInfo:nil] raise];
 }
 
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
+// Throws a "must subclass" exception.
+// Thus, provides a generic method to be used in abstact classes to remind a programmer when a method must be subclassed.
+
++ (void) imb_throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
 {
-	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
+	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
+	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector
+{
+	[self imb_performCoalescedSelector:inSelector withObject:nil];
+}
+
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject
+{
+	[self imb_performCoalescedSelector:inSelector withObject:inObject afterDelay:0.0];
+}
+
+
++ (void) imb_performCoalescedSelector:(SEL)inSelector withObject:(id)inObject afterDelay:(double)inDelay
+{
+	[self imb_cancelCoalescedSelector:inSelector withObject:inObject];
+	[self performSelector:inSelector withObject:inObject afterDelay:inDelay];
+}
+
+
++ (void) imb_cancelCoalescedSelector:(SEL)inSelector withObject:(id)inObject
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:inSelector object:inObject];
+}
+
+
++ (void) imb_cancelAllCoalescedSelectors
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
 
 
 @end

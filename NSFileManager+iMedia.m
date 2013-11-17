@@ -197,24 +197,24 @@
 
 - (NSString*)imb_uniqueTemporaryPathWithinDirectory:(NSString*)directoryPath
 {
-	NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
-	const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
-	NSString* tempFilePath = nil;
-	
-	char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
-	if (tempFileNameCString != NULL)
-	{
-		strcpy(tempFileNameCString, tempFileTemplateCString);
+    NSString *tempFileTemplate = [directoryPath stringByAppendingPathComponent:@"XXXXXXXXXXXX"];
+    const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
+    NSString* tempFilePath = nil;
 
-        mkstemp(tempFileNameCString);
-		tempFilePath = [NSString stringWithUTF8String:tempFileNameCString];	
-		
-		free(tempFileNameCString);
-	}
-	
-	return tempFilePath;
+    char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+
+    if (tempFileNameCString != NULL) {
+        strcpy(tempFileNameCString, tempFileTemplateCString);
+
+        char *tmpName = mktemp(tempFileNameCString); // TODO: use mkstemp and mkdtemp
+
+        tempFilePath = [NSString stringWithUTF8String:tmpName];
+
+        free(tempFileNameCString);
+    }
+
+    return tempFilePath;
 }
-
 
 - (NSString*) imb_volumeNameAtPath:(NSString*)inPath
 {
@@ -299,7 +299,7 @@
 				{
 					if (!exists)
 					{
-						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %@",volName,@(i)] stringByAppendingPathComponent:relPath];
+						newPath = [[NSString stringWithFormat:@"/Volumes/%@ %d",volName, (int)i] stringByAppendingPathComponent:relPath];
 						exists = [self fileExistsAtPath:newPath];
 						if (exists) break;
 					}
