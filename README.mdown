@@ -18,6 +18,10 @@ There is also a longer-term effort in the `iMediaSandboxing` fork to farm out pa
 Compatibility
 ========
 
+### 2.7
+
+The same as 2.6, minus support for Garbage Collection.
+
 ### 2.6
 
 Out of the box (the `v2.6.x` branch), iMedia supports OS X 10.6 Snow Leopard and later. It is suitable for both 32 and 64 bit apps. See above for sandbox compatibility details.
