@@ -122,11 +122,6 @@ extern NSString* kIMBObjectImageRepresentationProperty;
 
 
 @interface IMBObjectViewController : NSViewController <IMBObjectsPromiseDelegate, IMBObjectArrayControllerDelegate, NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
-//#if IMB_COMPILING_WITH_SNOW_LEOPARD_OR_NEWER_SDK
-//<NSPasteboardItemDataProvider,QLPreviewPanelDelegate,QLPreviewPanelDataSource>
-//#else
-//<NSPasteboardItemDataProvider>
-//#endif
 {
 	IMBLibraryController* _libraryController;
 	IMBNodeViewController* _nodeViewController;
