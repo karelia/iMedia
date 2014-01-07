@@ -148,19 +148,19 @@
 			
 			f = [CIFilter filterWithName:@"CIAffineTransform"];
 			[f setValue:t forKey:@"inputTransform"];
-			[f setValue:im forKey:@"inputImage"];
+			[f setValue:im forKey:kCIInputImageKey];
 			im = [f valueForKey:@"outputImage"];
 			
 			f = [CIFilter filterWithName:@"CIGaussianBlur"];
 			[f setValue:[NSNumber numberWithFloat:1.0] forKey:@"inputRadius"];
-			[f setValue:im forKey:@"inputImage"];
+			[f setValue:im forKey:kCIInputImageKey];
 			im = [f valueForKey:@"outputImage"];
 
 			f = [CIFilter filterWithName:@"CIColorControls"];
 			[f setValue:[NSNumber numberWithFloat:0.42] forKey:@"inputBrightness"];
 			[f setValue:[NSNumber numberWithFloat:1.0] forKey:@"inputSaturation"];
 			[f setValue:[NSNumber numberWithFloat:0.15] forKey:@"inputContrast"];
-			[f setValue:im forKey:@"inputImage"];
+			[f setValue:im forKey:kCIInputImageKey];
 			im = [f valueForKey:@"outputImage"];
 
 			f = [CIFilter filterWithName:@"CICrop"];
@@ -168,7 +168,7 @@
 											Y: 0
 											Z: flp.size.width
 											W: flp.size.height] forKey:@"inputRectangle"];
-			[f setValue:im forKey:@"inputImage"];
+			[f setValue:im forKey:kCIInputImageKey];
 			im = [f valueForKey:@"outputImage"];
 
 			NSCIImageRep *ir = [NSCIImageRep imageRepWithCIImage:im];
@@ -177,7 +177,7 @@
 			[reflection setImage:reflex];
 		}
 // We immediately pass the initial image to the filter and release it.
-		[transitionFilter setValue:initialImage forKey:@"inputImage"];
+		[transitionFilter setValue:initialImage forKey:kCIInputImageKey];
 		[initialImage release];
 // To prevent flicker...
 		NSDisableScreenUpdates();
@@ -245,7 +245,7 @@
 // All the magic happens here... drawing the flipping animation.
 
 - (void)drawRect:(NSRect)rect {
-	if (!initialWindow || ![transitionFilter valueForKey:@"inputImage"]) {
+	if (!initialWindow || ![transitionFilter valueForKey:kCIInputImageKey]) {
 // If there's no window yet, we don't need to draw anything.
 		return;
 	}
@@ -268,7 +268,7 @@
 	if (time>0.5) {
 // At this point,  we need to swap in the final image, for the second half of the animation.
 		if (finalImage) {
-			[transitionFilter setValue:finalImage forKey:@"inputImage"];
+			[transitionFilter setValue:finalImage forKey:kCIInputImageKey];
 			[finalImage release];
 			finalImage = nil;
 		}
