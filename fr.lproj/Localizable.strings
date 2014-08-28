@@ -275,7 +275,7 @@
 "IMBObjectViewController.menuItem.openWithFinder" = "Ouvrir en utilisant le Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Ouvrir l'image maître en utilisant le Finder";
+"IMBObjectViewController.menuItem.openWithFinder.Lightroom" = "Ouvrir l'image maîtredans le Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.quickLook" = "Coup d'œil";
@@ -284,7 +284,7 @@
 "IMBObjectViewController.menuItem.revealInFinder" = "Afficher dans le Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
-"IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Révéler l'image maître dans le Finder";
+"IMBObjectViewController.menuItem.revealInFinder.Lightroom" = "Afficher l'image maître dans le Finder";
 
 /* Menu item in context menu of IMBObjectViewController */
 "IMBObjectViewController.menuItem.showAll" = "Tout afficher";
