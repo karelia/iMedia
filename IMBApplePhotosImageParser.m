@@ -165,6 +165,8 @@
 			NSString *dateTime = [exifDateFormatter stringFromDate:date];
 
 			[metadata setValue:dateTime forKey:@"dateTime"];
+
+			[exifDateFormatter release];
 		}
 	}
 

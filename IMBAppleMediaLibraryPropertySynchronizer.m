@@ -85,6 +85,8 @@
 - (instancetype)initWithKey:(NSString *)key ofObject:(id)object
 {
 	if (object == nil) {
+		[self release];
+
 		return nil;
 	}
 	NSParameterAssert(key != nil);
@@ -140,9 +142,9 @@
 {
 	NSAssert(![NSThread isMainThread], @"This method must not be invoked on main thread");
 
-	IMBAppleMediaLibraryPropertySynchronizer *instance = [[self alloc] initWithKey:key ofObject:object];
+	IMBAppleMediaLibraryPropertySynchronizer *instance = [[IMBAppleMediaLibraryPropertySynchronizer alloc] initWithKey:key ofObject:object];
 
-	if (instance) {
+	if (instance != nil) {
 		instance.semaphore = dispatch_semaphore_create(0);
 		[instance.observedObject addObserver:instance forKeyPath:instance.key options:0 context:NULL];
 		instance.valueForKey = [instance.observedObject valueForKey:instance.key];
@@ -153,8 +155,14 @@
 			dispatch_semaphore_wait(instance.semaphore, DISPATCH_TIME_FOREVER);
 		}
 		dispatch_release(instance.semaphore);
-		return instance.valueForKey;
+
+		id valueForKey = [[instance.valueForKey retain] autorelease];
+
+		[instance release];
+
+		return valueForKey;
 	}
+
 	return nil;
 }
 

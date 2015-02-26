@@ -164,13 +164,14 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 
 	NSDictionary *libraryOptions = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:MEDIA_SOURCE_IDENTIFIER]
 															   forKey:MLMediaLoadIncludeSourcesKey];
+	MLMediaLibrary *appleMediaLibrary = [[MLMediaLibrary alloc] initWithOptions:libraryOptions];
+	NSDictionary *mediaSources = [IMBAppleMediaLibraryPropertySynchronizer mediaSourcesForMediaLibrary:appleMediaLibrary];
 
-	self.appleMediaLibrary = [[MLMediaLibrary alloc] initWithOptions:libraryOptions];
-
-	NSDictionary *mediaSources = [IMBAppleMediaLibraryPropertySynchronizer mediaSourcesForMediaLibrary:self.appleMediaLibrary];
-
+	self.appleMediaLibrary = appleMediaLibrary;
 	self.appleMediaSource = [mediaSources objectForKey:MEDIA_SOURCE_IDENTIFIER];
 
+	[appleMediaLibrary release];
+	
 	// Note that the following line is only proven to work for Photos app. Would have to use other means e.g. for iPhoto to provide path to media library (look in attributes dictionary for root group).
 	self.mediaSource = [[self.appleMediaSource.attributes objectForKey:kIMBApplePhotosParserMediaSourceAttributeLibraryURL] path];
 
