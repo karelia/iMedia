@@ -78,6 +78,7 @@ extern NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL;
 	NSString *_appPath;
 	MLMediaLibrary *_appleMediaLibrary;
 	MLMediaSource *_appleMediaSource;
+	NSString *_identifierPrefix;
 }
 
 /**

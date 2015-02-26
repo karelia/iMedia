@@ -69,15 +69,17 @@
 
  Apple doesn't seem to yet publicly define these constants anywhere.
  */
-NSString * const kIMBApplePhotosParserMediaSourceAttributeIdentifier = @"mediaSourceIdentifier";
 
 /**
  Only supported by Photos media source (as of OS X 10.10.3)
  */
 NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"libraryURL";
+NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryUuid = @"libraryUuid";
 
 
 @interface IMBApplePhotosParser ()
+
+@property (copy) NSString *identifierPrefix;
 
 @end
 
@@ -87,6 +89,7 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 @synthesize appPath = _appPath;
 @synthesize appleMediaLibrary = _appleMediaLibrary;
 @synthesize appleMediaSource = _appleMediaSource;
+@synthesize identifierPrefix = _identifierPrefix;
 
 - (id) initWithMediaType:(NSString*)inMediaType
 {
@@ -161,19 +164,28 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 	// __38-[MLMediaLibraryImpl connectToService]_block_invoke connection interrupted
 	// MLMediaLibrary error obtaining remote object proxy: Error Domain=NSCocoaErrorDomain Code=4097 "Couldn’t communicate with a helper application." (connection to service named com.apple.MediaLibraryService) {NSDebugDescription=connection to service named com.apple.MediaLibraryService}
 
-
-	NSDictionary *libraryOptions = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:MEDIA_SOURCE_IDENTIFIER]
+	NSString *mediaSourceIdentifier = MEDIA_SOURCE_IDENTIFIER;
+	NSDictionary *libraryOptions = [NSDictionary dictionaryWithObject:[NSArray arrayWithObject:mediaSourceIdentifier]
 															   forKey:MLMediaLoadIncludeSourcesKey];
 	MLMediaLibrary *appleMediaLibrary = [[MLMediaLibrary alloc] initWithOptions:libraryOptions];
 	NSDictionary *mediaSources = [IMBAppleMediaLibraryPropertySynchronizer mediaSourcesForMediaLibrary:appleMediaLibrary];
+	MLMediaSource *appleMediaSource = [mediaSources objectForKey:MEDIA_SOURCE_IDENTIFIER];
 
 	self.appleMediaLibrary = appleMediaLibrary;
-	self.appleMediaSource = [mediaSources objectForKey:MEDIA_SOURCE_IDENTIFIER];
+	self.appleMediaSource = appleMediaSource;
 
 	[appleMediaLibrary release];
-	
-	// Note that the following line is only proven to work for Photos app. Would have to use other means e.g. for iPhoto to provide path to media library (look in attributes dictionary for root group).
-	self.mediaSource = [[self.appleMediaSource.attributes objectForKey:kIMBApplePhotosParserMediaSourceAttributeLibraryURL] path];
+
+	NSDictionary *attributes = appleMediaSource.attributes;
+	NSString *libraryPath = [[attributes objectForKey:kIMBApplePhotosParserMediaSourceAttributeLibraryURL] path];
+	NSString *libraryUuid = [attributes objectForKey:kIMBApplePhotosParserMediaSourceAttributeLibraryUuid];
+
+	if (libraryUuid == nil) {
+		libraryUuid = libraryPath;
+	}
+
+	self.mediaSource = libraryPath;
+	self.identifierPrefix = [NSString stringWithFormat:@"%@:%@:", mediaSourceIdentifier, libraryUuid];
 
 	return self;
 }
@@ -190,6 +202,8 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 
 /**
  Returns YES if media group contains at least one media object of media type associated with the receiver. NO otherwise.
+ @discussion
+ This method will take a long time to return if you provide a media group that contains a lot of media objects. Use with extreme care!
  */
 - (BOOL)shouldUseMediaGroup:(MLMediaGroup *)mediaGroup
 {
@@ -246,22 +260,10 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 	return [[NSBundle bundleWithPath:self.appPath] localizedInfoDictionary][@"CFBundleDisplayName"];
 }
 
-- (NSString *)identifierPrefix
-{
-	return self.mediaSource;
-}
-
 - (NSString *)globalIdentifierForLocalIdentifier:(NSString *)identifier
 {
 	return [[self identifierPrefix] stringByAppendingString:identifier];
 }
-
-- (NSData*)previewDataForObject:(IMBObject*)inObject maximumSize:(NSNumber*)maximumSize
-{
-
-	return nil;
-}
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -340,7 +342,7 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL = @"library
 	for (MLMediaGroup *mediaGroup in [parentGroup childGroups]) {
 		// Create node for this album...
 
-		if ([self shouldUseMediaGroup:mediaGroup]) {
+		if (YES && [self shouldUseMediaGroup:mediaGroup]) {
 			IMBNode* albumNode = [[[IMBNode alloc] init] autorelease];
 
 			albumNode.name = [mediaGroup name];
