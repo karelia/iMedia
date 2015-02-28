@@ -288,8 +288,15 @@ NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryUuid = @"librar
 
 		[icon setSize:NSMakeSize(16.0,16.0)];
 
+		NSString *mediaGroupIdentifier = [rootMediaGroup identifier];
+
+		if (mediaGroupIdentifier == nil) {
+			// Library not loaded. Host application probably is not code-signed
+			mediaGroupIdentifier = @"Error: Library not loaded";
+		}
+		
 		node.mediaSource = self.mediaSource;
-		node.identifier = [self globalIdentifierForLocalIdentifier:[rootMediaGroup identifier]];
+		node.identifier = [self globalIdentifierForLocalIdentifier:mediaGroupIdentifier];
 		node.name = [self libraryName];
 		node.icon = icon;
 		node.parser = self;
