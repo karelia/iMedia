@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2005-2016 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -44,7 +44,7 @@
  */
 
 
-// Author: Peter Baumgartner
+// Author: Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,71 +52,96 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom4VideoParser.h"
-#import "IMBParserController.h"
+#import "IMBLightroom6Parser.h"
+
+#import <Quartz/Quartz.h>
+
+#import "FMDatabase.h"
+#import "IMBNode.h"
+#import "IMBNodeObject.h"
 #import "IMBObject.h"
-#import "NSDictionary+iMedia.h"
-#import "NSURL+iMedia.h"
+#import "NSFileManager+iMedia.h"
+#import "NSImage+iMedia.h"
+#import "NSWorkspace+iMedia.h"
 
-//----------------------------------------------------------------------------------------------------------------------
 
-
-#pragma mark 
-
-@interface IMBLightroom4VideoParser ()
-
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata;
+@interface IMBLightroom6Parser ()
 
 @end
 
 
-//----------------------------------------------------------------------------------------------------------------------
-
-
-#pragma mark 
-
-@implementation IMBLightroom4VideoParser
+@implementation IMBLightroom6Parser
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Loaded lazily when actually needed for display. Here we combine the metadata we got from the Aperture XML file
-// (which was available immediately, but not enough information) with more information that we obtain via ImageIO.
-// This takes a little longer, but since it only done laziy for those object that are actually visible it's fine.
-// Please note that this method may be called on a background thread...
+// Unique identifier for this parser...
 
-- (void) loadMetadataForObject:(IMBObject*)inObject
++ (NSString*) identifier
 {
-	NSURL* videoURL = [inObject URL];
-	
-	if (videoURL == nil) {
-		return;
-	}
-	
-	NSMutableDictionary* metadata = [NSMutableDictionary dictionaryWithDictionary:inObject.preliminaryMetadata];
-	
-	[metadata setObject:[inObject path] forKey:@"path"];
-	[metadata addEntriesFromDictionary:[NSURL imb_metadataFromVideoAtURL:videoURL]];
-	
-	NSString* description = [self metadataDescriptionForMetadata:metadata];
-	
-	if ([NSThread isMainThread])
-	{
-		inObject.metadata = metadata;
-		inObject.metadataDescription = description;
-	}
-	else
-	{
-		NSArray* modes = [NSArray arrayWithObject:NSRunLoopCommonModes];
-		[inObject performSelectorOnMainThread:@selector(setMetadata:) withObject:metadata waitUntilDone:NO modes:modes];
-		[inObject performSelectorOnMainThread:@selector(setMetadataDescription:) withObject:description waitUntilDone:NO modes:modes];
-	}
+	return @"com.karelia.imedia.Lightroom6";
 }
 
-- (NSString*) metadataDescriptionForMetadata:(NSDictionary*)inMetadata
+// The bundle identifier of the Lightroom app this parser is based upon
+
++ (NSString*) lightroomAppBundleIdentifier
 {
-	return [NSDictionary imb_metadataDescriptionForMovieMetadata:inMetadata];
+	return @"com.adobe.Lightroom6";
 }
 
+// Key in Ligthroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+    return @"libraryToLoad20";
+}
+
+// Key in Ligthroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+    return @"recentLibraries20";
+}
+
+- (BOOL) checkDatabaseVersion
+{
+	NSNumber *databaseVersion = [self databaseVersion];
+	
+	if (databaseVersion != nil) {
+		long databaseVersionLong = [databaseVersion longValue];
+		
+		if (databaseVersionLong < 600007) {
+			return NO;
+		}
+		else if (databaseVersionLong >= 700000) {
+			return NO;
+		}
+	}
+	
+	return YES;
+}
+
+- (FMDatabase*) libraryDatabase
+{
+	NSString* databasePath = (NSString*)self.mediaSource;
+	FMDatabase* database = [FMDatabase databaseWithPath:databasePath];
+	
+	[database setLogsErrors:YES];
+	
+	return database;
+}
+
+- (FMDatabase*) previewsDatabase
+{
+	NSString* mainDatabasePath = (NSString*)self.mediaSource;
+	NSString* rootPath = [mainDatabasePath stringByDeletingPathExtension];
+	NSString* previewPackagePath = [[NSString stringWithFormat:@"%@ Previews", rootPath] stringByAppendingPathExtension:@"lrdata"];
+	NSString* previewDatabasePath = [[previewPackagePath stringByAppendingPathComponent:@"previews"] stringByAppendingPathExtension:@"db"];
+	FMDatabase* database = [FMDatabase databaseWithPath:previewDatabasePath];
+	
+	[database setLogsErrors:YES];
+	
+	return database;
+}
 
 @end

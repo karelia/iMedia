@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2005-2015 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -52,7 +52,7 @@
 
 #pragma mark HEADERS
 
-#import "IMBLightroom3or4Parser.h"
+#import "IMBLightroomModernParser.h"
 
 #import <Quartz/Quartz.h>
 
@@ -60,65 +60,34 @@
 #import "IMBNode.h"
 #import "IMBNodeObject.h"
 #import "IMBObject.h"
+#import "IMBLightroomObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSImage+iMedia.h"
+#import "NSObject+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
 
-@interface IMBLightroom3or4Parser ()
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector;
+@interface IMBLightroomModernParser ()
 
 - (BOOL) checkDatabaseVersion;
 
 @end
 
 
-@implementation IMBLightroom3or4Parser
+@implementation IMBLightroomModernParser
 
 //----------------------------------------------------------------------------------------------------------------------
-
-
-// Check if Lightroom is installed...
-
-+ (NSString*) lightroomPath
-{
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
-	
-	return nil;
-}
-
-
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
-{
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
-	
-	return nil;
-}
 
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType
 {
 	NSMutableArray* parserInstances = [NSMutableArray array];
 	
-	if ([self isInstalled]) {
+	if ([self lightroomPath] != nil) {
 		NSArray* libraryPaths = [self libraryPaths];
 		
 		for (NSString* libraryPath in libraryPaths) {
-			NSString* dataPath = [[[libraryPath stringByDeletingPathExtension]
-								   stringByAppendingString:@" Previews"]
-								  stringByAppendingPathExtension:@"lrdata"];
-			NSFileManager* fileManager = [NSFileManager imb_threadSafeManager];
-			
-			BOOL isDirectory;
-			if (!([fileManager fileExistsAtPath:dataPath isDirectory:&isDirectory] && isDirectory)) {
-				dataPath = nil;
-			}
-			
-			IMBLightroom3or4Parser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
+			IMBLightroomModernParser* parser = [[[[self class] alloc] initWithMediaType:inMediaType] autorelease];
 			parser.mediaSource = libraryPath;
-			parser.dataPath = dataPath;
 			parser.shouldDisplayLibraryName = libraryPaths.count > 1;
 			
 			// Check database version
@@ -136,7 +105,7 @@
 
 - (BOOL) checkDatabaseVersion
 {	
-	return YES;
+	return NO;
 }
 
 - (NSNumber*) databaseVersion
@@ -185,7 +154,7 @@
 	foldersNode.mediaSource = self.mediaSource;
 	foldersNode.identifier = [self identifierWithFolderId:id_local];
 	foldersNode.name = foldersName;
-	foldersNode.icon = [self folderIcon];
+	foldersNode.icon = [[self class] folderIcon];
 	foldersNode.parser = self;
 	foldersNode.attributes = [self attributesWithRootFolder:id_local
                                                     idLocal:id_local
@@ -204,7 +173,7 @@
 	foldersObject.index = 0;
 	foldersObject.imageLocation = (id)self.mediaSource;
 	foldersObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	foldersObject.imageRepresentation = [self largeFolderIcon];
+	foldersObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:foldersObject];
 
@@ -224,7 +193,7 @@
 	IMBNode* collectionsNode = [[[IMBNode alloc] init] autorelease];
 	collectionsNode.identifier = [self identifierWithCollectionId:[NSNumber numberWithLong:0]];
 	collectionsNode.name = collectionsName;
-	collectionsNode.icon = [self groupIcon];
+	collectionsNode.icon = [[self class] groupIcon];
 	collectionsNode.parser = self;
 	collectionsNode.leaf = NO;
 	collectionsNode.attributes = collectionsAttributes;
@@ -239,7 +208,7 @@
 	collectionsObject.index = 1;
 	collectionsObject.imageLocation = (id)self.mediaSource;
 	collectionsObject.imageRepresentationType = IKImageBrowserNSImageRepresentationType;
-	collectionsObject.imageRepresentation = [self largeFolderIcon];
+	collectionsObject.imageRepresentation = [[self class] largeFolderIcon];
 	
 	[objects addObject:collectionsObject];
 	
@@ -271,9 +240,9 @@
 
 - (NSString*) rootCollectionNodesQuery
 {
-	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
+	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
 						@" FROM AgLibraryCollection alc"
-						@" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
+						@" WHERE (alc.creationId = 'com.adobe.ag.library.collection' OR alc.creationId = 'com.adobe.ag.library.group') "
 						@" AND alc.parent IS NULL";
 	
 	return query;
@@ -282,9 +251,9 @@
 
 - (NSString*) collectionNodesQuery
 {
-	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name"
+	NSString* query =	@" SELECT alc.id_local, alc.parent, alc.name, alc.creationId"
 						@" FROM AgLibraryCollection alc"
-                        @" WHERE (creationId = 'com.adobe.ag.library.collection' OR creationId = 'com.adobe.ag.library.group') "
+                        @" WHERE (alc.creationId = 'com.adobe.ag.library.collection' OR alc.creationId = 'com.adobe.ag.library.group') "
 						@" AND alc.parent = ?";
 	
 	return query;
@@ -293,8 +262,27 @@
 
 - (NSString*) folderObjectsQuery
 {
-	NSString* query =
-		@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation,"
+	NSString* query = nil;
+
+	if ([self.mediaType isEqualTo:kIMBMediaTypeMovie]) {
+		query =
+		@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
+		@"			iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile alf ON ai.rootFile = alf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE alf.folder in ( "
+		@"		SELECT id_local"
+		@"		FROM AgLibraryFolder"
+		@"		WHERE id_local = ? OR (rootFolder = ? AND (pathFromRoot IS NULL OR pathFromRoot = ''))"
+		@" )"
+		@" AND ai.fileFormat == 'VIDEO'"
+		@" ORDER BY ai.captureTime ASC";
+	}
+	else
+	{
+		query =
+		@" SELECT	alf.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 		@"			iptc.caption"
 		@" FROM Adobe_images ai"
 		@" LEFT JOIN AgLibraryFile alf ON ai.rootFile = alf.id_local"
@@ -306,15 +294,38 @@
 		@" )"
 		@" AND ai.fileFormat <> 'VIDEO'"
 		@" ORDER BY ai.captureTime ASC";
-	
+	}
+
 	return query;
+
 }
 
 - (NSString*) collectionObjectsQuery
 {
-	NSString* query = 
-		@" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
-		@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, "
+	NSString* query = nil;
+
+	if ([self.mediaType isEqualTo:kIMBMediaTypeMovie])
+	{
+		query =  @" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+		@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
+		@"        iptc.caption"
+		@" FROM Adobe_images ai"
+		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
+		@" INNER JOIN AgLibraryFolder alf ON aif.folder = alf.id_local"
+		@" INNER JOIN AgLibraryRootFolder arf ON alf.rootFolder = arf.id_local"
+		@" LEFT JOIN AgLibraryIPTC iptc on ai.id_local = iptc.image"
+		@" WHERE IFNULL(ai.masterImage, ai.id_local) in ( "
+		@"		SELECT image"
+		@"		FROM AgLibraryCollectionImage alci"
+		@"		WHERE alci.collection = ?"
+		@" )"
+		@" AND ai.fileFormat == 'VIDEO'"
+		@" ORDER BY ai.captureTime ASC";
+	}
+	else
+	{
+		query =  @" SELECT arf.absolutePath || '/' || alf.pathFromRoot absolutePath,"
+		@"        aif.idx_filename, ai.id_local, ai.fileHeight, ai.fileWidth, ai.orientation, ai.captureTime,"
 		@"        iptc.caption"
 		@" FROM Adobe_images ai"
 		@" LEFT JOIN AgLibraryFile aif ON aif.id_local = ai.rootFile"
@@ -328,11 +339,12 @@
 		@" )"
 		@" AND ai.fileFormat <> 'VIDEO'"
 		@" ORDER BY ai.captureTime ASC";
+	}
 	
 	return query;
 }
 
-- (NSImage*) folderIcon
++ (NSImage*) folderIcon
 {
 	static NSImage* folderIcon = nil;
 	
@@ -354,7 +366,7 @@
 	return folderIcon;
 }
 
-- (NSImage*) groupIcon;
++ (NSImage*) groupIcon;
 {
 	static NSImage* groupIcon = nil;
 	
@@ -376,7 +388,7 @@
 	return groupIcon;
 }
 
-- (NSImage*) collectionIcon;
++ (NSImage*) collectionIcon;
 {
 	static NSImage* collectionIcon = nil;
 	
@@ -438,10 +450,13 @@
 {	
 	IMBLightroomObject* lightroomObject = (IMBLightroomObject*)inObject;
 	NSString* absolutePyramidPath = [lightroomObject absolutePyramidPath];
-	
+	NSData* data = nil;
+
 	if (absolutePyramidPath != nil) {
-		NSData* data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
-		
+		data = [NSData dataWithContentsOfMappedFile:absolutePyramidPath];
+	}
+
+	if (data != nil) {
 		//		'AgHg'					-- a magic marker
 		//		header length			-- 2 bytes, big endian includes marker and length
 		//		version					-- 1 byte, zero for now
@@ -480,14 +495,21 @@
 			
 			NSData* jpegData = nil;
 			
-            if ((index + headerLengthValue + dataLengthValue) < [data length]) {
+            if ((index + headerLengthValue + dataLengthValue) <= [data length]) {
                 jpegData = [data subdataWithRange:NSMakeRange(index + headerLengthValue, dataLengthValue)];
             }
-            
+            else {
+				break;
+			}
+
 			if (maximumSize == nil) {
 				return jpegData;
 			}
-			
+
+			if (previousData == nil) {
+				previousData = jpegData;
+			}
+
 			if (jpegData != nil) {
 				CGImageSourceRef source = CGImageSourceCreateWithData((CFDataRef)jpegData, nil);
 				
@@ -503,22 +525,15 @@
 						CFRelease(imageRepresentation);
 						
 						if ((width > maximumSizeFloat) || (height > maximumSizeFloat)) {
-							if (previousData == nil) {
-								previousData = jpegData;
-							}
-							
 							break;
 						}
 					}
 					
 					previousData = jpegData;
-					index = [data rangeOfData:patternData options:0 range:NSMakeRange(index + 4, [data length] - index - 4)].location;
-					
-					continue;
 				}
 			}
-			
-			return jpegData;
+
+			index = [data rangeOfData:patternData options:0 range:NSMakeRange(index + 4, [data length] - index - 4)].location;
 		}
 		
 		return previousData;
@@ -533,14 +548,14 @@
 
 - (FMDatabase*) libraryDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
 
 - (FMDatabase*) previewsDatabase
 {
-	[[self class] _throwAbstractBaseClassExceptionForSelector:_cmd];
+	[[self class] imb_throwAbstractBaseClassExceptionForSelector:_cmd];
 	
 	return nil;
 }
@@ -548,12 +563,6 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-
-+ (void) _throwAbstractBaseClassExceptionForSelector:(SEL)inSelector
-{
-	NSString* reason = [NSString stringWithFormat:@"Abstract base class: Please override method %@ in subclass",NSStringFromSelector(inSelector)];
-	[[NSException exceptionWithName:@"IMBProgrammerError" reason:reason userInfo:nil] raise];
-}
 
 
 //----------------------------------------------------------------------------------------------------------------------

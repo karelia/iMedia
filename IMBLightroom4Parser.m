@@ -75,36 +75,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Check if Lightroom is installed...
+// Unique identifier for this parser...
 
-+ (NSString*) lightroomPath
++ (NSString*) identifier
 {
-	return [[NSWorkspace imb_threadSafeWorkspace] absolutePathForAppBundleWithIdentifier:@"com.adobe.Lightroom4"];
+	return @"com.karelia.imedia.Lightroom4";
 }
 
+// The bundle identifier of the Lightroom app this parser is based upon
 
-// Return an array to Lightroom library files...
-
-+ (NSArray*) libraryPaths
++ (NSString*) lightroomAppBundleIdentifier
 {
-	NSMutableArray* libraryPaths = [NSMutableArray array];
-    
-	CFStringRef recentLibrariesList = CFPreferencesCopyAppValue((CFStringRef)@"recentLibraries20",(CFStringRef)@"com.adobe.Lightroom4");
-	
-	if (recentLibrariesList) {
-        [self parseRecentLibrariesList:(NSString*)recentLibrariesList into:libraryPaths];
-        CFRelease(recentLibrariesList);
-	}
-	
-    if ([libraryPaths count] == 0) {
-		CFPropertyListRef activeLibraryPath = CFPreferencesCopyAppValue((CFStringRef)@"libraryToLoad20",(CFStringRef)@"com.adobe.Lightroom4");
-		
-		if (activeLibraryPath) {
-			CFRelease(activeLibraryPath);
-		}
-    }
-    
-	return libraryPaths;
+    return @"com.adobe.Lightroom4";
+}
+
+// Key in Lightroom app user defaults: which library to load
+
++ (NSString*) preferencesLibraryToLoadKey
+{
+    return @"libraryToLoad20";
+}
+
+// Key in Lightroom app user defaults: which libraries have been loaded recently
+
++ (NSString*) preferencesRecentLibrariesKey
+{
+    return @"recentLibraries20";
 }
 
 - (BOOL) checkDatabaseVersion

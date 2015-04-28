@@ -57,7 +57,7 @@
 
 // SANDBOXING: Requires com.apple.security.assets.pictures.read-only entitlment (provided user hasn't moved their photos elsewhere). Also com.apple.security.temporary-exception.shared-preference.read-only for com.adobe.Lightroom
 
-@interface IMBLightroom1Parser : IMBLightroomParser
+@interface IMBLightroom1Parser : IMBLightroomParser <IMBLightroomParser>
 {
 	
 }

@@ -44,6 +44,9 @@
 */
 
 
+//----------------------------------------------------------------------------------------------------------------------
+
+
 // Author: Pierre Bernard
 
 
@@ -67,27 +70,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 
-typedef enum { 
+typedef enum
+{ 
 	kIMBLightroomNodeTypeUnspecified = 0,
 	IMBLightroomNodeTypeFolder,
 	IMBLightroomNodeTypeCollection,
-	IMBLightroomNodeTypeRootCollection
-} 
+	IMBLightroomNodeTypeRootCollection,
+	IMBLightroomNodeTypeSmartCollection
+}
 IMBLightroomNodeType;
 
-
-//----------------------------------------------------------------------------------------------------------------------
-
-@interface IMBLightroomObject : IMBObject
-{
-	NSString* _absolutePyramidPath;
-	NSNumber* _idLocal;
-}
-
-@property (retain) NSString* absolutePyramidPath;
-@property (retain) NSNumber* idLocal;
-
-@end
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -105,21 +97,22 @@ IMBLightroomNodeType;
 	// instance across multiple threads, and we can't predict which thread we will be called on.
 	NSMutableDictionary* _databases;
 	NSMutableDictionary* _thumbnailDatabases;
-	NSSize _thumbnailSize;
 }
 
 @property (retain) NSString* appPath;
-@property (retain) NSString* dataPath;
+@property (retain) NSString* atomicDataPath;
 @property (assign) BOOL shouldDisplayLibraryName;
 @property (nonatomic, retain) NSMutableDictionary *databases;
 @property (nonatomic, retain) NSMutableDictionary *thumbnailDatabases;
 @property (retain,readonly) FMDatabase* database;
 @property (retain,readonly) FMDatabase* thumbnailDatabase;
 
-+ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
-+ (BOOL) isInstalled;
++ (NSString*) identifier;
++ (NSString*) lightroomPath;
 
-- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
+// Return an array to Lightroom library files...
++ (NSArray*) libraryPaths;
++ (void) parseRecentLibrariesList:(NSString*)inRecentLibrariesList into:(NSMutableArray*)inLibraryPaths;
 
 - (NSString*) rootNodeIdentifier;
 - (NSString*) identifierWithFolderId:(NSNumber*)inIdLocal;
@@ -131,7 +124,6 @@ IMBLightroomNodeType;
 							  pathFromRoot:(NSString*)inPathFromRoot
                                   nodeType:(IMBLightroomNodeType)inNodeType;
 
-- (NSImage*) largeFolderIcon;
 
 // Returns a cached FMDatabase for the current thread
 - (FMDatabase*) database;
@@ -148,9 +140,13 @@ IMBLightroomNodeType;
 @end
 
 
-@interface IMBLightroomParser (Abstract)
+//----------------------------------------------------------------------------------------------------------------------
 
-+ (NSString*) lightroomPath;
+
+@protocol IMBLightroomParser
+
+@required
+
 + (NSArray*) concreteParserInstancesForMediaType:(NSString*)inMediaType;
 
 - (NSString*) rootFolderQuery;
@@ -162,9 +158,36 @@ IMBLightroomNodeType;
 - (NSString*) folderObjectsQuery;
 - (NSString*) collectionObjectsQuery;
 
-- (NSImage*) folderIcon;
-- (NSImage*) groupIcon;
-- (NSImage*) collectionIcon;
++ (NSImage*) folderIcon;
++ (NSImage*) groupIcon;
++ (NSImage*) collectionIcon;
+
+@end
+
+
+@interface IMBLightroomParser (Subclassers)
+
+- (void) populateSubnodesForRootNode:(IMBNode*)inRootNode;
+- (void) populateSubnodesForRootFoldersNode:(IMBNode*)inFoldersNode;
+- (void) populateSubnodesForFolderNode:(IMBNode*)inParentNode;
+- (void) populateSubnodesForCollectionNode:(IMBNode*)inRootNode;
+- (void) populateSubnodesForSmartCollectionNode:(IMBNode*)inRootNode;
+- (void) populateObjectsForFolderNode:(IMBNode*)inNode;
+- (void) populateObjectsForCollectionNode:(IMBNode*)inNode;
+- (void) populateObjectsForSmartCollectionNode:(IMBNode*)inNode;
+
++ (IMBLightroomNodeType) nodeTypeForCreationId:(NSString *)creationId;
+
++ (NSImage*) largeFolderIcon;
+
+- (NSNumber*) idLocalFromAttributes:(NSDictionary*)inAttributes;
+- (BOOL) canOpenImageFileAtPath:(NSString*)inPath;
+- (IMBObject*) objectWithPath:(NSString*)inPath
+					  idLocal:(NSNumber*)idLocal
+						 name:(NSString*)inName
+				  pyramidPath:(NSString*)inPyramidPath
+					 metadata:(NSDictionary*)inMetadata
+						index:(NSUInteger)inIndex;
 
 @end
 
