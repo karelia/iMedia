@@ -109,14 +109,22 @@
 	if ([type isEqualToString:IKImageBrowserNSURLRepresentationType])
     {
         NSURL *url = [item imageRepresentation];
-        result = [[[CIImage alloc] initWithContentsOfURL:url] autorelease];
+		// We get crash if you try to drag in a PDF, so make sure this is a reasonable image
+		if ([@[@"jpeg", @"jpg", @"tif", @"tiff", @"png", @"gif"] containsObject:[[url pathExtension] lowercaseString]])
+		{
+			result = [[[CIImage alloc] initWithContentsOfURL:url] autorelease];
+		}
     }
     else if ([type isEqualToString:IKImageBrowserPathRepresentationType])
     {
         NSString *path = [item imageRepresentation];
-        result = [[CIImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:path]];
-        [result autorelease];
-    }
+		NSURL *url = [NSURL fileURLWithPath:path];
+		// We get crash if you try to drag in a PDF, so make sure this is a reasonable image
+		if ([@[@"jpeg", @"jpg", @"tif", @"tiff", @"png", @"gif"] containsObject:[[url pathExtension] lowercaseString]])
+		{
+			result = [[[CIImage alloc] initWithContentsOfURL:url] autorelease];
+		}
+	}
     else if ([type isEqualToString:IKImageBrowserNSDataRepresentationType])
     {
         NSData *data = [item imageRepresentation];
