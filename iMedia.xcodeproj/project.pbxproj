@@ -1976,6 +1976,7 @@
 			baseConfigurationReference = D0CF005310C50908009EC68F /* IMBTargetDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1984,6 +1985,7 @@
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				VALID_ARCHS = "i386 x86_64";
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1993,6 +1995,7 @@
 			baseConfigurationReference = D0CF005410C50908009EC68F /* IMBTargetRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2001,6 +2004,7 @@
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				VALID_ARCHS = "i386 x86_64";
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
@@ -2068,6 +2072,7 @@
 			baseConfigurationReference = D0CF005510C50908009EC68F /* IMBTargetTest.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_LINK_OBJC_RUNTIME = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -2076,6 +2081,7 @@
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				PRODUCT_NAME = iMedia;
 				VALID_ARCHS = "i386 x86_64";
+				SDKROOT = macosx10.9;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Test;
