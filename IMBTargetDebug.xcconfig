@@ -7,6 +7,8 @@
 // You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
 // is now referencing your own set of xcconfig files.
 
+#include "IMBProject.xcconfig"
+
 ONLY_ACTIVE_ARCH = YES
 
 COPY_PHASE_STRIP = NO

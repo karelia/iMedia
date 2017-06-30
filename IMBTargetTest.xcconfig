@@ -7,6 +7,7 @@
 // You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
 // is now referencing your own set of xcconfig files.
 
+#include "IMBProject.xcconfig"
 
 GCC_MODEL_TUNING = G5
 GCC_PRECOMPILE_PREFIX_HEADER = YES

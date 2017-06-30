@@ -7,6 +7,7 @@
 // You may have to relaunch XCode and clean you project to build with the new settings. Please verify that Xcode
 // is now referencing your own set of xcconfig files.
 
+#include "IMBProject.xcconfig"
 
 DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
 GCC_OPTIMIZATION_LEVEL = s
