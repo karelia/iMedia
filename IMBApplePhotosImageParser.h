@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2015 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2015 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -41,70 +41,24 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
+
+
+// Author: Jörg Jacobsen, Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
+#pragma mark HEADERS
 
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
+#import "IMBApplePhotosParser.h"
 
-// Model...
 
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-#import <iMedia/IMBLightroomObject.h>
+@interface IMBApplePhotosImageParser : IMBApplePhotosParser
+{
+}
 
-// Parsers...
-
-#import <iMedia/IMBParser.h>
-#import <iMedia/IMBFolderParser.h>
-#import <iMedia/IMBImageFolderParser.h>
-#import <iMedia/IMBiPhotoParser.h>
-#import <iMedia/IMBiTunesParser.h>
-#import <iMedia/IMBApertureParser.h>
-#import <iMedia/IMBLightroomParser.h>
-#import <iMedia/IMBImageCaptureParser.h>
-#import <iMedia/IMBFlickrParser.h>
-#import <iMedia/IMBGarageBandParser.h>
-
-// Controllers...
-
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
-
-// Views...
-
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
-
-// Categories...
-
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
-
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
-
-

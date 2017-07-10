@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2015 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -21,7 +21,7 @@
  
 	Redistributions of source code must retain the original terms stated here,
 	including this list of conditions, the disclaimer noted below, and the
-	following copyright notice: Copyright (c) 2005-2012 by Karelia Software et al.
+	following copyright notice: Copyright (c) 2005-2015 by Karelia Software et al.
  
 	Redistributions in binary form must include, in an end-user-visible manner,
 	e.g., About window, Acknowledgments window, or similar, either a) the original
@@ -41,70 +41,61 @@
  LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH, THE
  SOFTWARE OR THE USE OF, OR OTHER DEALINGS IN, THE SOFTWARE.
-*/
+ */
+
+
+// Author: Jörg Jacobsen, Pierre Bernard
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
 
-// Common...
+#pragma mark HEADERS
 
-#import <iMedia/IMBCommon.h>
-#import <iMedia/IMBConfig.h>
-#import <iMedia/IMBOperationQueue.h>
-#import <iMedia/IMBIconCache.h>
+#import "IMBParser.h"
 
-// Model...
+#import <MediaLibrary/MediaLibrary.h>
 
-#import <iMedia/IMBNode.h>
-#import <iMedia/IMBObject.h>
-#import <iMedia/IMBObjectsPromise.h>
-#import <iMedia/IMBFlickrNode.h>
-#import <iMedia/IMBLightroomObject.h>
 
-// Parsers...
+/**
+ Reverse-engineered keys of the Photos app media source's attributes.
 
-#import <iMedia/IMBParser.h>
-#import <iMedia/IMBFolderParser.h>
-#import <iMedia/IMBImageFolderParser.h>
-#import <iMedia/IMBiPhotoParser.h>
-#import <iMedia/IMBiTunesParser.h>
-#import <iMedia/IMBApertureParser.h>
-#import <iMedia/IMBLightroomParser.h>
-#import <iMedia/IMBImageCaptureParser.h>
-#import <iMedia/IMBFlickrParser.h>
-#import <iMedia/IMBGarageBandParser.h>
+ Apple doesn't seem to yet publicly define these constants anywhere.
+ */
+extern NSString * const kIMBApplePhotosParserMediaSourceAttributeIdentifier;
 
-// Controllers...
+/**
+ Only supported by Photos media source (as of OS X 10.10.3)
+ */
+extern NSString * const kIMBApplePhotosParserMediaSourceAttributeLibraryURL;
 
-#import <iMedia/IMBParserController.h>
-#import <iMedia/IMBLibraryController.h>
-#import <iMedia/IMBNodeTreeController.h>
-#import <iMedia/IMBObjectArrayController.h>
-#import <iMedia/IMBNodeViewController.h>
-#import <iMedia/IMBObjectViewController.h>
-#import <iMedia/IMBImageViewController.h>
-#import <iMedia/IMBPanelController.h>
 
-// Views...
+/**
+ Base class for parser classes that support different Apple Photos app media types.
+ */
+@interface IMBApplePhotosParser : IMBParser
+{
+	NSString *_appPath;
+	MLMediaLibrary *_appleMediaLibrary;
+	MLMediaSource *_appleMediaSource;
+	NSString *_identifierPrefix;
+}
 
-#import <iMedia/IMBOutlineView.h>
-#import <iMedia/IMBNodeCell.h>
-#import <iMedia/IMBTableView.h>
-#import <iMedia/IMBComboTableView.h>
-#import <iMedia/IMBImageBrowserView.h>
+/**
+ Path to library's original app.
+ */
+@property (copy) NSString *appPath;
 
-// Categories...
+/**
+ The root library object (providing possibly multiple media sources from different apps).
+ */
+@property (retain) MLMediaLibrary *appleMediaLibrary;
 
-#import <iMedia/NSFileManager+iMedia.h>
-#import <iMedia/NSWorkspace+iMedia.h>
-#import <iMedia/NSString+iMedia.h>
-#import <iMedia/NSImage+iMedia.h>
-//#import <iMedia/NSDictionary+iMedia.h>
-//#import <iMedia/NSView+iMedia.h>
-#import <iMedia/NSURL+iMedia.h>
+/**
+ An MLMediaSource (an app's library) in Apple speak is not a mediaSource (a library's URL) in iMedia speak.
+ */
+@property (retain) MLMediaSource *appleMediaSource;
 
+@end
 
 //----------------------------------------------------------------------------------------------------------------------
-
-

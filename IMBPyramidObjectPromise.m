@@ -1,7 +1,7 @@
 /*
  iMedia Browser Framework <http://karelia.com/imedia/>
  
- Copyright (c) 2005-2012 by Karelia Software et al.
+ Copyright (c) 2005-2015 by Karelia Software et al.
  
  iMedia Browser is based on code originally developed by Jason Terhorst,
  further developed for Sandvox by Greg Hulands, Dan Wood, and Terrence Talbot.
@@ -56,6 +56,10 @@
 #import "IMBLightroom1Parser.h"
 #import "IMBLightroom2Parser.h"
 #import "IMBLightroom3Parser.h"
+#import "IMBLightroom4Parser.h"
+#import "IMBLightroom5Parser.h"
+#import "IMBLightroom6Parser.h"
+#import "IMBLightroomObject.h"
 #import "NSFileManager+iMedia.h"
 #import "NSWorkspace+iMedia.h"
 
@@ -73,6 +77,7 @@
 @interface IMBPyramidObjectPromise ()
 
 + (NSURL*) placeholderImageUrl;
++ (NSURL*) errorImageUrl;
 
 @end
 
@@ -205,7 +210,7 @@
 		return [NSURL fileURLWithPath:imagePath];
 	}
 	
-	return nil;
+	return [self errorImageUrl];
 }
 
 + (NSURL*) placeholderImageUrl
@@ -284,7 +289,10 @@
 	[[NSColor colorWithDeviceRed:0.1 green:0.1 blue:0.1 alpha:1.0] set];
 	NSRectFill(imageBounds);
 	
-	NSString* lightroomPath = [IMBLightroom3Parser lightroomPath];
+	NSString* lightroomPath = [IMBLightroom6Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom5Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom4Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom3Parser lightroomPath];
 	if (lightroomPath == nil) lightroomPath = [IMBLightroom2Parser lightroomPath];
 	if (lightroomPath == nil) lightroomPath = [IMBLightroom1Parser lightroomPath];
 	if (lightroomPath)
@@ -327,4 +335,125 @@
 	return url;
 }
 
++ (NSURL*) errorImageUrl
+{
+	static NSURL *errorImageUrl = nil;
+	
+	if (errorImageUrl != nil) {
+		NSString *errorImagePath = [errorImageUrl path];
+		NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+
+		if ([fm isReadableFileAtPath:errorImagePath]) {
+			return errorImageUrl;
+		}
+	}
+	
+	NSString *message1 = NSLocalizedStringWithDefaultValue(
+		@"IMB.IMBPyramidObjectPromise.ErrorMessage1",
+		nil,
+		IMBBundle(),
+		@"Processed image could not be extracted.\n",
+		@"Message to export when JPEG cannot be extracted from Pyramid");
+														  
+	NSString *message2 = NSLocalizedStringWithDefaultValue(
+		@"IMB.IMBPyramidObjectPromise.ErrorMessage2",
+		nil,
+		IMBBundle(),
+		@"Please make sure you have sufficient access rights.",
+		@"Message to export when JPEG cannot be extracted from Pyramid");
+
+	NSMutableParagraphStyle* style = [[[NSMutableParagraphStyle alloc] init] autorelease];
+	[style setAlignment:NSCenterTextAlignment];
+
+	NSDictionary *attributes1 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[NSFont boldSystemFontOfSize:24.0],NSFontAttributeName, 
+		[NSColor whiteColor],NSForegroundColorAttributeName,
+		style,NSParagraphStyleAttributeName,
+		nil];
+								
+	NSDictionary *attributes2 = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[NSFont boldSystemFontOfSize:16.0],NSFontAttributeName, 
+		[NSColor grayColor],NSForegroundColorAttributeName,
+		style,NSParagraphStyleAttributeName,
+		nil];
+
+	NSMutableAttributedString *string = [[[NSMutableAttributedString alloc] 
+		initWithString:message1 
+		attributes:attributes1] 
+		autorelease];
+
+	[string appendAttributedString:[[[NSMutableAttributedString alloc] 
+		initWithString:message2 
+		attributes:attributes2] 
+		autorelease]];
+		
+	NSFileManager *fm = [NSFileManager imb_threadSafeManager];
+	NSString *jpegPath = [[fm imb_uniqueTemporaryFile:@"LightroomError"] stringByAppendingPathExtension:@"jpg"];
+	NSSize imageSize = NSMakeSize(640.0,480.0);
+	NSRect imageBounds =  NSMakeRect(0.0,0.0,imageSize.width,imageSize.height);
+	
+	NSBitmapImageRep *bitmapImage = [[[NSBitmapImageRep alloc] 
+		initWithBitmapDataPlanes:NULL 
+		pixelsWide:imageSize.width 
+		pixelsHigh:imageSize.height 
+		bitsPerSample:8 
+		samplesPerPixel:4 
+		hasAlpha:YES 
+		isPlanar:NO
+		colorSpaceName:NSCalibratedRGBColorSpace 
+		bytesPerRow:0 
+		bitsPerPixel:0] autorelease];
+	
+	[NSGraphicsContext saveGraphicsState];
+	NSGraphicsContext *nsContext = [NSGraphicsContext graphicsContextWithBitmapImageRep:bitmapImage];
+	[NSGraphicsContext setCurrentContext:nsContext];
+
+	[[NSColor colorWithDeviceRed:0.1 green:0.1 blue:0.1 alpha:1.0] set];
+	NSRectFill(imageBounds);
+	
+	NSString* lightroomPath = [IMBLightroom6Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom5Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom4Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom3Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom2Parser lightroomPath];
+	if (lightroomPath == nil) lightroomPath = [IMBLightroom1Parser lightroomPath];
+	if (lightroomPath)
+	{
+		NSImage* lightroomIcon = [[NSWorkspace imb_threadSafeWorkspace] iconForFile:lightroomPath];
+		if (lightroomIcon)
+		{
+			NSRect lightroomRect = NSMakeRect(256.0,230.0,128.0,128.0);
+			[lightroomIcon drawInRect:lightroomRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+		}	
+	}
+	
+	NSString* cautionPath = @"/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertCautionIcon.icns";
+	NSImage* cautionIcon = [[[NSImage alloc] initWithContentsOfFile:cautionPath] autorelease];
+	if (cautionIcon)
+	{
+		NSRect cautionRect = NSMakeRect(347.0,228.0,64.0,64.0);
+		[cautionIcon drawInRect:cautionRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	}
+	
+	NSRect stringRect = NSMakeRect(64.0,64.0,512.0,156.0);
+	[string drawInRect:stringRect];
+	
+	[NSGraphicsContext restoreGraphicsState];
+
+	NSData *data = [bitmapImage representationUsingType:NSJPEGFileType properties:nil];
+	NSURL *url = [NSURL fileURLWithPath:jpegPath];
+	BOOL status = [data writeToURL:url atomically:YES];
+	
+	
+  	if (status == NO) {
+		NSLog(@"%s Failed to write %@", __FUNCTION__, jpegPath);
+		
+		return nil;
+	}
+	
+	[errorImageUrl release];
+	errorImageUrl = [url retain];
+	
+	return url;
+}
 @end
